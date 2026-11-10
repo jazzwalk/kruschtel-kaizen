@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Kruschtel-Kaizen">
+<meta name="theme-color" content="#f1e4d4" id="themecolor">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="description" content="Kruschtel-Kaizen: Ausmisten Raum für Raum, jeden Tag ein kleiner Schritt.">
+<title>Kruschtel-Kaizen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --paper:#f1e4d4; --paper2:#e8d6c2; --sheet:#faf3ea; --ink:#3a2a26; --soft:#7a645b; --hair:#dcc8b4; --wall:#f6ebdd;
+  --teal:#2f6f6a; --saffron:#e0a43a; --rose:#c97a7e; --olive:#8a8f45; --plum:#5b3d55; --light:#f6c66b; --sky1:#f9d9a8; --sky2:#fbefe0;
+  --serif:"Young Serif",Georgia,serif; --sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+  --grain:.07; color-scheme:light;
+}
+html[data-theme=dark]{
+  --paper:#2a201d; --paper2:#3a2d28; --sheet:#352823; --ink:#f3e6d6; --soft:#bba696; --hair:#54443d; --wall:#30251f;
+  --sky1:#e98f5a; --sky2:#5b3d55; --light:#ffcf7a; --grain:.12; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent;
+  padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) 0 env(safe-area-inset-left,0)}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:var(--grain);z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.18 0 0 0 0 0.1 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+html[data-theme=dark] :focus-visible{outline-color:var(--light)}
+.app{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:22px 22px 120px}
+h1,h2,h3{font-family:var(--serif);font-weight:400;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(48px,15vw,72px);line-height:.95}
+h1.title{font-size:clamp(40px,12.5vw,64px);line-height:1}
+h2{font-size:30px;line-height:1.1}
+h3{font-size:21px;line-height:1.2}
+p{margin:0}
+a{color:inherit}
+.lede{color:var(--soft);font-size:17px;margin-top:10px;max-width:30ch}
+.soft{color:var(--soft)}
+.small{font-size:14px}
+.stack>*+*{margin-top:22px}
+.btn{display:block;width:100%;border:0;border-radius:999px;padding:15px 22px;font-weight:600;font-size:16px;background:var(--ink);color:var(--paper);cursor:pointer;min-height:52px;text-align:center;text-decoration:none}
+.btn:disabled{opacity:.35;cursor:default}
+.btn.line{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.btn.text{background:none;color:var(--soft);padding:10px;min-height:44px;text-decoration:underline;text-underline-offset:3px}
+.btn.sm{width:auto;display:inline-block;padding:9px 16px;min-height:42px;font-size:15px}
+.row{display:flex;gap:10px}.row>*{flex:1}
+/* Einrichtung */
+.steps{display:flex;gap:6px;margin-top:26px}
+.steps i{flex:1;height:3px;border-radius:2px;background:var(--hair)}
+.steps i.on{background:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:0;border-radius:999px;padding:11px 16px;background:var(--sheet);box-shadow:inset 0 0 0 1px var(--hair);cursor:pointer;font-weight:500;font-size:15px;min-height:46px;display:inline-flex;align-items:center;gap:8px}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--paper);box-shadow:none}
+.chip .big{font-size:12px;opacity:.65}
+.chip .x{margin-left:2px;opacity:.6;padding:4px}
+.add{display:flex;gap:8px;align-items:center}
+.add input[type=text]{flex:1;min-width:0;border:0;border-bottom:1.5px solid var(--ink);background:transparent;padding:10px 2px;font-size:16px;border-radius:0}
+.add label{font-size:14px;color:var(--soft);display:flex;gap:6px;align-items:center;white-space:nowrap}
+.add input[type=checkbox]{accent-color:var(--ink);width:18px;height:18px}
+.add .btn{width:auto;padding:10px 18px;min-height:44px}
+.mlist{display:flex;flex-direction:column;gap:10px}
+.mopt{display:grid;grid-template-columns:1fr 26px;gap:12px;text-align:left;border:0;background:var(--sheet);box-shadow:inset 0 0 0 1px var(--hair);border-radius:20px;padding:16px 18px;cursor:pointer;align-items:start}
+.mopt b{font-family:var(--serif);font-weight:400;font-size:20px;display:block;line-height:1.2}
+.mopt span{color:var(--soft);font-size:14px;display:block;margin-top:4px}
+.ck{width:26px;height:26px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--soft);display:grid;place-items:center;margin-top:2px;transition:background .25s,box-shadow .25s}
+.mopt[aria-pressed=true]{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.mopt[aria-pressed=true] .ck{background:var(--olive);box-shadow:none}
+.ck svg{width:20px;height:20px}
+/* Woche */
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.wk{font-family:var(--serif);font-size:15px;color:var(--soft)}
+.scene{position:relative;margin:10px -10px 0;border-radius:28px;overflow:hidden;background:var(--wall);box-shadow:inset 0 0 0 1px var(--hair)}
+.scene svg,.cell svg{display:block;width:100%;height:auto;color:var(--ink)}
+.room{font-size:clamp(40px,12vw,56px);line-height:1;margin-top:20px}
+.meth{display:inline-block;margin-top:10px;font-size:15px;font-weight:600;padding:5px 14px;border-radius:999px;color:#faf3ea}
+.m-km{background:var(--rose)}.m-vk{background:var(--saffron);color:#3a2a26}.m-mg{background:var(--olive)}.m-tt{background:var(--teal)}.m-ds{background:var(--plum)}.m-zz{background:#9a6a4e}
+.count{font-family:var(--serif);font-size:15px;color:var(--soft);white-space:nowrap}
+details.how{background:var(--sheet);border-radius:22px;padding:4px 18px}
+details.how summary{cursor:pointer;list-style:none;padding:14px 0;font-family:var(--serif);font-size:19px;display:flex;justify-content:space-between;align-items:center}
+details.how summary::-webkit-details-marker{display:none}
+details.how summary:after{content:"+";font-family:var(--sans);font-size:22px;color:var(--soft)}
+details.how[open] summary:after{content:"–"}
+details.how p{padding-bottom:12px;max-width:62ch}
+.rule{font-family:var(--serif);font-size:18px;line-height:1.35;border-left:2px solid var(--ink);padding-left:12px;margin-bottom:16px}
+.tasks{list-style:none;margin:0;padding:0}
+.task{display:grid;grid-template-columns:30px 1fr auto;gap:14px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--hair);padding:16px 2px;cursor:pointer;align-items:start;font-size:16px;line-height:1.4}
+.tasks li:last-child .task{border-bottom:1px solid var(--hair)}
+.task .c{width:28px;height:28px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--soft);display:grid;place-items:center;transition:background .25s,box-shadow .25s,transform .2s}
+.task .c svg{width:22px;height:22px}
+.task:active .c{transform:scale(.9)}
+.task[aria-pressed=true] .c{background:var(--olive);box-shadow:none}
+.task[aria-pressed=true] .t{color:var(--soft);text-decoration:line-through;text-decoration-color:var(--hair);text-decoration-thickness:1.5px}
+.task .n{font-family:var(--serif);font-size:14px;color:var(--soft);padding-top:2px}
+.gate{font-size:14px;color:var(--soft);margin-top:14px}
+/* Zähler */
+.tally{background:var(--sheet);border-radius:24px;padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:6px 14px;align-items:center}
+.tally .big{font-family:var(--serif);font-size:56px;line-height:.9;font-variant-numeric:tabular-nums}
+.tally .lbl{color:var(--soft);font-size:14px}
+.tally .pm{display:flex;gap:6px;grid-row:1 / 3;grid-column:2}
+.tally .pm button{width:52px;height:52px;border-radius:50%;border:0;background:var(--paper);box-shadow:inset 0 0 0 1px var(--hair);font-size:18px;font-weight:600;cursor:pointer}
+.tally .pm button.plus{background:var(--ink);color:var(--paper);box-shadow:none}
+.tally .links{grid-column:1 / 3;display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;font-size:14px}
+.tally .links button{background:none;border:0;padding:6px 0;color:var(--soft);text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:36px}
+.bump{animation:bump .35s ease}
+@keyframes bump{40%{transform:scale(1.12)}}
+.paused{background:var(--sheet);border-radius:24px;padding:22px;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.paused svg{width:64px;height:64px;color:var(--soft)}
+/* Stillleben */
+.obj{transition:opacity .8s ease,transform .8s ease;transform-box:fill-box;transform-origin:50% 100%}
+.obj.gone{opacity:0;transform:translateY(-12px) scale(.9)}
+.sun{transition:transform 1.2s ease,opacity 1s ease}
+.dim .obj{filter:saturate(.3) opacity(.8)}
+/* Plan */
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 14px}
+.cell svg{border-radius:18px;box-shadow:inset 0 0 0 1px var(--hair)}
+.cell.now svg{box-shadow:0 0 0 2px var(--ink)}
+.cell.lock{opacity:.6}
+.cell b{display:block;font-family:var(--serif);font-weight:400;font-size:17px;margin-top:8px;line-height:1.2}
+.cell span{font-size:13px;color:var(--soft)}
+.order{list-style:none;padding:0;margin:0}
+.order li{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--hair)}
+.order li:last-child{border-bottom:1px solid var(--hair)}
+.order b{font-family:var(--serif);font-weight:400;color:var(--soft)}
+.order .nm{font-weight:600}
+.order .nm small{display:block;font-weight:400;color:var(--soft);font-size:13px}
+.order .mv{display:flex;gap:6px}
+.order .mv button{width:42px;height:42px;border-radius:50%;border:0;background:var(--sheet);box-shadow:inset 0 0 0 1px var(--hair);cursor:pointer;font-size:16px}
+.order .mv button:disabled{opacity:.25}
+.order .fixed{font-size:13px;color:var(--soft)}
+/* Abgabe */
+.give{list-style:none;padding:0;margin:0}
+.give li{display:grid;grid-template-columns:30px 1fr auto;gap:12px;align-items:center;padding:13px 0;border-top:1px solid var(--hair)}
+.give li:last-child{border-bottom:1px solid var(--hair)}
+.give .c{width:28px;height:28px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--soft);display:grid;place-items:center;border:0;background:none;cursor:pointer;padding:0;transition:background .25s,box-shadow .25s}
+.give .c svg{width:22px;height:22px}
+.give li.done .c{background:var(--olive);box-shadow:none}
+.give li.done .tt{color:var(--soft);text-decoration:line-through}
+.give .tt small{display:block;color:var(--soft);font-size:13px;text-decoration:none}
+.give .del{background:none;border:0;color:var(--soft);font-size:18px;cursor:pointer;width:40px;height:40px}
+.form{display:flex;flex-direction:column;gap:10px}
+.form input[type=text]{border:0;border-bottom:1.5px solid var(--ink);background:transparent;padding:10px 2px;font-size:16px;border-radius:0;width:100%}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:0;border-radius:999px;padding:8px 14px;background:var(--paper);box-shadow:inset 0 0 0 1px var(--hair);cursor:pointer;font-size:14px;min-height:40px}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--paper);box-shadow:none}
+.portals{display:flex;flex-direction:column;gap:18px}
+.pgroup h3{font-size:19px;margin-bottom:4px}
+.pgroup>p{margin-bottom:6px}
+.plink{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 0;border-top:1px solid var(--hair);text-decoration:none}
+.plink:last-child{border-bottom:1px solid var(--hair)}
+.plink b{font-weight:600}
+.plink span{grid-column:1;color:var(--soft);font-size:14px}
+.plink i{grid-row:1 / 3;grid-column:2;align-self:center;font-style:normal;font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px;background:var(--paper2)}
+/* Mehr */
+.panel{background:var(--sheet);border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:12px}
+select{flex:1;border:0;border-radius:14px;background:var(--paper);padding:12px;font-size:16px;box-shadow:inset 0 0 0 1px var(--hair)}
+textarea{width:100%;min-height:120px;border-radius:14px;border:0;box-shadow:inset 0 0 0 1px var(--hair);background:var(--paper);padding:12px;font:12px ui-monospace,monospace;color:var(--ink)}
+/* Navigation */
+.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;padding:14px 12px calc(12px + env(safe-area-inset-bottom,0));background:linear-gradient(transparent,var(--paper) 40%);z-index:5;pointer-events:none}
+.tabs div{display:flex;gap:2px;background:var(--ink);border-radius:999px;padding:5px;pointer-events:auto;box-shadow:0 10px 30px rgba(42,30,26,.28)}
+.tabs button{border:0;background:none;color:var(--paper2);border-radius:999px;padding:10px 11px;font-weight:600;font-size:13.5px;cursor:pointer;min-height:44px}
+.tabs button.on{background:var(--paper);color:var(--ink)}
+/* Dialog */
+.modal{position:fixed;inset:0;background:rgba(42,30,26,.5);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+.sheetd{width:100%;max-width:520px;max-height:92vh;overflow:auto;background:var(--sheet);border-radius:28px 28px 0 0;padding:26px 22px calc(22px + env(safe-area-inset-bottom,0));display:flex;flex-direction:column;gap:16px;animation:up .35s ease}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0));transform:translateX(-50%);background:var(--ink);color:var(--paper);border-radius:999px;padding:9px 18px;font-size:14px;font-weight:600;z-index:20;white-space:nowrap}
+.buddy{display:grid;grid-template-columns:84px 1fr;gap:14px;align-items:center;margin-top:18px}
+.buddy.big{grid-template-columns:120px 1fr;margin-top:22px}
+.buddy button{background:none;border:0;padding:0;cursor:pointer;display:block}
+.buddy svg{width:100%;height:auto;display:block;overflow:visible}
+.bubble{position:relative;background:var(--sheet);border-radius:20px;padding:12px 16px;font-size:15px;line-height:1.4;box-shadow:inset 0 0 0 1px var(--hair)}
+.bubble:before{content:"";position:absolute;left:-6px;top:50%;width:12px;height:12px;background:var(--sheet);transform:translateY(-50%) rotate(45deg);box-shadow:-1px 1px 0 0 var(--hair)}
+.bubble b{font-family:var(--serif);font-weight:400}
+.mascot{transform-origin:50% 100%}
+.mascot.hop{animation:hop .45s ease 2}
+@keyframes hop{30%{transform:translateY(-12px) scale(1.04,.96)}60%{transform:translateY(0) scale(1.06,.92)}}
+.mascot .eye{transform-box:fill-box;transform-origin:center;animation:blink 5s infinite}
+@keyframes blink{0%,95%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.mascot .tuft{transform-box:fill-box;transform-origin:50% 100%;animation:tuft 5s ease-in-out infinite}
+.mascot .tuft.r{animation-delay:-2.5s}
+@keyframes tuft{0%,85%,100%{transform:rotate(0)}90%{transform:rotate(-12deg)}95%{transform:rotate(8deg)}}
+.mascot .body{transform-box:fill-box;transform-origin:50% 100%;animation:breathe 3.6s ease-in-out infinite}
+.mascot .tail{transform-box:view-box;transform-origin:68px 92px;animation:wag 3s ease-in-out infinite}
+@keyframes wag{0%,100%{transform:rotate(0)}50%{transform:rotate(-6deg)}}
+@keyframes breathe{50%{transform:scale(1.015,.985)}}
+.mascot .spark{animation:spark 1.6s ease-in-out infinite}
+@keyframes spark{50%{opacity:.2}}
+.center{text-align:center}
+.tasks li.own{display:grid;grid-template-columns:1fr auto;align-items:center}
+.tasks .tdel{background:none;border:0;color:var(--soft);font-size:17px;width:40px;height:40px;cursor:pointer}
+.tasks li.own .task{border-top:1px solid var(--hair)}
+.addt{display:flex;flex-direction:column;gap:8px;margin:14px 0 6px}
+.addt .row2{display:flex;gap:8px;align-items:center}
+.addt input[type=text]{flex:1;min-width:0;border:0;border-bottom:1.5px solid var(--ink);background:transparent;padding:10px 2px;font-size:16px;border-radius:0}
+.addt label{font-size:13px;color:var(--soft);display:flex;gap:8px;align-items:center}
+.addt input[type=checkbox]{accent-color:var(--olive);width:18px;height:18px}
+.addt .btn{width:auto;padding:10px 18px;min-height:44px}
+.ownb{font-size:11px;font-weight:600;color:var(--soft);border:1px solid var(--hair);border-radius:999px;padding:1px 7px;margin-left:6px;white-space:nowrap}
+.mini{background:none;border:0;color:var(--paper2);font-size:14px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:4px 0;align-self:flex-start}
+.today.light .mini{color:var(--soft)}
+.timer{font-family:var(--serif);font-size:56px;text-align:center;font-variant-numeric:tabular-nums;line-height:1}
+.mtask{font-family:var(--serif);font-size:24px;line-height:1.25;text-align:center}
+.qty{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.qty button{border:0;border-radius:16px;padding:12px 4px;background:var(--paper);box-shadow:inset 0 0 0 1px var(--hair);font-weight:600;cursor:pointer;min-height:48px}
+.shareimg{width:100%;border-radius:18px;box-shadow:0 8px 30px rgba(42,30,26,.2)}
+.cell.done{cursor:pointer}
+.cell .shr{font-size:12px;color:var(--soft);text-decoration:underline;text-underline-offset:2px}
+.tipc{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start;background:var(--sheet);border-radius:22px;padding:16px 18px;margin-top:14px;box-shadow:inset 0 0 0 1px var(--hair)}
+.tipc svg{width:30px;height:30px}
+.tipc h4{margin:0;font-family:var(--serif);font-weight:400;font-size:17px}
+.tipc h4 span{font-family:var(--sans);font-size:13px;color:var(--soft);margin-left:6px}
+.tipc p{margin:4px 0 0;font-size:15px;line-height:1.45}
+.tipc .acts{display:flex;column-gap:18px;row-gap:0;flex-wrap:wrap;margin-top:4px;align-items:center}
+.tipc .acts button{background:none;border:0;padding:6px 0;color:var(--soft);text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-size:14px}
+.quiz{display:flex;flex-direction:column;gap:10px}
+.quiz .qopt{text-align:left;border:0;background:var(--paper);box-shadow:inset 0 0 0 1px var(--hair);border-radius:18px;padding:14px 16px;cursor:pointer}
+.quiz .qopt b{display:block;font-family:var(--serif);font-weight:400;font-size:19px}
+.quiz .qopt span{color:var(--soft);font-size:14px}
+.cbres{font-family:var(--serif);font-size:28px;line-height:1.1}
+.c svg path,.ck svg path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .35s ease .05s}
+.task[aria-pressed=true] .c svg path,.mopt[aria-pressed=true] .ck svg path,.give li.done .c svg path{stroke-dashoffset:0}
+.today{background:var(--ink);color:var(--paper);border-radius:26px;padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px}
+.today .buddy{margin:0;grid-template-columns:60px 1fr;gap:10px}
+.today .bubble{background:transparent;box-shadow:none;padding:0;font-size:14px;color:var(--paper2)}
+.today .bubble:before{display:none}
+.today.light .bubble{color:var(--soft)}
+.today .tt2.sm{font-size:19px}
+.today .tsub{font-size:13px;color:var(--paper2);margin:0}
+.today.light .tsub{color:var(--soft)}
+.tbar{height:4px;border-radius:2px;background:rgba(255,255,255,.18);overflow:hidden;margin-top:4px}
+.today.light .tbar{background:var(--hair)}
+.tbar i{display:block;height:100%;background:var(--light);transition:width .5s}
+.today.light .tbar i{background:var(--ink)}
+.dots{display:inline-flex;gap:5px;align-items:center}
+.dots i{width:8px;height:8px;border-radius:50%;box-shadow:inset 0 0 0 1.4px currentColor;opacity:.7}
+.dots i.past{background:currentColor;opacity:.5}
+.dots i.cur{background:var(--light);box-shadow:none;opacity:1;width:10px;height:10px}
+.today.light .dots i.cur{background:var(--ink)}
+.dots em{font-style:normal;font-size:12px;margin-left:2px}
+.mbtn{border:0;cursor:pointer;margin:0;font:inherit;font-size:13px;font-weight:600}
+.head2{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.head2 .room{margin:2px 0 0;font-size:clamp(34px,10vw,44px)}
+.head2 .mbtn{flex:none;margin-bottom:6px}
+.strip{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--sheet);border-radius:22px;padding:12px 12px 12px 18px;margin-top:12px;box-shadow:inset 0 0 0 1px var(--hair)}
+.strip .sn{display:flex;align-items:center;gap:12px}
+.strip .sn b{font-family:var(--serif);font-weight:400;font-size:36px;line-height:1;font-variant-numeric:tabular-nums}
+.strip .sn>span{font-size:13px;color:var(--soft);line-height:1.3}
+.strip .pm{display:flex;gap:6px}
+.strip .pm button{width:46px;height:46px;border-radius:50%;border:0;background:var(--paper);box-shadow:inset 0 0 0 1px var(--hair);font-size:17px;font-weight:600;cursor:pointer}
+.strip .pm button.plus{background:var(--ink);color:var(--paper);box-shadow:none}
+.links{display:flex;gap:16px;margin:4px 0 0 6px;font-size:14px}
+.links button{background:none;border:0;padding:8px 0;color:var(--soft);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+details.list{margin-top:14px}
+details.list summary .soft{font-family:var(--sans);font-size:14px;margin-left:auto;margin-right:12px}
+.today .tl{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--paper2);font-weight:600}
+.today .tt2{font-family:var(--serif);font-size:23px;line-height:1.2}
+.today .soft{color:var(--paper2)}
+.today .btn{background:var(--paper);color:var(--ink)}
+.today .btn.line{background:transparent;color:var(--paper);box-shadow:inset 0 0 0 1.5px var(--paper)}
+.today.light{background:var(--sheet);color:var(--ink);box-shadow:inset 0 0 0 1px var(--hair)}
+.today.light .tl,.today.light .soft{color:var(--soft)}
+.today.light .btn{background:var(--ink);color:var(--paper)}
+.today.light .btn.line{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.month{font-family:var(--serif);font-size:20px;margin:26px 0 6px}
+.cal{list-style:none;margin:0;padding:0}
+.cal li{display:grid;grid-template-columns:54px 1fr;gap:14px;align-items:center;padding:12px 0;border-top:1px solid var(--hair)}
+.cal li:last-child{border-bottom:1px solid var(--hair)}
+.cal .dt{text-align:center;border-radius:16px;padding:6px 0;background:var(--sheet);box-shadow:inset 0 0 0 1px var(--hair)}
+.cal .dt b{display:block;font-family:var(--serif);font-weight:400;font-size:24px;line-height:1}
+.cal .dt span{font-size:12px;color:var(--soft)}
+.cal li.now .dt{background:var(--ink);color:var(--paper);box-shadow:none}.cal li.now .dt span{color:var(--paper2)}
+.cal li.done{opacity:.6}
+.cal .rm{font-weight:600;line-height:1.3}
+.cal .sub{font-size:13px;color:var(--soft);margin-top:3px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.cal .meth{margin:0;font-size:12px;padding:2px 10px}
+.danger{color:#a8483f;box-shadow:inset 0 0 0 1.5px #a8483f!important}
+html[data-theme=dark] .danger{color:#e89b8f;box-shadow:inset 0 0 0 1.5px #e89b8f!important}
+#roll{display:flex;align-items:center;justify-content:center;gap:10px}
+.dice{display:inline-block;width:24px;height:24px}.dice svg{width:24px;height:24px;display:block}
+.dice.roll{animation:roll .45s ease}
+@keyframes roll{to{transform:rotate(360deg) scale(.8)}}.center svg{margin:0 auto}
+@media (prefers-reduced-motion:reduce){.obj,.sun,.task .c,.task .c svg{transition:none}.sheetd,.bump,.c svg path,.ck svg path{transition:none}.dice.roll,.mascot.hop,.mascot .eye,.mascot .tuft,.mascot .body,.mascot .tail,.mascot .spark{animation:none}}
+</style>
+</head>
+<body>
+<main id="app" class="app"></main>
+<nav class="tabs" id="tabs" hidden><div>
+  <button data-tab="woche" class="on">Heute</button>
+  <button data-tab="plan">Plan</button>
+  <button data-tab="kalender">Kalender</button>
+  <button data-tab="abgabe">Abgabe</button>
+  <button data-tab="mehr">Mehr</button>
+</div></nav>
+<div class="modal" id="dlg" hidden><div class="sheetd" id="dlgbox" role="dialog" aria-modal="true"></div></div>
+
+<script id="core">
+var PRESETS=[
+  {id:'ku',name:'Küche',big:true,on:true},{id:'wz',name:'Wohnzimmer',big:true,on:true},{id:'sz',name:'Schlafzimmer',big:true,on:true},
+  {id:'bad',name:'Bad',big:false,on:true},{id:'fl',name:'Flur',big:false,on:true},{id:'kz',name:'Kinderzimmer',big:true,on:false},
+  {id:'az',name:'Arbeitszimmer',big:false,on:false},{id:'wc',name:'Gäste-WC',big:false,on:false},{id:'hw',name:'Hauswirtschaftsraum',big:false,on:false},
+  {id:'ar',name:'Abstellraum',big:false,on:false},{id:'kl',name:'Keller',big:true,on:false},{id:'db',name:'Dachboden',big:true,on:false},
+  {id:'gr',name:'Garage',big:true,on:false},{id:'ga',name:'Garten',big:false,on:false},{id:'bk',name:'Balkon',big:false,on:false}
+];
+var ROOMTASKS={
+  ku:['Abgelaufene Lebensmittel und Gewürze aussortieren','Doppelte Töpfe, Becher und Dosen ohne Deckel aussortieren'],
+  wz:['Couchtisch, Regale und Fensterbänke komplett freiräumen','Kabel, Fernbedienungen und alte Geräte durchgehen'],
+  sz:['Kleiderschrank: Was hast du ein Jahr nicht getragen?','Nachttische und alles unter dem Bett durchgehen'],
+  bad:['Abgelaufene Kosmetik und leere Flaschen aussortieren','Handtücher und Badschrank durchgehen'],
+  fl:['Schuhe und Jacken durchgehen: Was trägt niemand mehr?','Kommode, Taschen und Schlüsselbrett leeren'],
+  kz:['Gemeinsam mit dem Kind: Was ist zu klein geworden?','Spiele, Bücher und Bastelsachen durchgehen'],
+  az:['Schreibtisch komplett freiräumen, nur Nötiges zurück','Papiere, Ordner und Kabel durchgehen'],
+  wc:['Vorräte und Deko durchgehen','Handtücher und Kleinkram aussortieren'],
+  hw:['Putzmittel durchgehen, Leeres und Doppeltes weg','Einzelsocken und Wäschekorb-Kram klären'],
+  ar:['Regale von oben nach unten durchgehen','Vorräte auf Haltbarkeit prüfen'],
+  kl:['Kartons öffnen: Was war seit dem Einzug zu?','Werkzeug, Vorräte und Sportsachen durchgehen'],
+  db:['Kisten öffnen: Was hattest du vergessen?','Deko und Erinnerungsstücke durchgehen'],
+  gr:['Werkzeug und Schrauben: Doppeltes und Kaputtes weg','Fahrräder, Sportsachen und Autozubehör durchgehen'],
+  ga:['Kaputte Gartengeräte und Blumentöpfe aussortieren','Schuppen und Gartenmöbel durchgehen'],
+  bk:['Leere Töpfe und vertrocknete Pflanzen entsorgen','Möbel und Deko auf dem Balkon durchgehen']
+};
+var GENERIC_ROOM=['Alle Oberflächen freiräumen, nur Nötiges zurück','Den vollsten Schrank oder die vollste Schublade durchgehen'];
+var METHODS={
+  km:{name:'KonMari',short:'Behalten, was Freude macht',text:'Nach Marie Kondo: Du sammelst alle Dinge einer Art an einem Ort und nimmst jedes einzeln in die Hand. Bleiben darf, was dir Freude macht oder was du wirklich brauchst. Den Rest verabschiedest du mit einem Danke.',rule:'Erst komplett aussortieren, dann einräumen.'},
+  vk:{name:'4-Kisten',short:'Behalten, Spenden, Müll, Woanders hin',text:'Jedes Teil, das du in die Hand nimmst, landet sofort in einer von vier Kisten. Zurücklegen und „später entscheiden“ gibt es nicht. So bleibt jede Entscheidung klein.',rule:'Wenn du zögerst, kommt es in die Spenden-Kiste.'},
+  mg:{name:'Minimalism Game',short:'Jeden Schritt ein Teil mehr, 28 insgesamt',text:'Das Spiel von The Minimalists in sieben Schritten: Erst geht ein Teil, dann gehen zwei, am Ende sieben. Zusammen sind es 28 Dinge, in kleinen Schritten.',rule:'Was gehen soll, verlässt bis abends das Haus.'},
+  tt:{name:'12-12-12',short:'12 weg, 12 spenden, 12 zurück an ihren Platz',text:'Du suchst 12 Dinge zum Wegwerfen, 12 zum Spenden und 12, die an ihren Platz zurückgehören. Feste Zahlen nehmen dir das Grübeln ab.',rule:'Zählen, nicht abwägen.'},
+  ds:{name:'Döstädning',short:'Schwedisch: aufräumen, damit es niemand anders muss',text:'Die schwedische Idee: Räum so auf, dass später niemand anders deine Sachen sortieren muss. Fang mit den großen Dingen an, Fotos und Briefe kommen zuletzt. Was anderen Freude machen kann, verschenkst du jetzt.',rule:'Würde jemand anders das nach dir behalten wollen?'},
+  zz:{name:'20/20-Regel',short:'Unter 20 € und in 20 Minuten ersetzbar? Darf gehen',text:'Für alles, was du „vielleicht mal“ brauchst: Lässt es sich für unter 20 € und in unter 20 Minuten wieder besorgen, darf es gehen. Das Risiko ist klein, der Platz ist sofort frei.',rule:'„Vielleicht mal“ ist kein Grund zum Behalten.'}
+};
+var METHOD_ORDER=['km','vk','mg','tt','ds','zz'];
+var PACES={woche:{days:7,name:'Gemütlich',desc:'Ein Raum pro Woche',one:'Woche',many:'Wochen'},zuegig:{days:4,name:'Zügig',desc:'Ein Raum alle 4 Tage',one:'Etappe',many:'Etappen'},sprint:{days:2,name:'Sprint',desc:'Ein Raum alle 2 Tage, z. B. vor einem Umzug',one:'Etappe',many:'Etappen'}};
+function paceOf(s){return PACES[(s&&s.pace)||'woche']||PACES.woche;}
+/* Aufgaben: [Text, Anzahl Dinge, die dabei das Haus verlassen] */
+function methodTasks(m,extra,pace){var step=(pace&&pace!=='woche')?'Schritt':'Tag';
+  var T=function(t,n){return {t:t,n:n||0,done:false};};
+  if(m==='vk')return [T('Vier Kisten beschriften: Behalten, Spenden, Müll, Woanders hin'),T('Den ersten Bereich komplett leeren und alles in die Kisten sortieren'),T(extra),T('Den Rest des Raums genauso durchgehen'),T('Die Woanders-Kiste leeren: alles an seinen Platz'),T('Müll entsorgen und die Spenden-Kiste ins Auto stellen')];
+  if(m==='km')return [T('Eine Kategorie wählen (Bücher, Kabel, Deko …) und alles davon an einem Ort sammeln'),T('Jedes Teil einzeln in die Hand nehmen: Macht es Freude?'),T(extra),T('Aussortiertes mit Danke verabschieden: Spende oder Müll'),T('Behaltenes einräumen: Jedes Ding bekommt einen festen Platz')];
+  if(m==='mg'){var a=[];for(var d=1;d<=7;d++)a.push(T(step+' '+d+': '+(d===1?'ein Teil':d+' Teile')+' aussortieren'+(d===4?' (Idee: '+extra.charAt(0).toLowerCase()+extra.slice(1)+')':''),d));return a;}
+  if(m==='tt')return [T('12 Dinge zum Wegwerfen finden',12),T('12 Dinge zum Spenden finden',12),T('12 Dinge an ihren richtigen Platz bringen'),T(extra),T('Die Spenden-Tüte aus dem Haus bringen')];
+  if(m==='ds')return [T('Mit den großen Dingen im Raum anfangen: Möbel, Geräte, Kisten'),T('Bei jedem Teil fragen: Würde jemand anders es nach mir behalten wollen?'),T(extra),T('Eine kleine, beschriftete Kiste nur für dich erlauben'),T('Was anderen Freude macht, jetzt verschenken')];
+  if(m==='zz')return [T('Alles sammeln, was du „vielleicht mal“ brauchst'),T(extra),T('Für jedes Teil prüfen: unter 20 € und in 20 Minuten ersetzbar?'),T('Was den Test besteht und seit einem Jahr unbenutzt ist, darf gehen'),T('Aussortiertes spenden oder entsorgen')];
+  return [];
+}
+function planWeeks(rooms,methods,weeks,seed,pace){
+  weeks=weeks||12;methods=(methods&&methods.length)?methods:['vk'];var rnd=rng(seed==null?Math.floor(Math.random()*1e9):seed);
+  var units=rooms.map(function(r){return {ids:[r.id],name:r.name,big:!!r.big};});
+  if(!units.length)return [];
+  while(units.length>weeks){
+    var smalls=units.map(function(u,i){return {u:u,i:i};}).filter(function(x){return !x.u.big;});
+    var cand=smalls.length>=2?smalls:units.map(function(u,i){return {u:u,i:i};});
+    cand.sort(function(x,y){return x.u.ids.length-y.u.ids.length||y.i-x.i;});
+    var a=Math.min(cand[0].i,cand[1].i),b=Math.max(cand[0].i,cand[1].i);
+    var m={ids:units[a].ids.concat(units[b].ids),name:units[a].name+' & '+units[b].name,big:false};
+    units.splice(b,1);units.splice(a,1,m);
+  }
+  /* Räume auswürfeln: jede Runde, jeder Wurf eine andere Reihenfolge */
+  var shuf=function(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(rnd()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;};
+  var first=shuf(units);
+  var out=first.map(function(u){return {ids:u.ids,name:u.name,big:u.big,pass:0};});
+  var pool=shuf(first.filter(function(u){return u.big;}));if(!pool.length)pool=shuf(first);
+  while(out.length<weeks){
+    for(var k=0;k<pool.length&&out.length<weeks;k++){
+      var src=pool[k],cnt=out.filter(function(u){return u.ids.join()===src.ids.join();}).length;
+      out.push({ids:src.ids,name:src.name,big:src.big,pass:cnt});
+    }
+    pool=shuf(first);
+  }
+  /* derselbe Raum nie zweimal direkt hintereinander */
+  for(var q=1;q<out.length;q++){if(out[q].ids.join()===out[q-1].ids.join()){for(var z=q+1;z<out.length;z++){if(out[z].ids.join()!==out[q-1].ids.join()&&(z+1>=out.length||out[z+1].ids.join()!==out[q].ids.join())){var tt=out[q];out[q]=out[z];out[z]=tt;break;}}}}
+  /* zweiter Besuch eines Raums bekommt die zweite Raumaufgabe */
+  var seenR={};out.forEach(function(u){var k2=u.ids.join();u.pass=seenR[k2]||0;seenR[k2]=(seenR[k2]||0)+1;});
+  /* Methoden auswürfeln: nie zweimal hintereinander, möglichst ausgewogen, im selben Raum möglichst nicht doppelt.
+     Intern 40 Würfe, der ausgewogenste gewinnt. */
+  var assign=function(){
+    var used={},count={},prev=null,res=[],dup=0;methods.forEach(function(m){count[m]=0;});
+    out.forEach(function(u){
+      var key=u.ids.join(),c=methods.filter(function(m){return m!==prev;});if(!c.length)c=methods.slice();
+      var score=function(m){return count[m]*2+((used[key]&&used[key].indexOf(m)>=0)?3:0);};
+      var min=Math.min.apply(null,c.map(score));c=c.filter(function(m){return score(m)===min;});
+      var mt=c[Math.floor(rnd()*c.length)];if(used[key]&&used[key].indexOf(mt)>=0)dup++;
+      count[mt]++;prev=mt;(used[key]=used[key]||[]).push(mt);res.push(mt);
+    });
+    var v=methods.map(function(m){return count[m];});return {res:res,pen:(Math.max.apply(null,v)-Math.min.apply(null,v))*2+dup*3};
+  };
+  var best=null;for(var tr=0;tr<40;tr++){var a=assign();if(!best||a.pen<best.pen)best=a;}
+  return out.map(function(u,i){
+    var mt=best.res[i];
+    var rt=ROOMTASKS[u.ids[0]]||GENERIC_ROOM,extra=rt[u.pass%2];
+    return {ids:u.ids,room:u.name,method:mt,out:0,tasks:methodTasks(mt,extra,pace)};
+  });
+}
+function newSeed(){return Math.floor(Math.random()*1e9);}
+function newState(rooms,methods,seed,pace){seed=seed==null?newSeed():seed;pace=pace||'woche';return {v:2,app:'leerraum',seed:seed,pace:pace,rooms:rooms,methods:methods,plan:planWeeks(rooms,methods,12,seed,pace),week:0,round:1,outPrev:0,give:[],paused:null,cal:{day:0,time:'10:00',freq:'daily'},theme:'auto',started:new Date().toISOString()};}
+function migrate(s){
+  if(!s)return s;
+  if(s.outPrev==null)s.outPrev=0;if(!s.give)s.give=[];if(s.paused===undefined)s.paused=null;if(!s.theme)s.theme='auto';
+  s.plan.forEach(function(w){if(w.out==null)w.out=0;w.tasks.forEach(function(t){if(t.n==null)t.n=0;});});
+  if(!s.started)s.started=new Date().toISOString();if(!s.pace)s.pace='woche';if(!s.cal)s.cal={day:0,time:'10:00'};if(!s.cal.freq)s.cal.freq='weekly';
+  s.v=2;return s;
+}
+function weekDone(w){return w.tasks.every(function(t){return t.done;});}
+function totalOut(s){return s.outPrev+s.plan.reduce(function(a,w){return a+(w.out||0);},0);}
+function toggleTask(s,i){var w=s.plan[s.week],t=w.tasks[i];t.done=!t.done;if(t.n)w.out=Math.max(0,w.out+(t.done?t.n:-t.n));return t;}
+function addOut(s,n){var w=s.plan[s.week];w.out=Math.max(0,(w.out||0)+n);return w.out;}
+/* Eigene Aufgaben: gelten für die aktuelle Woche, auf Wunsch auch für spätere Besuche im selben Raum */
+function applyCustom(s,i){var w=s.plan[i];if(!w)return;var ct=(s.custom||{})[w.ids.join()]||[];ct.forEach(function(t){if(!w.tasks.some(function(x){return x.t===t;}))w.tasks.push({t:t,n:0,done:false,own:true});});}
+function addTask(s,text,remember){text=String(text).trim().slice(0,120);if(!text)return false;var w=s.plan[s.week];if(w.tasks.some(function(x){return x.t===text;}))return false;w.tasks.push({t:text,n:0,done:false,own:true});
+  if(remember){s.custom=s.custom||{};var k=w.ids.join();(s.custom[k]=s.custom[k]||[]);if(s.custom[k].indexOf(text)<0)s.custom[k].push(text);}return true;}
+function removeTask(s,k){var w=s.plan[s.week],t=w.tasks[k];if(!t||!t.own)return false;if(t.done&&t.n)w.out=Math.max(0,w.out-t.n);w.tasks.splice(k,1);var c=(s.custom||{})[w.ids.join()];if(c){var j=c.indexOf(t.t);if(j>=0)c.splice(j,1);}return true;}
+/* Nur 5 Minuten: Mini-Aufgaben für Tage mit wenig Energie */
+var MINI=['Nur die oberste Schublade: Was darf raus?','Fünf Dinge finden, die eindeutig Müll sind.','Eine einzige Fläche freiräumen, nur eine.','Drei Dinge zurück an ihren Platz bringen.','Ein Teil, das du nie benutzt, in die Spenden-Tüte.','Alles Abgelaufene aus einem einzigen Fach.','Die Kabel-Ecke: Was gehört zu nichts mehr?','Eine Tasche oder ein Korb: komplett ausleeren, nur Gutes zurück.','Stifte und Kleinkram: Was schreibt nicht mehr, was ist kaputt?','Einen Stapel Papier durchgehen, nur einen.'];
+function miniTask(n){return MINI[(Math.floor(Date.now()/86400000)+(n||0))%MINI.length];}
+function advance(s,now){if(!weekDone(s.plan[s.week]))return false;now=(now||new Date()).toISOString();s.plan[s.week].doneAt=now;if(!s.plan[s.week].startAt)s.plan[s.week].startAt=s.week?s.plan[s.week-1].doneAt||s.started:s.started;if(s.week<s.plan.length-1){s.week++;s.plan[s.week].startAt=now;applyCustom(s,s.week);return 'next';}s.finished=true;return 'finish';}
+function nextRound(s){s.outPrev=totalOut(s);s.round++;s.seed=newSeed();s.plan=planWeeks(s.rooms,s.methods,12,s.seed,s.pace);s.week=0;s.finished=false;s.started=new Date().toISOString();applyCustom(s,0);return s;}
+function moveWeek(s,i,dir){var j=i+dir;if(i<=s.week||j<=s.week||j>=s.plan.length)return false;var t=s.plan[i];s.plan[i]=s.plan[j];s.plan[j]=t;return true;}
+/* Kalender: erledigte Wochen mit echten Daten, die aktuelle läuft bis mindestens heute, kommende schließen an */
+var DAY=86400000;
+function span(s){return (paceOf(s).days-1)*DAY;}
+function d0(x){var d=new Date(x);d.setHours(0,0,0,0);return d;}
+function schedule(s,now){
+  var today=d0(now||new Date()),res=[],prevEnd=null;
+  s.plan.forEach(function(w,i){
+    var st,start,end;
+    if(s.finished||i<s.week){st='done';start=d0(w.startAt||(prevEnd?prevEnd.getTime()+DAY:s.started));end=d0(w.doneAt||start.getTime()+span(s));if(end<start)end=start;}
+    else if(i===s.week){st=s.paused?'paused':'now';start=d0(w.startAt||(prevEnd?prevEnd.getTime()+DAY:s.started));end=new Date(Math.max(start.getTime()+span(s),today.getTime()));}
+    else{st='next';start=new Date(prevEnd.getTime()+DAY);end=new Date(start.getTime()+span(s));}
+    res.push({i:i,room:w.room,method:w.method,st:st,start:start,end:end,out:w.out||0});prevEnd=end;
+  });
+  return res;
+}
+function planIcs(sc,s){var U=paceOf(s);
+  var p=function(n){return ('0'+n).slice(-2);},f=function(x){return x.getFullYear()+p(x.getMonth()+1)+p(x.getDate());};
+  var L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//jazzwalk//Kruschtel-Kaizen//DE'];
+  sc.forEach(function(e){if(e.st==='done')return;L.push('BEGIN:VEVENT','UID:kruschtel-w'+e.i+'-'+Date.now()+'@jazzwalk','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z','DTSTART;VALUE=DATE:'+f(e.start),'DTEND;VALUE=DATE:'+f(new Date(e.end.getTime()+DAY)),'SUMMARY:Kruschtel-Kaizen: '+e.room+' ('+METHODS[e.method].name+')','DESCRIPTION:'+U.one+' '+(e.i+1)+': '+METHODS[e.method].short,'TRANSP:TRANSPARENT','END:VEVENT');});
+  L.push('END:VCALENDAR');return L.join('\r\n');
+}
+/* Heute dran: Aufgaben gleichmäßig auf die Tage des Abschnitts verteilt */
+function today(s,now){
+  var w=s.plan[s.week],D=paceOf(s).days,N=w.tasks.length,start=d0(w.startAt||s.started),k=Math.floor((d0(now||new Date())-start)/DAY);if(k<0)k=0;
+  var dueIdx=function(day){var r=[];for(var i=0;i<N;i++)if(Math.floor(i*D/N)<=day)r.push(i);return r;};
+  var due=dueIdx(k).filter(function(i){return !w.tasks[i].done;});
+  var next=w.tasks.map(function(t,i){return i;}).filter(function(i){return !w.tasks[i].done;})[0];
+  return {day:k,days:D,late:k>=D,task:due.length?due[0]:null,dueLeft:due.length,next:next==null?null:next};
+}
+function icsText(day,time,freq){
+  var codes=['SU','MO','TU','WE','TH','FR','SA'],d=new Date(),diff=freq==='daily'?1:(day-d.getDay()+7)%7;d.setDate(d.getDate()+(diff||7));
+  var hm=time.split(':'),p=function(n){return ('0'+n).slice(-2);},f=function(x){return x.getFullYear()+p(x.getMonth()+1)+p(x.getDate())+'T'+p(x.getHours())+p(x.getMinutes())+'00';};
+  d.setHours(+hm[0],+hm[1],0,0);var e=new Date(d.getTime()+3600000);
+  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//jazzwalk//Kruschtel-Kaizen//DE','BEGIN:VEVENT','UID:kruschtel-'+Date.now()+'@jazzwalk','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z',
+    'DTSTART;TZID=Europe/Berlin:'+f(d),'DTEND;TZID=Europe/Berlin:'+f(e),(freq==='daily'?'RRULE:FREQ=DAILY':'RRULE:FREQ=WEEKLY;BYDAY='+codes[day]),'SUMMARY:Kruschtel-Kaizen: '+(freq==='daily'?'Heute dran':'Aufgaben der Woche'),'DESCRIPTION:Kruschtel-Kaizen öffnen und die Aufgabe für heute abhaken.',
+    'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:Kruschtel-Kaizen','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+}
+/* ===== Abgabe: Kategorien und Portale ===== */
+/* Aufräumstile nach Cas Aarssens Clutterbug-System: sichtbar/versteckt x einfach/detailliert */
+var CB={
+  lb:{name:'Marienkäfer',en:'Ladybug',store:'versteckt',sys:'einfach',desc:'Du magst es aufgeräumt auf den ersten Blick, Kruschtel darf hinter Türen verschwinden. Und es muss schnell gehen.',
+      tips:['Körbe und Kisten ohne Deckel in Schränken: reinlegen statt einsortieren.','Schubladen-Trenner helfen, damit das Versteckte nicht zum Wühltisch wird.','Wenige, grobe Kategorien reichen dir. Lieber eine Kiste „Kabel“ als fünf kleine.','Gefahr für dich: Hinter Türen sammelt sich unbemerkt Kram. Mach öfter mal einen Schrank auf.']},
+  bf:{name:'Schmetterling',en:'Butterfly',store:'sichtbar',sys:'einfach',desc:'Was du nicht siehst, vergisst du. Du brauchst offene, schnelle Lösungen.',
+      tips:['Offene Regale, Haken und Körbe: Was du siehst, findest du auch.','Durchsichtige Behälter ohne Deckel sind dein bester Freund.','Grobe Kategorien reichen. Hauptsache, alles hat einen sichtbaren Platz.','Gefahr für dich: Sichtbar heißt schnell voll. Gib jedem Korb ein Limit.']},
+  cr:{name:'Grille',en:'Cricket',store:'versteckt',sys:'detailliert',desc:'Du liebst Ordnung bis ins Detail, aber bitte hinter geschlossenen Türen.',
+      tips:['Schubladeneinsätze und beschriftete Boxen hinter Türen passen zu dir.','Ein Rollwagen hält Dinge griffbereit, die du ständig brauchst.','Viele Etiketten sind gut, aber halte die Zahl der Kategorien überschaubar.','Gefahr für dich: Perfektion bremst. Erst ausmisten, dann das schöne System.']},
+  be:{name:'Biene',en:'Bee',store:'sichtbar',sys:'detailliert',desc:'Du willst deine Sachen sehen und trotzdem genau sortiert haben. Oft laufen bei dir mehrere Projekte gleichzeitig.',
+      tips:['Lochwand, Wandregale und Magnetleisten bringen Ordnung an die Wand.','Durchsichtige Stapelboxen mit Schubladen: sichtbar und sortiert.','Tabletts begrenzen, wie weit sich Dinge ausbreiten.','Gib laufenden Projekten einen festen Platz, damit sie nicht durchs ganze Haus wandern.']}
+};
+var TIPS=['Erst ausmisten, dann Aufbewahrung kaufen. Sonst sortierst du Kruschtel nur schöner.',
+  'Eins rein, eins raus: Für jedes neue Teil darf ein altes gehen.',
+  'Stell eine Spenden-Tüte fest in den Schrank. Dann landet Aussortiertes sofort dort.',
+  'Von Erinnerungsstücken darfst du ein Foto behalten. Das Ding selbst darf gehen.',
+  'Stell dir einen Timer auf 15 Minuten. Danach darfst du aufhören, versprochen.',
+  'Mach ein Vorher-Foto. Das Nachher-Foto ist dann deine Belohnung.',
+  'Die meisten Menschen sind nicht nur ein Aufräumtyp. In der Küche Biene, im Schlafzimmer Marienkäfer ist völlig normal.',
+  'Ordnung muss an einem normalen Dienstag funktionieren, nicht nur im Video.',
+  'Was du ein Jahr nicht benutzt hast, brauchst du sehr wahrscheinlich nicht mehr.',
+  'Duplikate zuerst: Zwei Schneebesen, drei Scheren? Behalte die beste.'];
+function cbType(store,sys){return store==='sichtbar'?(sys==='einfach'?'bf':'be'):(sys==='einfach'?'lb':'cr');}
+function tipFor(s,n){var k=Math.floor(Date.now()/86400000)+(n||0);if(s&&s.cb&&CB[s.cb]){var own=CB[s.cb].tips;if(k%2===0)return {text:own[(k/2)%own.length],own:true};return {text:TIPS[((k-1)/2)%TIPS.length],own:false};}return {text:TIPS[k%TIPS.length],own:false};}
+var GIVE_CATS=[['kl','Kleidung & Schuhe'],['bm','Bücher & Medien'],['sp','Spielzeug'],['hm','Haushalt & Möbel'],['el','Elektro'],['so','Sonstiges']];
+var GIVE_HOW=[['spenden','Spenden'],['verschenken','Verschenken'],['verkaufen','Verkaufen']];
+var PORTALS=[
+  {cat:['kl'],how:['spenden'],name:'Platz schaffen mit Herz',desc:'Kleiderspende im Karton, kostenloser Paketschein für Hermes',url:'https://www.otto.de/kleiderspende/'},
+  {cat:['kl'],how:['spenden'],name:'Deutsche Kleiderstiftung',desc:'Paketspende, Paketschein online, ab 5 kg kostenfrei',url:'https://www.kleiderstiftung.de'},
+  {cat:['kl'],how:['spenden'],name:'altkleiderspenden.de',desc:'Seriöse Altkleider-Container in deiner Nähe finden',url:'https://www.altkleiderspenden.de'},
+  {cat:['kl'],how:['verkaufen'],name:'Vinted',desc:'Gut erhaltene Kleidung verkaufen',url:'https://www.vinted.de'},
+  {cat:['bm','kl','hm','sp'],how:['spenden'],name:'Oxfam Shops',desc:'Kleidung, Bücher, Spielzeug, Haushaltswaren im Laden abgeben',url:'https://shops.oxfam.de'},
+  {cat:['bm'],how:['verkaufen'],name:'momox',desc:'Bücher, CDs, DVDs und Spiele per Barcode verkaufen',url:'https://www.momox.de'},
+  {cat:['el','bm'],how:['verkaufen'],name:'rebuy',desc:'Handys, Konsolen, Technik und Medien verkaufen',url:'https://www.rebuy.de'},
+  {cat:['el'],how:['verkaufen'],name:'geldfuermuell.de',desc:'Altgeräte, Handys und Druckerpatronen einschicken',url:'https://www.geldfuermuell.de'},
+  {cat:['hm','sp','so','el','kl','bm'],how:['verschenken','verkaufen'],name:'nebenan.de',desc:'In der Nachbarschaft verschenken oder verkaufen',url:'https://nebenan.de'},
+  {cat:['hm','sp','so','el','kl','bm'],how:['verkaufen','verschenken'],name:'Kleinanzeigen',desc:'Verkaufen oder unter „Zu verschenken“ einstellen',url:'https://www.kleinanzeigen.de'}
+];
+/* Portale passend zu den offenen Dingen: Gruppen je Art+Weg, Fallback nur nach Art */
+function portalGroups(items){
+  var groups=[],key={};
+  items.forEach(function(g){var k=g.cat+'|'+g.how;if(!key[k]){key[k]={cat:g.cat,how:g.how,items:[]};groups.push(key[k]);}key[k].items.push(g.t);});
+  groups.forEach(function(gr){
+    var exact=PORTALS.filter(function(p){return p.cat.indexOf(gr.cat)>=0&&p.how.indexOf(gr.how)>=0;});
+    gr.exact=!!exact.length;gr.portals=exact.length?exact:PORTALS.filter(function(p){return p.cat.indexOf(gr.cat)>=0;});
+  });
+  return groups;
+}
+/* ===== Stillleben ===== */
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
+function hash(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+var PAL=['#2f6f6a','#e0a43a','#c97a7e','#8a8f45','#5b3d55','#d8b99a','#f0c97a','#9a6a4e'];
+var ROOMSHAPES={
+  ku:['pot','jar','cup','bottle','pot','jar','cup'],bad:['bottle','jar','stack','bottle','basket','plant'],wz:['books','vase','lamp','plant','ball','books','frame'],
+  sz:['stack','lamp','books','stack','basket','vase'],kz:['block','ball','books','block','basket','ball'],az:['binder','books','lamp','binder','plant','books'],
+  wc:['bottle','plant','stack','jar'],hw:['bottle','basket','stack','bottle','can'],ar:['box','jar','can','box','basket'],kl:['box','box','can','jar','basket'],
+  db:['box','box','lamp','basket','books','frame'],gr:['can','box','bottle','box','can','basket'],ga:['plant','plant','can','basket','pot'],bk:['plant','plant','basket','can','vase'],
+  fl:['basket','stack','lamp','plant','frame']
+};
+var GENERIC_SHAPES=['box','books','ball','jar','vase','plant','basket'];
+function shape(type,r,x,base,big){
+  var P=function(){return PAL[Math.floor(r()*PAL.length)];},c=P(),c2=P(),s='',w,h,k=big?1.25:1;
+  switch(type){
+  case 'books':var n=2+Math.floor(r()*4);w=0;for(var i=0;i<n;i++){var bw=(5+r()*5)*k,bh=(26+r()*24)*k;s+='<rect x="'+(x+w)+'" y="'+(base-bh)+'" width="'+bw+'" height="'+bh+'" rx="1.2" fill="'+P()+'"/>';w+=bw+.8;}
+    if(r()<.5){var lw=(8+r()*6)*k;s+='<rect x="'+(x+w+1)+'" y="'+(base-lw*1.4)+'" width="'+lw+'" height="'+lw*1.4+'" rx="1" fill="'+P()+'" transform="rotate(12 '+(x+w+1)+' '+base+')"/>';w+=lw+4;}break;
+  case 'ball':w=(14+r()*16)*k;s='<circle cx="'+(x+w/2)+'" cy="'+(base-w/2)+'" r="'+w/2+'" fill="'+c+'"/><path d="M'+(x+w*.2)+' '+(base-w*.7)+'q'+w*.3+' '+w*.25+' '+w*.6+' 0" stroke="#faf3ea" stroke-opacity=".5" stroke-width="1.4" fill="none"/>';break;
+  case 'jar':w=(14+r()*12)*k;h=w*1.25;s='<rect x="'+x+'" y="'+(base-h)+'" width="'+w+'" height="'+h+'" rx="'+w/4+'" fill="'+c+'"/><rect x="'+(x+w*.12)+'" y="'+(base-h-5)+'" width="'+w*.76+'" height="6" rx="2" fill="'+c2+'"/><rect x="'+(x+w*.2)+'" y="'+(base-h*.65)+'" width="'+w*.6+'" height="'+h*.28+'" rx="1.5" fill="#faf3ea" fill-opacity=".55"/>';break;
+  case 'vase':w=(16+r()*14)*k;h=w*1.6;s='<path d="M'+(x+w*.36)+' '+(base-h)+'h'+w*.28+'v'+h*.22+'c'+w*.42+' '+h*.12+' '+w*.38+' '+h*.78+' 0 '+h*.78+'h-'+w*.28+'c-'+w*.38+' 0-'+w*.42+'-'+h*.66+' 0-'+h*.78+'z" fill="'+c+'"/>';
+    if(r()<.6)s+='<path d="M'+(x+w/2)+' '+(base-h)+'q-6 -18 -12 -22M'+(x+w/2)+' '+(base-h)+'q4 -20 10 -24" stroke="#8a8f45" stroke-width="1.6" fill="none"/><circle cx="'+(x+w/2-12)+'" cy="'+(base-h-22)+'" r="3.5" fill="#e0a43a"/><circle cx="'+(x+w/2+10)+'" cy="'+(base-h-24)+'" r="3.5" fill="#c97a7e"/>';break;
+  case 'pot':w=(26+r()*12)*k;h=w*.62;s='<rect x="'+x+'" y="'+(base-h)+'" width="'+w+'" height="'+h+'" rx="4" fill="'+c+'"/><rect x="'+(x-4)+'" y="'+(base-h+3)+'" width="5" height="3" rx="1.5" fill="'+c+'"/><rect x="'+(x+w-1)+'" y="'+(base-h+3)+'" width="5" height="3" rx="1.5" fill="'+c+'"/><rect x="'+(x+2)+'" y="'+(base-h-4)+'" width="'+(w-4)+'" height="5" rx="2.5" fill="'+c2+'"/><circle cx="'+(x+w/2)+'" cy="'+(base-h-6)+'" r="2.6" fill="'+c2+'"/>';w+=4;break;
+  case 'cup':w=(11+r()*6)*k;h=w*1.05;s='<path d="M'+x+' '+(base-h)+'h'+w+'l-'+w*.08+' '+h+'h-'+w*.84+'z" fill="'+c+'"/><path d="M'+(x+w-1)+' '+(base-h*.8)+'a'+h*.24+' '+h*.24+' 0 0 1 0 '+h*.48+'" stroke="'+c+'" stroke-width="2.2" fill="none"/>';w+=5;break;
+  case 'bottle':w=(10+r()*7)*k;h=w*3;s='<path d="M'+x+' '+base+'v-'+h*.62+'q0 -'+h*.12+' '+w*.3+' -'+h*.16+'v-'+h*.16+'h'+w*.4+'v'+h*.16+'q'+w*.3+' '+h*.04+' '+w*.3+' '+h*.16+'v'+h*.62+'z" fill="'+c+'"/><rect x="'+(x+w*.28)+'" y="'+(base-h-3)+'" width="'+w*.44+'" height="5" rx="1" fill="'+c2+'"/><rect x="'+x+'" y="'+(base-h*.45)+'" width="'+w+'" height="'+h*.2+'" fill="#faf3ea" fill-opacity=".5"/>';break;
+  case 'stack':w=(26+r()*14)*k;var ly=base,cnt=3+Math.floor(r()*3);for(var j=0;j<cnt;j++){var th=6+r()*3,off=(r()-.5)*4;s+='<rect x="'+(x+off)+'" y="'+(ly-th)+'" width="'+w+'" height="'+th+'" rx="'+th/2+'" fill="'+P()+'"/>';ly-=th+.6;}break;
+  case 'plant':w=(18+r()*12)*k;h=w*.75;var px=x+w/2,top=base-h;s='<path d="M'+x+' '+top+'h'+w+'l-'+w*.12+' '+h+'h-'+w*.76+'z" fill="'+(r()<.5?'#9a6a4e':c)+'"/>';
+    for(var l=0;l<5;l++){var ang=-70+l*35+(r()-.5)*14,len=w*(.7+r()*.5);s+='<ellipse cx="'+px+'" cy="'+(top-len/2)+'" rx="'+(3.5+r()*2.5)*k+'" ry="'+len/2+'" fill="'+(l%2?'#8a8f45':'#5f7a3c')+'" transform="rotate('+ang+' '+px+' '+top+')"/>';}break;
+  case 'basket':w=(26+r()*14)*k;h=w*.55;s='<path d="M'+x+' '+(base-h)+'h'+w+'l-'+w*.06+' '+h+'h-'+w*.88+'z" fill="'+(r()<.5?'#c49a64':c)+'"/>';for(var b=1;b<4;b++)s+='<path d="M'+(x+w*.04*b/2)+' '+(base-h+h*b/4)+'h'+(w-w*.04*b)+'" stroke="#3a2a26" stroke-opacity=".18" stroke-width="1"/>';break;
+  case 'lamp':w=(20+r()*8)*k;h=w*1.9;s='<rect x="'+(x+w*.3)+'" y="'+(base-4)+'" width="'+w*.4+'" height="4" rx="2" fill="'+c2+'"/><rect x="'+(x+w*.47)+'" y="'+(base-h*.62)+'" width="'+w*.06+'" height="'+h*.6+'" fill="'+c2+'"/><path d="M'+(x+w*.18)+' '+(base-h)+'h'+w*.64+'l'+w*.18+' '+h*.38+'h-'+w+'z" fill="'+c+'"/>';break;
+  case 'binder':w=0;var nb=2+Math.floor(r()*3);for(var q=0;q<nb;q++){var bw2=(9+r()*3)*k,bh2=(38+r()*8)*k,col=P();s+='<rect x="'+(x+w)+'" y="'+(base-bh2)+'" width="'+bw2+'" height="'+bh2+'" rx="1" fill="'+col+'"/><rect x="'+(x+w+bw2*.2)+'" y="'+(base-bh2*.8)+'" width="'+bw2*.6+'" height="'+bh2*.22+'" fill="#faf3ea" fill-opacity=".7"/><circle cx="'+(x+w+bw2/2)+'" cy="'+(base-bh2*.2)+'" r="'+bw2*.18+'" fill="#3a2a26" fill-opacity=".35"/>';w+=bw2+1;}break;
+  case 'block':w=0;var nbl=2+Math.floor(r()*2),bs=(11+r()*5)*k;for(var z=0;z<nbl;z++)s+='<rect x="'+(x+z*(bs+1))+'" y="'+(base-bs)+'" width="'+bs+'" height="'+bs+'" rx="2" fill="'+P()+'"/>';s+='<rect x="'+(x+bs*.5)+'" y="'+(base-bs*2-1)+'" width="'+bs+'" height="'+bs+'" rx="2" fill="'+P()+'"/>';w=nbl*(bs+1);break;
+  case 'can':w=(16+r()*10)*k;h=w*1.3;s='<rect x="'+x+'" y="'+(base-h)+'" width="'+w+'" height="'+h+'" rx="2" fill="'+c+'"/><rect x="'+x+'" y="'+(base-h)+'" width="'+w+'" height="3" fill="#3a2a26" fill-opacity=".25"/><rect x="'+x+'" y="'+(base-h*.6)+'" width="'+w+'" height="'+h*.25+'" fill="#faf3ea" fill-opacity=".45"/>';break;
+  case 'frame':w=(22+r()*10)*k;h=w*1.2;s='<rect x="'+x+'" y="'+(base-h)+'" width="'+w+'" height="'+h+'" rx="1.5" fill="#9a6a4e" transform="rotate(-6 '+x+' '+base+')"/><rect x="'+(x+3)+'" y="'+(base-h+3)+'" width="'+(w-6)+'" height="'+(h-6)+'" fill="'+c+'" transform="rotate(-6 '+x+' '+base+')"/>';break;
+  default:w=(18+r()*20)*k;h=w*(.55+r()*.6);s='<rect x="'+x+'" y="'+(base-h)+'" width="'+w+'" height="'+h+'" rx="1.5" fill="'+(type==='box'?'#c49a64':c)+'"/>'+(type==='box'?'<path d="M'+(x+w/2)+' '+(base-h)+'v'+h*.35+'" stroke="#3a2a26" stroke-opacity=".3" stroke-width="2.5"/><path d="M'+(x+2)+' '+(base-h+1)+'h'+(w-4)+'" stroke="#3a2a26" stroke-opacity=".15"/>':'');
+  }
+  var sh='<ellipse cx="'+(x+w/2)+'" cy="'+(base+1.5)+'" rx="'+w*.55+'" ry="2.2" fill="#3a2a26" fill-opacity=".14"/>';
+  return {svg:sh+s,w:w};
+}
+function stillLife(seedStr,frac,opts){
+  opts=opts||{};var r=rng(hash(seedStr)),objs=[],W=320,H=244,id='s'+hash(seedStr+'#'+(opts.uid||'')).toString(36);
+  var types=ROOMSHAPES[opts.room]||GENERIC_SHAPES;
+  var levels=[[34,286,112,false],[10,312,226,true]];
+  levels.forEach(function(L){var x=L[0]+r()*8;while(true){var t=types[Math.floor(r()*types.length)],o=shape(t,r,x,L[2],L[3]);if(x+o.w>L[1])break;objs.push(o.svg);x+=o.w+3+r()*7;}});
+  var idx=objs.map(function(_,i){return i;});for(var i=idx.length-1;i>0;i--){var j=Math.floor(r()*(i+1));var t2=idx[i];idx[i]=idx[j];idx[j]=t2;}
+  var order=idx.slice(3),gone=Math.round(order.length*frac),goneSet={};order.slice(0,gone).forEach(function(i){goneSet[i]=1;});
+  var sunY=(1-frac)*30;
+  var lbl=String(opts.label||'Raum').replace(/[<>"&]/g,'');
+  var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+lbl+'"'+(opts.dim?' class="dim"':'')+'>';
+  s+='<defs><linearGradient id="'+id+'g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--sky1)" style="stop-color:var(--sky1)"/><stop offset="1" stop-color="var(--sky2)" style="stop-color:var(--sky2)"/></linearGradient><clipPath id="'+id+'c"><path d="M120 112V58a40 40 0 0 1 80 0v54z"/></clipPath>'+
+     '<radialGradient id="'+id+'r" cx=".5" cy=".3" r=".7"><stop offset="0" stop-color="#f6c66b" stop-opacity="'+(0.05+0.3*frac).toFixed(2)+'"/><stop offset="1" stop-color="#f6c66b" stop-opacity="0"/></radialGradient></defs>';
+  s+='<rect width="'+W+'" height="'+H+'" style="fill:var(--wall)"/>';
+  s+='<rect width="'+W+'" height="'+H+'" fill="url(#'+id+'r)"/>';
+  s+='<g clip-path="url(#'+id+'c)"><rect x="118" y="16" width="84" height="98" fill="url(#'+id+'g)"/><circle class="sun" cx="160" cy="70" r="15" style="fill:var(--light);transform:translateY('+sunY.toFixed(1)+'px)"/>'+
+     '<path d="M118 100q20-10 42-4t42-6v24h-84z" fill="#8a8f45" fill-opacity=".45"/></g>';
+  s+='<path d="M120 112V58a40 40 0 0 1 80 0v54" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M160 18v94M120 70h80" stroke="currentColor" stroke-width="1"/>';
+  s+='<path d="M24 112h272" stroke="currentColor" stroke-width="1.6"/><path d="M40 112l6 8M280 112l-6 8" stroke="currentColor" stroke-width="1.2"/>';
+  s+='<rect x="0" y="226" width="'+W+'" height="'+(H-226)+'" style="fill:var(--paper2)"/><path d="M0 226h320" stroke="currentColor" stroke-width="1.6"/>';
+  s+='<path d="M60 236h200" stroke="currentColor" stroke-opacity=".12" stroke-width="6" stroke-linecap="round"/>';
+  objs.forEach(function(o,i){s+='<g class="obj'+(goneSet[i]?' gone':'')+'">'+o+'</g>';});
+  s+='</svg>';
+  return {svg:s,total:objs.length};
+}
+if(typeof module!=='undefined')module.exports={planWeeks:planWeeks,newState:newState,migrate:migrate,advance:advance,nextRound:nextRound,moveWeek:moveWeek,toggleTask:toggleTask,addOut:addOut,totalOut:totalOut,stillLife:stillLife,icsText:icsText,PRESETS:PRESETS,METHOD_ORDER:METHOD_ORDER,PORTALS:PORTALS,portalGroups:portalGroups,schedule:schedule,planIcs:planIcs,today:today,PACES:PACES,cbType:cbType,tipFor:tipFor,CB:CB,addTask:addTask,removeTask:removeTask,applyCustom:applyCustom,miniTask:miniTask};
+</script>
+
+<script>
+(function(){
+var KEY='leerraum-v1',S=null,tab='woche',draft=null,orderMode=false,allPortals=false,giveDraft={cat:'kl',how:'spenden'};
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function load(){try{var j=localStorage.getItem(KEY);if(j)return migrate(JSON.parse(j));}catch(e){}return null;}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function toast(t){var d=document.createElement('div');d.className='toast';d.setAttribute('role','status');d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove();},1700);}
+var TICK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.2 12.6l3.9 3.8 7.7-8.6" stroke="#fbf5ec" stroke-width="2.3" fill="none" stroke-linecap="round" stroke-linejoin="round" pathLength="1"/></svg>';
+function U(){return paceOf(S||draft);}
+function frac(w){return w.tasks.filter(function(t){return t.done;}).length/w.tasks.length;}
+function seed(i){return S.round+'|'+S.plan[i].room+'|'+S.plan[i].method;}
+function rid(w){return w.ids[0];}
+function fmtDate(iso){var d=new Date(iso);return d.getDate()+'.'+(d.getMonth()+1)+'.';}
+function num(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+
+/* ===== Maskottchen: Kurumi von der Kruschtel-Kaizen ===== */
+function weeksDone(){return S?(S.finished?S.plan.length:S.week):0;}
+function tines(){if(!S)return 1;return Math.min(5,1+Math.floor(weeksDone()/3)+(S.round-1));}
+function happs(n,mood){
+  n=n||1;var happy=mood==='happy'||mood==='proud',pile=5-n;
+  var s='<svg viewBox="0 0 112 106" class="mascot" aria-hidden="true">';
+  s+='<ellipse cx="56" cy="102" rx="44" ry="3.2" fill="#3a2a26" fill-opacity=".15"/>';
+  var cols=['#c49a64','#2f6f6a','#c97a7e','#8a8f45'],by=101;
+  for(var k=0;k<pile;k++){var bw=20-k*2,bh=11,bx=4+k*1.5+(k%2?2:0);s+='<rect x="'+bx+'" y="'+(by-bh)+'" width="'+bw+'" height="'+bh+'" rx="1.5" fill="'+cols[k%4]+'"/><path d="M'+(bx+bw/2)+' '+(by-bh)+'v4" stroke="#3a2a26" stroke-opacity=".3" stroke-width="2"/>';by-=bh+.5;}
+  if(pile===0)s+='<g class="spark"><ellipse cx="14" cy="94" rx="7" ry="8" fill="#e0a43a"/><path d="M6 89q8-7 16 0v-2q-8-6-16 0z" fill="#9a6a4e"/><path d="M14 82v-4" stroke="#9a6a4e" stroke-width="1.8" stroke-linecap="round"/></g>';
+  s+='<g class="tail"><path d="M70 96C102 94 108 52 90 34C80 24 64 28 68 42C72 53 88 50 86 63C84 74 72 78 66 88Z" fill="#c56a3a"/><path d="M74 90c20-4 26-30 14-46" stroke="#e8a46a" stroke-width="4" fill="none" stroke-linecap="round"/></g>';
+  s+='<g class="body">';
+  s+='<ellipse cx="49" cy="99" rx="8" ry="4" fill="#a65530"/><ellipse cx="63" cy="99" rx="7" ry="3.6" fill="#a65530"/>';
+  s+='<ellipse cx="54" cy="78" rx="18" ry="21" fill="#d27b45"/><ellipse cx="54" cy="83" rx="11" ry="14" fill="#f3d9b8"/>';
+  s+='<g class="tuft"><path d="M38 38L39 20L48 32Z" fill="#c56a3a"/><path d="M39 20l-3-6M39 20l1-7" stroke="#a65530" stroke-width="1.8" stroke-linecap="round"/></g>';
+  s+='<g class="tuft r"><path d="M70 37L70 19L61 31Z" fill="#c56a3a"/><path d="M70 19l3-6M70 19l-1-7" stroke="#a65530" stroke-width="1.8" stroke-linecap="round"/></g>';
+  s+='<circle cx="54" cy="46" r="17" fill="#d27b45"/><ellipse cx="54" cy="54" rx="10" ry="7.5" fill="#f3d9b8"/>';
+  s+='<path d="M37.5 38.5q16.5-7 33 0l-.8 5q-15.7-6-31.4 0z" fill="#fbf5ec" stroke="#3a2a26" stroke-opacity=".15" stroke-width=".6"/><circle cx="54" cy="38.2" r="2" fill="#c8483c"/><path d="M38.5 41.5l-8 2 3 3zM38.5 41.5l-6-4.5-.5 4z" fill="#fbf5ec" stroke="#3a2a26" stroke-opacity=".15" stroke-width=".6"/>';
+  if(happy)s+='<path d="M44 47q3.5-4 7 0M57 47q3.5-4 7 0" stroke="#3a2a26" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
+  else if(mood==='sleepy')s+='<path d="M44 48q3.5 3 7 0M57 48q3.5 3 7 0" stroke="#3a2a26" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
+  else s+='<ellipse class="eye" cx="47.5" cy="47" rx="2.8" ry="3.3" fill="#3a2a26"/><ellipse class="eye" cx="60.5" cy="47" rx="2.8" ry="3.3" fill="#3a2a26"/><circle cx="48.4" cy="45.8" r=".95" fill="#fff"/><circle cx="61.4" cy="45.8" r=".95" fill="#fff"/>';
+  s+='<circle cx="41" cy="54" r="3.4" fill="#c97a7e" fill-opacity=".55"/><circle cx="67" cy="54" r="3.4" fill="#c97a7e" fill-opacity=".55"/>';
+  s+='<ellipse cx="54" cy="52" rx="2.6" ry="2" fill="#3a2a26"/>';
+  if(happy)s+='<path d="M49 56q5 5 10 0" stroke="#3a2a26" stroke-width="1.8" fill="#c97a7e" stroke-linecap="round"/><rect x="52" y="56" width="4" height="3.4" rx=".8" fill="#fff"/>';
+  else s+='<path d="M50.5 56.5q3.5 2.5 7 0" stroke="#3a2a26" stroke-width="1.7" fill="none" stroke-linecap="round"/><rect x="52.2" y="57.2" width="3.6" height="2.8" rx=".7" fill="#fff"/>';
+  if(happy)s+='<ellipse cx="54" cy="70" rx="5.5" ry="6.2" fill="#e0a43a"/><path d="M48.5 66q5.5-5 11 0v-1.6q-5.5-4.6-11 0z" fill="#9a6a4e"/>';
+  s+='<ellipse cx="46" cy="70" rx="4.5" ry="3.5" fill="#c56a3a"/><ellipse cx="62" cy="70" rx="4.5" ry="3.5" fill="#c56a3a"/>';
+  s+='</g>';
+  if(mood==='proud')s+='<g class="spark" fill="#f6c66b"><path d="M96 14l1.6 3.4 3.4 1.6-3.4 1.6L96 24l-1.6-3.4L91 19l3.4-1.6z"/><path d="M26 18l1.2 2.6 2.6 1.2-2.6 1.2L26 26l-1.2-2.6-2.6-1.2 2.6-1.2z"/></g>';
+  if(mood==='sleepy')s+='<text x="78" y="26" font-family="Young Serif,Georgia,serif" font-size="12" fill="#7a645b">z</text><text x="86" y="16" font-family="Young Serif,Georgia,serif" font-size="9" fill="#7a645b">z</text>';
+  return s+'</svg>';
+}
+var LINES={
+  start:['Kumm, mir fange a! Erste Aufgabe, los.','Klein anfangen zählt. Eine Schublade ist schon ein Punkt für dich.','Neuer Raum, neues Glück. Die Kisten stehen bereit.','Zehn Minuten reichen für den Anfang. Ich halt die Stoppuhr.'],
+  some:['Sauber! Ich seh schon wieder Boden.','Weniger Kruschtel, mehr Platz. Weiter so!','Du sortierst, ich trag raus. Gutes Team.','Gut gemacht. Kurze Nusspause ist erlaubt, Aufgeben nicht.'],
+  last:['Nur noch eine Aufgabe. Endspurt! Gleich ist der Raum kruschtelfrei.','Fast geschafft. Ich hör schon den Applaus.'],
+  done:['Geschafft! Hier liegt kein Kruschtel mehr rum.','Raum erledigt. Ich bin stolz auf dich!'],
+  plus:['Furt demit!','Weg ist weg.','Eins weniger zum Abstauben.','Tschüss, Kruschtel!','Abtransport läuft.'],
+  pause:['Ich halt die Stellung. Komm zurück, wenn es passt.','Pause ist auch ein Plan. Ich knabber so lang an meiner Nuss.'],
+  give:['Was im Flur steht, ist noch nicht weg. Ab damit!','Spenden macht doppelt froh: dich und jemand anderen.'],
+  grow:['Früher hab ich gehortet wie verrückt. Alle drei geschafften Räume wird mein Vorrat eine Kiste kleiner.']
+};
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function buddyLine(w){var d=w.tasks.filter(function(t){return t.done;}).length,n=w.tasks.length;if(d===n)return pick(LINES.done);if(d===n-1)return pick(LINES.last);if(d===0)return pick(LINES.start.concat(weeksDone()?LINES.grow:[]));return pick(LINES.some);}
+function buddyMood(w){var d=w.tasks.filter(function(t){return t.done;}).length;return d===w.tasks.length?'proud':d>0?'happy':'';}
+function buddyHTML(line,mood,big){return '<div class="buddy'+(big?' big':'')+'"><button id="deerbtn" aria-label="Kurumi antippen">'+happs(tines(),mood)+'</button><p class="bubble" id="say" aria-live="polite">'+line+'</p></div>';}
+function hop(){var d=document.querySelector('#deerbtn .mascot');if(!d)return;d.classList.remove('hop');void d.getBoundingClientRect();d.classList.add('hop');}
+function say(line,mood){var s=$('say');if(s)s.textContent=line;var b=$('deerbtn');if(b&&mood!==undefined){b.innerHTML=happs(tines(),mood);}hop();}
+
+/* Dunkelmodus */
+var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+function applyTheme(){var t=S&&S.theme||'auto',dark=t==='dark'||(t==='auto'&&mq&&mq.matches);document.documentElement.setAttribute('data-theme',dark?'dark':'light');$('themecolor').setAttribute('content',dark?'#2a201d':'#f1e4d4');}
+if(mq&&mq.addEventListener)mq.addEventListener('change',applyTheme);
+
+/* ===== Einrichtung ===== */
+function startSetup(prev){
+  var rooms=PRESETS.map(function(p){return {id:p.id,name:p.name,big:p.big,on:prev?prev.rooms.some(function(r){return r.id===p.id;}):p.on};});
+  if(prev)prev.rooms.forEach(function(r){if(r.custom)rooms.push({id:r.id,name:r.name,big:r.big,on:true,custom:true});});
+  draft={step:1,rooms:rooms,methods:prev?prev.methods.slice():['km','vk','mg'],seed:newSeed(),rolls:0,pace:prev&&prev.pace||'woche'};
+  render();
+}
+var DICE='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.6" fill="currentColor"/></svg>';
+function steps(n){return '<div class="steps" aria-label="Schritt '+n+' von 3">'+[1,2,3].map(function(i){return '<i class="'+(i<=n?'on':'')+'"></i>';}).join('')+'</div>';}
+function renderSetup(){
+  var d=draft,h='';
+  if(d.step===1){
+    var n=d.rooms.filter(function(r){return r.on;}).length;
+    h+='<h1 class="title">Kruschtel-<wbr>Kaizen</h1><p class="lede">Furt demit! Kaizen heißt: jeden Tag ein kleines bisschen besser. Raum für Raum.</p>'+buddyHTML('Konnichiwa! Ich bin <b>Kurumi</b>, das heißt auf Japanisch Walnuss. Früher hab ich alles gehortet, heute misten wir zusammen aus. Kumm, mir fange a!','happy',true)+steps(1);
+    h+='<div class="stack" style="margin-top:26px"><h2>Welche Räume gibt es bei dir?</h2><p class="soft small">Große Räume kommen bei Bedarf zweimal dran.</p><div class="chips">';
+    d.rooms.forEach(function(r,i){h+='<button class="chip" data-r="'+i+'" aria-pressed="'+r.on+'">'+esc(r.name)+(r.big?'<span class="big">groß</span>':'')+(r.custom?'<span class="x" data-del="'+i+'" aria-label="Entfernen">✕</span>':'')+'</button>';});
+    h+='</div><div class="add"><input type="text" id="nr" placeholder="Eigener Raum" maxlength="28" aria-label="Eigener Raum"><label><input type="checkbox" id="nb"> groß</label><button class="btn" id="ad">Hinzufügen</button></div>';
+    h+='<button class="btn" id="next"'+(n?'':' disabled')+'>Weiter mit '+n+' '+(n===1?'Raum':'Räumen')+'</button>'+(S?'<button class="btn text" id="cancel">Abbrechen</button>':'')+'</div>';
+  }else if(d.step===2){
+    h+=steps(2)+'<div class="stack" style="margin-top:26px"><h2>Nach welchen Methoden?</h2><p class="soft small">Die Methoden werden auf die Räume verteilt. Eine reicht auch.</p><div class="mlist">';
+    METHOD_ORDER.forEach(function(k){var m=METHODS[k],on=d.methods.indexOf(k)>=0;h+='<button class="mopt" data-m="'+k+'" aria-pressed="'+on+'"><div><b>'+m.name+'</b><span>'+m.short+'</span></div><span class="ck">'+TICK+'</span></button>';});
+    h+='</div><h2 style="margin-top:34px">Wie schnell?</h2><p class="soft small">Egal welches Tempo: Jeden Tag steht eine kleine Aufgabe für heute bereit.</p><div class="mlist">';
+    Object.keys(PACES).forEach(function(k){var pc=PACES[k];h+='<button class="mopt" data-pace="'+k+'" aria-pressed="'+(d.pace===k)+'"><div><b>'+pc.name+'</b><span>'+pc.desc+', 12 Räume in etwa '+Math.round(pc.days*12/7)+' Wochen</span></div><span class="ck">'+TICK+'</span></button>';});
+    h+='</div><button class="btn" id="next"'+(d.methods.length?'':' disabled')+'>Plan ansehen</button><button class="btn text" id="back">Zurück</button></div>';
+  }else{
+    var rooms=d.rooms.filter(function(r){return r.on;}),plan=planWeeks(rooms,d.methods,12,d.seed,d.pace);
+    var cnt={};plan.forEach(function(w){cnt[w.method]=(cnt[w.method]||0)+1;});
+    h+=steps(3)+'<div class="stack" style="margin-top:26px"><h2>Dein Plan</h2>';
+    h+=buddyHTML(d.methods.length>1?(d.rolls?pick(['Neuer Wurf! Diesmal fängst du mit '+METHODS[plan[0].method].name+' an.','Gewürfelt! '+PACES[d.pace].one+' 1 wird '+METHODS[plan[0].method].name+'.','Die Würfel sind gefallen. Passt es dir so?']):'Ich hab ausgewürfelt, welche Methode wann dran ist. '+PACES[d.pace].one+' 1 wird '+METHODS[plan[0].method].name+'.'):'Mit einer Methode gibt es nichts zu würfeln. Dafür weißt du immer, was kommt.','happy');
+    if(d.methods.length>1)h+='<button class="btn line" id="roll"><span class="dice" id="dice">'+DICE+'</span>Neu würfeln</button>';
+    h+='<p class="soft small">'+Object.keys(cnt).map(function(k){return METHODS[k].name+' '+cnt[k]+'×';}).join(', ')+'. Räume und Methoden sind ausgewürfelt, die Reihenfolge kannst du später im Plan ändern.</p><div class="grid">';
+    plan.forEach(function(w,i){h+='<div class="cell">'+stillLife('1|'+w.room+'|'+w.method,0,{label:w.room,room:w.ids[0],uid:'p'+i}).svg+'<b>'+esc(w.room)+'</b><span>'+PACES[d.pace].one+' '+(i+1)+', '+METHODS[w.method].name+'</span></div>';});
+    h+='</div><button class="btn" id="go">Mit '+PACES[d.pace].one+' 1 beginnen</button><button class="btn text" id="back">Zurück</button></div>';
+  }
+  $('app').innerHTML=h;window.scrollTo(0,0);
+  var q=function(s){return $('app').querySelectorAll(s);};
+  q('[data-r]').forEach(function(b){b.onclick=function(e){if(e.target.dataset.del){d.rooms.splice(+e.target.dataset.del,1);}else{var r=d.rooms[+b.dataset.r];r.on=!r.on;}renderSetup();};});
+  q('[data-pace]').forEach(function(b){b.onclick=function(){d.pace=b.dataset.pace;renderSetup();window.scrollTo(0,document.body.scrollHeight);};});
+  q('[data-m]').forEach(function(b){b.onclick=function(){var k=b.dataset.m,i=d.methods.indexOf(k);if(i>=0)d.methods.splice(i,1);else d.methods.push(k);d.methods.sort(function(a,c){return METHOD_ORDER.indexOf(a)-METHOD_ORDER.indexOf(c);});renderSetup();};});
+  if($('ad')){var add=function(){var v=$('nr').value.trim();if(!v)return;d.rooms.push({id:'c'+Date.now(),name:v,big:$('nb').checked,on:true,custom:true});renderSetup();};$('ad').onclick=add;$('nr').onkeydown=function(e){if(e.key==='Enter')add();};}
+  if($('next'))$('next').onclick=function(){d.step++;renderSetup();};
+  if($('deerbtn'))$('deerbtn').onclick=function(){hop();};
+  if($('roll'))$('roll').onclick=function(){var dc=$('dice');dc.classList.add('roll');setTimeout(function(){d.seed=newSeed();d.rolls++;var y=window.scrollY;renderSetup();window.scrollTo(0,y);hop();},450);};
+  if($('back'))$('back').onclick=function(){d.step--;renderSetup();};
+  if($('cancel'))$('cancel').onclick=function(){draft=null;render();};
+  if($('go'))$('go').onclick=function(){
+    var rooms=d.rooms.filter(function(r){return r.on;}).map(function(r){return {id:r.id,name:r.name,big:r.big,custom:!!r.custom};});
+    var old=S;S=newState(rooms,d.methods.slice(),d.seed,d.pace);
+    if(old){S.cal=old.cal;S.theme=old.theme;S.give=old.give;S.round=old.round;S.outPrev=totalOut(old);}
+    draft=null;save();tab='woche';render();
+  };
+}
+
+/* ===== Woche ===== */
+function scene(i,f){var w=S.plan[i];return stillLife(seed(i),f,{label:w.room,room:rid(w),uid:'w'}).svg;}
+function tallyHTML(w){
+  return '<section class="tally" aria-label="Zähler"><div><div class="big" id="tw">'+(w.out||0)+'</div><div class="lbl">Dinge haben '+(U().one==='Woche'?'diese Woche':'in dieser Etappe')+' das Haus verlassen. Insgesamt <b id="tt">'+num(totalOut(S))+'</b>.</div></div>'+
+    '<div class="pm"><button id="minus" aria-label="Eins weniger">−</button><button class="plus" id="plus" aria-label="Eins mehr">+1</button></div>'+
+    '<div class="links"><button id="togive">Auf die Abgabe-Liste</button><button id="where">Wohin damit?</button></div></section>';
+}
+function renderWeek(){
+  if(S.finished)return renderFinished();
+  var i=S.week,w=S.plan[i],m=METHODS[w.method],f=frac(w);
+  var h='<div class="head2"><div><span class="wk">'+U().one+' '+(i+1)+' von '+S.plan.length+(S.round>1?', Runde '+S.round:'')+'</span><h1 class="room">'+esc(w.room)+'</h1></div><button class="meth m-'+w.method+' mbtn" id="mhow" aria-label="So geht '+m.name+'">'+m.name+' <span aria-hidden="true">ⓘ</span></button></div>';
+  h+='<div class="scene" id="scene">'+scene(i,f)+'</div>';
+  if(S.paused){
+    h+='<section class="today light" style="margin-top:14px">'+buddyHTML(pick(LINES.pause),'sleepy')+'<p class="tt2">Pausiert seit '+fmtDate(S.paused)+'</p><p class="soft small">Der Plan wartet, deine Haken bleiben.</p><button class="btn" id="resume">Weitermachen</button></section>';
+    $('app').innerHTML=h;bindHow(m);$('resume').onclick=function(){S.paused=null;save();renderWeek();};$('deerbtn').onclick=function(){say(pick(LINES.pause));};return;
+  }
+  h+='<div id="todaybox" style="margin-top:14px"></div>';
+  h+='<section class="strip" aria-label="Zähler"><div class="sn"><b id="tw">'+(w.out||0)+'</b><span>weg '+(U().one==='Woche'?'diese Woche':'in dieser Etappe')+'<br>insgesamt <span id="tt">'+num(totalOut(S))+'</span></span></div><div class="pm"><button id="minus" aria-label="Eins weniger">−</button><button class="plus" id="plus" aria-label="Eins mehr">+1</button></div></section>';
+  h+='<div class="links"><button id="togive">Auf die Abgabe-Liste</button><button id="where">Wohin damit?</button></div>';
+  h+='<div id="tipbox"></div>';
+  h+='<details class="how list" id="all"><summary>Alle Aufgaben <span class="soft" id="cnt"></span></summary><ul class="tasks">';
+  w.tasks.forEach(function(t,k){h+='<li'+(t.own?' class="own"':'')+'><button class="task" data-t="'+k+'" aria-pressed="'+t.done+'"><span class="c">'+TICK+'</span><span class="t">'+esc(t.t)+(t.own?'<span class="ownb">eigene</span>':'')+'</span>'+(t.n?'<span class="n">+'+t.n+'</span>':'<span></span>')+'</button>'+(t.own?'<button class="tdel" data-del="'+k+'" aria-label="Eigene Aufgabe löschen">✕</button>':'')+'</li>';});
+  h+='</ul><div class="addt"><div class="row2"><input type="text" id="nt" maxlength="120" placeholder="Eigene Aufgabe, z. B. Kartons von Opa durchsehen" aria-label="Eigene Aufgabe"><button class="btn" id="ntadd">Hinzufügen</button></div><label><input type="checkbox" id="ntrem" checked> Auch beim nächsten Mal in diesem Raum</label></div><p class="gate">Die nächste '+U().one+' öffnet sich, sobald alle Aufgaben abgehakt sind.</p></details>';
+  h+='<button class="btn text" id="pause">'+U().one+' pausieren</button>';
+  $('app').innerHTML=h;bindHow(m);
+  var refresh=function(bump){
+    var tmp=document.createElement('div');tmp.innerHTML=scene(i,frac(w));
+    var fresh=tmp.querySelectorAll('.obj'),cur=$('scene').querySelectorAll('.obj');
+    cur.forEach(function(g,k){g.classList.toggle('gone',fresh[k].classList.contains('gone'));});
+    var sun=$('scene').querySelector('.sun');sun.setAttribute('style',tmp.querySelector('.sun').getAttribute('style'));
+    $('cnt').textContent=w.tasks.filter(function(x){return x.done;}).length+' von '+w.tasks.length;
+    $('tw').textContent=w.out;$('tt').textContent=num(totalOut(S));
+    $('app').querySelectorAll('[data-t]').forEach(function(x){x.setAttribute('aria-pressed',w.tasks[+x.dataset.t].done);});
+    if(bump){$('tw').classList.remove('bump');void $('tw').offsetWidth;$('tw').classList.add('bump');}
+    todayBox();
+  };
+  var toggle=function(k){var t=toggleTask(S,k);save();if(t.done&&navigator.vibrate)try{navigator.vibrate(12);}catch(e){}refresh(!!t.n);if(t.done)say(buddyLine(w),buddyMood(w));};
+  WK={toggle:toggle};
+  $('app').querySelectorAll('[data-t]').forEach(function(b){b.onclick=function(){toggle(+b.dataset.t);};});
+  $('plus').onclick=function(){addOut(S,1);save();refresh(true);say(pick(LINES.plus),'happy');};
+  if(openAll)$('all').open=true;
+  $('all').ontoggle=function(){openAll=$('all').open;};
+  var addOwn=function(){var v=$('nt').value;if(addTask(S,v,$('ntrem').checked)){save();openAll=true;var y=window.scrollY;renderWeek();window.scrollTo(0,y);toast('Aufgabe hinzugefügt');var f=$('nt');if(f)f.focus();}else if(v.trim())toast('Diese Aufgabe gibt es schon.');};
+  $('ntadd').onclick=addOwn;$('nt').onkeydown=function(e){if(e.key==='Enter')addOwn();};
+  $('app').querySelectorAll('[data-del]').forEach(function(b){b.onclick=function(){if(removeTask(S,+b.dataset.del)){save();var y=window.scrollY;renderWeek();window.scrollTo(0,y);toast('Aufgabe gelöscht');}};});
+  $('minus').onclick=function(){addOut(S,-1);save();refresh(false);};
+  $('togive').onclick=function(){addGiveDialog();};
+  $('where').onclick=function(){tab='abgabe';window.scrollTo(0,0);render();};
+  $('pause').onclick=function(){S.paused=new Date().toISOString();save();window.scrollTo(0,0);renderWeek();};
+  refresh(false);tipBox(0);
+}
+var WK=null,tipN=0,openAll=false,miniN=0,miniTimer=null;
+var ACORN='<svg viewBox="0 0 30 30" aria-hidden="true"><ellipse cx="15" cy="18" rx="8" ry="9" fill="#e0a43a"/><path d="M6 13q9-8 18 0v-2.5q-9-7-18 0z" fill="#9a6a4e"/><path d="M15 4v3.5" stroke="#9a6a4e" stroke-width="2" stroke-linecap="round"/></svg>';
+function tipBox(step){
+  tipN+=step;var t=tipFor(S,tipN),b=$('tipbox');if(!b)return;var cb=S.cb&&CB[S.cb];
+  b.innerHTML='<section class="tipc">'+ACORN+'<div><h4>Kurumis Tipp'+(t.own?'<span>für '+cb.name+'</span>':'')+'</h4><p>'+esc(t.text)+'</p><div class="acts"><button id="tipnext">Noch ein Tipp</button>'+(cb?'':'<button id="tipquiz">Welcher Aufräumtyp bin ich?</button>')+'</div></div></section>';
+  $('tipnext').onclick=function(){tipBox(1);};
+  if($('tipquiz'))$('tipquiz').onclick=function(){quiz();};
+}
+/* Kurztest nach Clutterbug: zwei Fragen */
+function quiz(){
+  var a={};
+  var q1=function(){dialog('<h3>Welcher Aufräumtyp bist du?</h3><p class="soft small">Zwei kurze Fragen, nach den Clutterbug-Stilen von Cas Aarssen.</p><p><b>Wie sieht die Vorderseite deines Kühlschranks aus?</b></p><div class="quiz"><button class="qopt" data-v="sichtbar"><b>Voll mit Zetteln und Fotos</b><span>Ich sehe meine Sachen gern, sonst vergesse ich sie.</span></button><button class="qopt" data-v="versteckt"><b>Ziemlich leer</b><span>Sachen dürfen gern hinter Türen und in Schubladen verschwinden.</span></button></div><button class="btn text" data-close>Später</button>',function(){
+    $('dlgbox').querySelectorAll('[data-v]').forEach(function(b){b.onclick=function(){a.store=b.dataset.v;q2();};});});};
+  var q2=function(){dialog('<h3>Welcher Aufräumtyp bist du?</h3><p><b>Wie sortierst du am liebsten?</b></p><div class="quiz"><button class="qopt" data-v="einfach"><b>Schnell und grob</b><span>Hauptsache, es ist weg. Ein Korb für alles reicht mir.</span></button><button class="qopt" data-v="detailliert"><b>Genau und mit System</b><span>Fächer, Etiketten, jedes Ding an seinem Platz.</span></button></div><button class="btn text" data-close>Später</button>',function(){
+    $('dlgbox').querySelectorAll('[data-v]').forEach(function(b){b.onclick=function(){a.sys=b.dataset.v;res();};});});};
+  var res=function(){var k=cbType(a.store,a.sys),c=CB[k];S.cb=k;save();
+    dialog('<div class="center" style="width:110px;margin:0 auto">'+happs(tines(),'proud')+'</div><p class="soft small center">Du bist ein</p><p class="cbres center">'+c.name+' <span class="soft" style="font-size:18px">('+c.en+')</span></p><p class="soft small center">'+c.store.charAt(0).toUpperCase()+c.store.slice(1)+' und '+c.sys+'</p><p>'+c.desc+'</p><p><b>Kurumis Tipp:</b> '+c.tips[0]+'</p><p class="soft small">Ab jetzt passen meine Tipps zu deinem Stil. Ändern kannst du ihn unter Mehr.</p><button class="btn" data-close>Alles klar</button>',function(){hop2();},function(){if(tab==='woche')tipBox(0);if(tab==='mehr')renderMore();});};
+  q1();
+}
+function bindHow(m){$('mhow').onclick=function(){dialog('<h3>So geht '+m.name+'</h3><p>'+m.text+'</p><p class="rule">'+m.rule+'</p><button class="btn" data-close>Alles klar</button>');};}
+function dots(t){var s='<span class="dots" aria-label="Tag '+Math.min(t.day+1,t.days)+' von '+t.days+'">';for(var d=0;d<t.days;d++)s+='<i class="'+(d<t.day?'past':d===t.day?'cur':'')+'"></i>';if(t.late)s+='<em>+'+(t.day-t.days+1)+'</em>';return s+'</span>';}
+function todayBox(){
+  var w=S.plan[S.week],t=today(S),box=$('todaybox'),h,d=w.tasks.filter(function(x){return x.done;}).length,n=w.tasks.length;if(!box)return;
+  var bar='<div class="tbar"><i style="width:'+(d/n*100)+'%"></i></div><p class="tsub">'+d+' von '+n+' Aufgaben '+(U().one==='Woche'?'dieser Woche':'dieser Etappe')+'</p>';
+  var bud=buddyHTML(buddyLine(w),buddyMood(w));
+  if(weekDone(w)){
+    h='<section class="today light">'+bud+'<p class="tt2">'+esc(w.room)+' ist geschafft.</p><button class="btn" id="fin">'+esc(w.room)+' abschließen</button></section>';
+  }else if(t.task!=null){
+    h='<section class="today">'+bud+'<div class="tl"><span>Heute dran</span>'+dots(t)+'</div><p class="tt2">'+esc(w.tasks[t.task].t)+'</p>'+(t.late?'<p class="tsub">Etwas hinterher. Kein Problem, einfach weiter.</p>':t.dueLeft>1?'<p class="tsub">Danach noch '+(t.dueLeft-1)+' für heute.</p>':'')+'<button class="btn" id="tdone">Erledigt</button><button class="mini" id="mini5">Wenig Energie? Nur 5 Minuten</button>'+bar+'</section>';
+  }else{
+    h='<section class="today light">'+bud+'<div class="tl"><span>Für heute geschafft</span>'+dots(t)+'</div><p class="tt2 sm">Morgen: '+esc(w.tasks[t.next].t)+'</p><button class="btn line" id="tmore">Schon jetzt erledigen</button><button class="mini" id="mini5">Noch Lust? 5-Minuten-Einsatz</button>'+bar+'</section>';
+  }
+  box.innerHTML=h;
+  $('deerbtn').onclick=function(){say(buddyLine(w),buddyMood(w));};
+  if($('tdone'))$('tdone').onclick=function(){WK.toggle(t.task);};
+  if($('tmore'))$('tmore').onclick=function(){WK.toggle(t.next);};
+  if($('fin'))$('fin').onclick=finishWeek;
+  if($('mini5'))$('mini5').onclick=function(){fiveMin();};
+}
+function fiveMin(){
+  var stop=function(){if(miniTimer){clearInterval(miniTimer);miniTimer=null;}};
+  var show=function(){stop();var room=S.plan[S.week].room;
+    dialog('<div class="center" style="width:96px;margin:0 auto">'+happs(tines(),'happy')+'</div><p class="soft small center">Nur 5 Minuten'+(room?', '+esc(room):'')+'</p><p class="mtask">'+esc(miniTask(miniN))+'</p><p class="timer" id="tm">5:00</p><button class="btn" id="mgo">Timer starten</button><div class="row"><button class="btn line" id="mnext">Andere Aufgabe</button><button class="btn line" id="mok">Geschafft</button></div><button class="btn text" data-close>Heute nicht</button>',function(){
+      $('mnext').onclick=function(){miniN++;show();};
+      $('mok').onclick=function(){stop();done();};
+      $('mgo').onclick=function(){var end=Date.now()+300000;$('mgo').hidden=true;var tick=function(){var r=Math.max(0,end-Date.now()),m=Math.floor(r/60000),s=Math.floor(r%60000/1000);var el=$('tm');if(!el){stop();return;}el.textContent=m+':'+('0'+s).slice(-2);if(r<=0){stop();if(navigator.vibrate)try{navigator.vibrate([80,60,80]);}catch(e){}el.textContent='Zeit!';}};tick();miniTimer=setInterval(tick,250);};
+    },function(){stop();});};
+  var done=function(){
+    dialog('<div class="center" style="width:96px;margin:0 auto">'+happs(tines(),'proud')+'</div><h3 class="center">Kaizen! Kleine Schritte zählen.</h3><p class="soft center">Wie viele Dinge sind dabei rausgeflogen?</p><div class="qty"><button data-q="0">Keins</button><button data-q="1">+1</button><button data-q="3">+3</button><button data-q="5">+5</button></div>',function(){hop2();
+      $('dlgbox').querySelectorAll('[data-q]').forEach(function(b){b.onclick=function(){var q=+b.dataset.q;S.minis=(S.minis||0)+1;if(q)addOut(S,q);save();closeDlg();if(tab==='woche')renderWeek();toast(q?'Furt demit! +'+q:'Auch Sortieren zählt.');};});});
+  };
+  show();
+}
+function finishWeek(){
+    var w=S.plan[S.week],room=w.room,out=w.out,r=advance(S);save();
+    var grew=tines()>Math.min(5,1+Math.floor((weeksDone()-1)/3)+(S.round-1));
+    dialog('<div class="center" style="width:120px;margin:0 auto">'+happs(tines(),'proud')+'</div><h2>'+esc(room)+' hat wieder Luft.</h2>'+(grew?'<p><b>Vorrat aufgeräumt!</b> Kurumis Kruschtel-Stapel ist eine Kiste kleiner.</p>':'')+'<p class="soft">'+(out?out+(out===1?' Ding hat':' Dinge haben')+' das Haus verlassen. ':'')+(r==='next'?'Als Nächstes: '+esc(S.plan[S.week].room)+' mit '+METHODS[S.plan[S.week].method].name+'.':'Das war die letzte '+U().one+'.')+'</p><button class="btn" data-close>'+(r==='next'?U().one+' '+(S.week+1)+' öffnen':'Weiter')+'</button><button class="btn line" id="shr">Als Bild teilen</button>',function(){hop2();var idx=S.finished?S.plan.length-1:S.week-1;$('shr').onclick=function(){shareCard(idx);};},function(){render();window.scrollTo(0,0);});
+}
+/* Abschlusskarte als Bild: Stillleben, Kurumi, Zahlen */
+var CARD_VARS={'var(--wall)':'#f6ebdd','var(--sky1)':'#f9d9a8','var(--sky2)':'#fbefe0','var(--light)':'#f6c66b','var(--paper2)':'#e8d6c2','currentColor':'#3a2a26'};
+function cardSVG(i){
+  var w=S.plan[i],sc=stillLife(seed(i),1,{label:w.room,room:rid(w),uid:'c'+i}).svg,ms=happs(tines(),'proud');
+  Object.keys(CARD_VARS).forEach(function(k){sc=sc.split(k).join(CARD_VARS[k]);});
+  sc=sc.replace('<svg ','<svg x="90" y="300" width="900" height="686" ');ms=ms.replace('<svg ','<svg x="700" y="1010" width="300" height="284" ');
+  var x=function(s){return esc(s).replace(/'/g,'&#39;');},d=new Date(w.doneAt||Date.now());
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350"><rect width="1080" height="1350" fill="#f1e4d4"/><rect x="60" y="60" width="960" height="1230" rx="56" fill="#faf3ea"/>'+
+    '<text x="110" y="150" font-family="Georgia,serif" font-size="40" fill="#7a645b">Kruschtel-Kaizen</text>'+
+    '<text x="110" y="250" font-family="Georgia,serif" font-size="92" fill="#3a2a26">'+x(w.room)+'</text>'+sc+
+    '<text x="110" y="1110" font-family="Georgia,serif" font-size="120" fill="#3a2a26">'+(w.out||0)+'</text>'+
+    '<text x="110" y="1170" font-family="Helvetica,Arial,sans-serif" font-size="40" fill="#3a2a26">'+((w.out||0)===1?'Ding ist furt':'Dinge sind furt')+'</text>'+
+    '<text x="110" y="1230" font-family="Helvetica,Arial,sans-serif" font-size="32" fill="#7a645b">'+x(U().one+' '+(i+1)+' von '+S.plan.length+', '+METHODS[w.method].name+', '+d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear())+'</text>'+ms+'</svg>';
+}
+function shareCard(i){
+  var w=S.plan[i],svg=cardSVG(i),name='kruschtel-kaizen-'+w.room.toLowerCase().replace(/[^a-z0-9äöüß]+/g,'-')+'.png';
+  var fallback=function(src){dialog('<h3>'+esc(w.room)+' ist geschafft</h3><img class="shareimg" src="'+src+'" alt="Abschlusskarte '+esc(w.room)+'"><p class="soft small">Lange auf das Bild drücken, um es zu speichern oder zu teilen.</p><button class="btn" data-close>Fertig</button>');};
+  var img=new Image();
+  img.onload=function(){
+    try{var c=document.createElement('canvas');c.width=1080;c.height=1350;c.getContext('2d').drawImage(img,0,0);
+      c.toBlob(function(b){
+        if(!b){fallback(img.src);return;}
+        var f=new File([b],name,{type:'image/png'}),url=URL.createObjectURL(b);
+        if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:w.room+' ist geschafft',text:(w.out||0)+' Dinge sind furt. Kruschtel-Kaizen'}).catch(function(){fallback(url);});}
+        else fallback(url);
+      },'image/png');
+    }catch(e){fallback(img.src);}
+  };
+  img.onerror=function(){toast('Die Karte ließ sich nicht erstellen.');};
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+}
+function hop2(){var d=$('dlgbox').querySelector('.mascot');if(d)d.classList.add('hop');}
+function renderFinished(){
+  var h='<span class="wk">Runde '+S.round+' abgeschlossen</span><div class="scene">'+stillLife('fin|'+S.round,1,{label:'Leerer Raum',room:'wz',uid:'f'}).svg+'</div>';
+  h+='<h1 class="room">Alles hat wieder Luft.</h1>'+buddyHTML('Zwölf '+U().many+'! Alles kruschtelfrei, Kaizen wie im Buche. Sogar mein Vorrat ist aufgeräumt.','proud')+'<div class="stack" style="margin-top:20px"><p class="soft">'+num(totalOut(S))+' Dinge haben dein Zuhause verlassen. Mit der Zeit kommt wieder etwas dazu, darum geht die nächste Runde schneller.</p>';
+  h+='<button class="btn" id="again">Runde '+(S.round+1)+' beginnen</button><button class="btn line" id="chg">Räume oder Methoden ändern</button></div>';
+  $('app').innerHTML=h;
+  $('again').onclick=function(){nextRound(S);save();render();};
+  $('deerbtn').onclick=function(){hop();};
+  $('chg').onclick=function(){S.round++;startSetup(S);};
+}
+
+/* ===== Plan ===== */
+function renderPlan(){
+  var h='<h2>Zwölf '+U().many+'</h2><p class="soft small" style="margin-top:6px">'+(S.round>1?'Runde '+S.round+'. ':'')+S.rooms.length+' Räume, '+S.methods.map(function(k){return METHODS[k].name;}).join(', ')+'.</p>'+(S.finished?'':'<button class="btn line sm" id="om" style="margin-top:14px">'+(orderMode?'Fertig':'Reihenfolge ändern')+'</button>');
+  if(orderMode){
+    h+='<p class="soft small" style="margin-top:14px">Kommende '+U().many+' lassen sich verschieben. Erledigte und die aktuelle bleiben fest.</p><ul class="order" style="margin-top:14px">';
+    S.plan.forEach(function(w,i){
+      var fixed=i<=S.week;
+      h+='<li><b>'+(i+1)+'</b><span class="nm">'+esc(w.room)+'<small>'+METHODS[w.method].name+'</small></span>'+(fixed?'<span class="fixed">'+(i<S.week?'erledigt':'jetzt')+'</span>':'<span class="mv"><button data-up="'+i+'" aria-label="Nach oben"'+(i-1<=S.week?' disabled':'')+'>↑</button><button data-dn="'+i+'" aria-label="Nach unten"'+(i+1>=S.plan.length?' disabled':'')+'>↓</button></span>')+'</li>';
+    });
+    h+='</ul>';
+  }else{
+    h+='<div class="grid" style="margin-top:22px">';
+    S.plan.forEach(function(w,i){
+      var st=S.finished||i<S.week?'done':i===S.week?'now':'lock',f=st==='done'?1:st==='now'?frac(w):0;
+      h+='<div class="cell '+st+'"'+(st==='done'?' data-share="'+i+'" role="button" tabindex="0" aria-label="'+esc(w.room)+' als Bild teilen"':'')+'>'+stillLife(seed(i),f,{label:w.room,room:rid(w),dim:st==='lock',uid:'g'+i}).svg+'<b>'+esc(w.room)+'</b><span>'+(st==='done'?'<span class="shr">Teilen</span> Erledigt'+(w.out?', '+w.out+' Dinge weg':''):st==='now'?(S.paused?'Pausiert':'Diese '+U().one):U().one+' '+(i+1))+', '+METHODS[w.method].name+'</span></div>';
+    });
+    h+='</div>';
+  }
+  $('app').innerHTML=h;
+  if($('om'))$('om').onclick=function(){orderMode=!orderMode;renderPlan();};
+  $('app').querySelectorAll('[data-share]').forEach(function(c){c.onclick=function(){shareCard(+c.dataset.share);};c.onkeydown=function(e){if(e.key==='Enter')shareCard(+c.dataset.share);};});
+  $('app').querySelectorAll('[data-up]').forEach(function(b){b.onclick=function(){moveWeek(S,+b.dataset.up,-1);save();renderPlan();};});
+  $('app').querySelectorAll('[data-dn]').forEach(function(b){b.onclick=function(){moveWeek(S,+b.dataset.dn,1);save();renderPlan();};});
+}
+
+/* ===== Abgabe ===== */
+function catName(k){return (GIVE_CATS.filter(function(c){return c[0]===k;})[0]||['','Sonstiges'])[1];}
+function howName(k){return (GIVE_HOW.filter(function(c){return c[0]===k;})[0]||['',''])[1];}
+function giveForm(){
+  return '<div class="form"><input type="text" id="gt" placeholder="Was soll weg? z. B. Wintermantel, Kinderbücher" maxlength="60" aria-label="Was soll weg?">'+
+    '<div class="seg" role="group" aria-label="Art">'+GIVE_CATS.map(function(c){return '<button data-gc="'+c[0]+'" aria-pressed="'+(giveDraft.cat===c[0])+'">'+c[1]+'</button>';}).join('')+'</div>'+
+    '<div class="seg" role="group" aria-label="Weg">'+GIVE_HOW.map(function(c){return '<button data-gh="'+c[0]+'" aria-pressed="'+(giveDraft.how===c[0])+'">'+c[1]+'</button>';}).join('')+'</div>'+
+    '<button class="btn" id="gadd">Auf die Liste</button></div>';
+}
+function bindGiveForm(after){
+  var root=$('dlg').hidden?$('app'):$('dlgbox');
+  root.querySelectorAll('[data-gc]').forEach(function(b){b.onclick=function(){giveDraft.cat=b.dataset.gc;root.querySelectorAll('[data-gc]').forEach(function(x){x.setAttribute('aria-pressed',x===b);});};});
+  root.querySelectorAll('[data-gh]').forEach(function(b){b.onclick=function(){giveDraft.how=b.dataset.gh;root.querySelectorAll('[data-gh]').forEach(function(x){x.setAttribute('aria-pressed',x===b);});};});
+  var add=function(){var v=root.querySelector('#gt').value.trim();if(!v){root.querySelector('#gt').focus();return;}
+    S.give.unshift({id:Date.now(),t:v,cat:giveDraft.cat,how:giveDraft.how,done:false,room:S.plan[S.week]?S.plan[S.week].room:''});save();toast('Auf der Abgabe-Liste');after();};
+  root.querySelector('#gadd').onclick=add;root.querySelector('#gt').onkeydown=function(e){if(e.key==='Enter')add();};
+}
+function addGiveDialog(){dialog('<h3>Auf die Abgabe-Liste</h3>'+giveForm()+'<button class="btn text" data-close>Abbrechen</button>',function(){bindGiveForm(closeDlg);setTimeout(function(){var g=$('gt');if(g)g.focus();},50);});}
+function renderGive(){
+  var open=S.give.filter(function(g){return !g.done;});
+  var h='<h2>Abgabe</h2>'+buddyHTML(open.length?pick(LINES.give):'Hier kommt hin, was raus soll. Dann steht es nicht wochenlang im Flur.','');
+  h+='<div class="stack" style="margin-top:22px"><section class="tally"><div><div class="big">'+num(totalOut(S))+'</div><div class="lbl">Dinge haben dein Zuhause bisher verlassen.</div></div></section>';
+  h+='<section class="panel">'+giveForm()+'</section>';
+  if(S.give.length){
+    h+='<ul class="give">';
+    S.give.forEach(function(g,i){h+='<li class="'+(g.done?'done':'')+'"><button class="c" data-gd="'+i+'" aria-pressed="'+g.done+'" aria-label="Abgegeben">'+TICK+'</button><span class="tt">'+esc(g.t)+'<small>'+catName(g.cat)+', '+howName(g.how)+(g.room?', aus '+esc(g.room):'')+'</small></span><button class="del" data-gx="'+i+'" aria-label="Löschen">✕</button></li>';});
+    h+='</ul>';
+  }
+  var plinkHTML=function(p){return '<a class="plink" href="'+p.url+'" target="_blank" rel="noopener"><b>'+esc(p.name)+'</b><span>'+esc(p.desc)+'</span><i>'+p.how.map(howName).join(', ')+'</i></a>';};
+  h+='<div><h3>Wohin damit?</h3><p class="soft small" style="margin-top:4px">';
+  if(allPortals||!open.length){
+    h+=(S.give.length&&!open.length?'Alles auf deiner Liste ist abgegeben. Hier sind alle Portale.':allPortals?'Alle Portale, nach Art sortiert.':'Sobald du etwas auf die Liste setzt, zeige ich hier nur die passenden Portale.')+'</p></div><div class="portals">';
+    GIVE_CATS.forEach(function(c){var ps=PORTALS.filter(function(p){return p.cat.indexOf(c[0])>=0;});if(ps.length)h+='<div class="pgroup"><h3>'+c[1]+'</h3>'+ps.map(plinkHTML).join('')+'</div>';});
+    h+='</div>'+(open.length?'<button class="btn line" id="allp">Nur passende Portale zeigen</button>':'');
+  }else{
+    var groups=portalGroups(open);
+    h+='Passend zu '+(open.length===1?'dem, was':'den '+open.length+' Dingen, die')+' noch abgegeben werden '+(open.length===1?'soll':'sollen')+'.</p></div><div class="portals">';
+    groups.forEach(function(gr){
+      h+='<div class="pgroup"><h3>'+catName(gr.cat)+' '+({spenden:'spenden',verschenken:'verschenken',verkaufen:'verkaufen'}[gr.how])+'</h3><p class="soft small">Für: '+gr.items.map(esc).join(', ')+'</p>'+
+        (gr.exact?'':'<p class="soft small">Zum '+howName(gr.how)+' gibt es dafür kein eigenes Portal. Diese nehmen '+catName(gr.cat)+' an:</p>')+gr.portals.map(plinkHTML).join('')+'</div>';
+    });
+    h+='</div><button class="btn line" id="allp">Alle Portale zeigen</button>';
+  }
+  h+='<p class="soft small">Für Sperrmüll, Elektroschrott und Sondermüll ist der Wertstoffhof deiner Stadt zuständig.</p></div>';
+  $('app').innerHTML=h;
+  bindGiveForm(renderGive);
+  if($('allp'))$('allp').onclick=function(){allPortals=!allPortals;renderGive();};
+  $('deerbtn').onclick=function(){say(pick(LINES.give));};
+  $('app').querySelectorAll('[data-gd]').forEach(function(b){b.onclick=function(){var g=S.give[+b.dataset.gd];g.done=!g.done;save();if(g.done)toast('Abgegeben');renderGive();};});
+  $('app').querySelectorAll('[data-gx]').forEach(function(b){b.onclick=function(){S.give.splice(+b.dataset.gx,1);save();renderGive();};});
+}
+
+/* ===== Kalender ===== */
+function download(name,txt){try{var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/calendar'}));a.download=name;document.body.appendChild(a);a.click();a.remove();}catch(e){toast('Der Kalender lässt sich hier nicht laden.');}}
+var MON=['Jan.','Feb.','März','Apr.','Mai','Juni','Juli','Aug.','Sep.','Okt.','Nov.','Dez.'],MONL=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+function dm(d){return d.getDate()+'.'+(d.getMonth()+1)+'.';}
+function renderCal(){
+  var sc=schedule(S),last=sc[sc.length-1],days=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+  var h='<h2>Kalender</h2><p class="soft small" style="margin-top:6px">'+(S.finished?'Runde '+S.round+' ist geschafft.':'Wenn du so weitermachst, bist du um den '+dm(last.end)+last.end.getFullYear()+' durch.')+' Eine '+U().one+' dauert so lange, bis alle Aufgaben abgehakt sind.</p>';
+  var mon=-1;
+  sc.forEach(function(e){
+    var m=e.start.getMonth();if(m!==mon){if(mon>=0)h+='</ul>';h+='<h3 class="month">'+MONL[m]+(e.start.getFullYear()!==new Date().getFullYear()?' '+e.start.getFullYear():'')+'</h3><ul class="cal">';mon=m;}
+    var lab={done:'Erledigt am '+dm(e.end)+(e.out?', '+e.out+' Dinge weg':''),now:'Diese '+U().one,paused:'Pausiert',next:'Geplant'}[e.st];
+    h+='<li class="'+e.st+'"><div class="dt"><b>'+e.start.getDate()+'</b><span>'+MON[m]+'</span></div><div><div class="rm">'+esc(e.room)+'</div><div class="sub"><span class="meth m-'+e.method+'">'+METHODS[e.method].name+'</span><span>'+dm(e.start)+' bis '+dm(e.end)+', '+lab+'</span></div></div></li>';
+  });
+  h+='</ul><div class="stack" style="margin-top:26px">';
+  h+='<section class="panel"><h3>Plan in deinen Kalender</h3><p class="soft small">Jede kommende '+U().one+' als ganztägiger Eintrag mit Raum und Methode. Verschiebt sich etwas, lade den Plan einfach neu.</p><button class="btn" id="planics">Plan in den Kalender</button></section>';
+  h+='<section class="panel"><h3>Erinnerung</h3><p class="soft small">Ein Termin in deinem Kalender, der dich an die Aufgabe für heute erinnert.</p><div class="seg" role="group" aria-label="Wie oft">'+[['daily','Täglich'],['weekly','Wöchentlich']].map(function(f){return '<button data-fq="'+f[0]+'" aria-pressed="'+(S.cal.freq===f[0])+'">'+f[1]+'</button>';}).join('')+'</div><div class="row">'+(S.cal.freq==='weekly'?'<select id="cd" aria-label="Tag">'+days.map(function(d,i){return '<option value="'+i+'"'+(S.cal.day===i?' selected':'')+'>'+d+'</option>';}).join('')+'</select>':'')+'<select id="ct" aria-label="Uhrzeit">'+['07:00','08:00','09:00','10:00','12:00','14:00','16:00','18:00','19:00','20:00'].map(function(t){return '<option'+(S.cal.time===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select></div><button class="btn" id="ics">Erinnerung in den Kalender</button></section>';
+  h+='</div>';
+  $('app').innerHTML=h;
+  $('planics').onclick=function(){download('kruschtel-plan.ics',planIcs(sc,S));};
+  if($('cd'))$('cd').onchange=function(){S.cal.day=+this.value;save();};
+  $('app').querySelectorAll('[data-fq]').forEach(function(b){b.onclick=function(){S.cal.freq=b.dataset.fq;save();var y=window.scrollY;renderCal();window.scrollTo(0,y);};});
+  $('ct').onchange=function(){S.cal.time=this.value;save();};
+  $('ics').onclick=function(){download('kruschtel-erinnerung.ics',icsText(S.cal.day,S.cal.time,S.cal.freq));};
+}
+
+/* ===== Mehr ===== */
+function renderMore(){
+  var days=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+  var h='<h2>Mehr</h2><div class="stack" style="margin-top:22px">';
+  var cb=S.cb&&CB[S.cb];
+  h+='<section class="panel"><h3>Dein Aufräumstil</h3><p class="soft small">'+(cb?'<b style="color:var(--ink)">'+cb.name+' ('+cb.en+')</b>: '+cb.store+' und '+cb.sys+'. '+cb.desc:'Noch nicht bestimmt. Zwei Fragen, dann passen Kurumis Tipps zu dir.')+'</p><p class="soft small">Nach den Clutterbug-Stilen von Cas Aarssen.</p><button class="btn line" id="cbq">'+(cb?'Test wiederholen':'Aufräumtyp finden')+'</button></section>';
+  h+='<section class="panel"><h3>Erscheinungsbild</h3><div class="seg" role="group" aria-label="Erscheinungsbild">'+[['auto','Wie das Handy'],['light','Hell'],['dark','Dunkel']].map(function(t){return '<button data-th="'+t[0]+'" aria-pressed="'+(S.theme===t[0])+'">'+t[1]+'</button>';}).join('')+'</div></section>';
+  h+='<section class="panel"><h3>Räume, Methoden, Tempo</h3><p class="soft small">Aktuell: '+U().name+', '+U().desc.charAt(0).toLowerCase()+U().desc.slice(1)+'. Eine Änderung erstellt einen neuen Plan. Dein Zähler und die Abgabe-Liste bleiben.</p><button class="btn line" id="edit">Ändern</button></section>';
+  h+='<section class="panel"><h3>Sicherung</h3><p class="soft small">Dein Fortschritt liegt nur auf diesem Gerät. Kopiere die Sicherung ab und zu in eine Notiz.</p><div class="row"><button class="btn line" id="exp">Kopieren</button><button class="btn line" id="imp">Einfügen</button></div></section>';
+  var live=/github\.io$/.test(location.hostname);
+  h+='<section class="panel"><h3>Als App aufs Handy</h3><p class="soft small">iPhone: Teilen, dann „Zum Home-Bildschirm“. Android: Menü, dann „App installieren“.</p></section>';
+  h+='<section class="panel"><h3>App weiterempfehlen</h3><p class="soft small">'+(live?'Schick den Link an Freunde. Jeder bekommt seinen eigenen Plan, die Daten bleiben auf dem eigenen Handy.':'Das Weiterempfehlen klappt, sobald die App live online ist.')+'</p>'+(live?'<button class="btn line" id="shareapp">Link teilen</button>':'')+'</section>';
+  h+='<section class="panel"><h3>Neustart</h3><p class="soft small">Löscht Plan, Zähler und Abgabe-Liste und beginnt wieder bei der Einrichtung. Wenn du nur andere Räume oder Methoden willst, nimm lieber „Ändern“ oben.</p><button class="btn line danger" id="reset">Neu starten</button></section></div>';
+  $('app').innerHTML=h;
+  $('app').querySelectorAll('[data-th]').forEach(function(b){b.onclick=function(){S.theme=b.dataset.th;save();applyTheme();renderMore();};});
+  $('cbq').onclick=function(){quiz();};
+  if($('shareapp'))$('shareapp').onclick=function(){var url=location.origin+location.pathname,txt='Kruschtel-Kaizen: Ausmisten Raum für Raum, jeden Tag ein kleiner Schritt.';
+    if(navigator.share)navigator.share({title:'Kruschtel-Kaizen',text:txt,url:url}).catch(function(){});
+    else if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(function(){toast('Link kopiert');},function(){toast(url);});
+    else toast(url);};
+  $('reset').onclick=function(){dialog('<div class="center" style="width:96px;margin:0 auto">'+happs(tines(),'sleepy')+'</div><h3>Wirklich neu starten?</h3><p class="soft">Plan, Zähler ('+num(totalOut(S))+' Dinge) und Abgabe-Liste werden gelöscht. Das lässt sich nicht rückgängig machen. Kopiere vorher die Sicherung, wenn du sie behalten willst.</p><div class="row"><button class="btn line" data-close>Abbrechen</button><button class="btn" id="resetok">Neu starten</button></div>',function(){
+    $('resetok').onclick=function(){try{localStorage.removeItem(KEY);}catch(e){}S=null;draft=null;tab='woche';closeDlg();render();window.scrollTo(0,0);toast('Alles auf Anfang');};});};
+  $('edit').onclick=function(){startSetup(S);};
+  $('exp').onclick=function(){var j=JSON.stringify(S),p=navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(j):Promise.reject();
+    p.then(function(){toast('Sicherung kopiert');},function(){dialog('<h3>Sicherung</h3><p class="soft small">Alles markieren und kopieren.</p><textarea readonly>'+esc(j)+'</textarea><button class="btn" data-close>Fertig</button>');});};
+  $('imp').onclick=function(){dialog('<h3>Sicherung einfügen</h3><p class="soft small">Der aktuelle Stand wird ersetzt.</p><textarea id="it"></textarea><div class="row"><button class="btn line" data-close>Abbrechen</button><button class="btn" id="ok">Laden</button></div>',function(){
+    $('ok').onclick=function(){try{var o=JSON.parse($('it').value);if(!o.plan||!o.rooms||!o.methods)throw 0;S=migrate(o);save();applyTheme();closeDlg();tab='woche';render();toast('Sicherung geladen');}catch(e){toast('Das ist keine Kruschtel-Kaizen-Sicherung.');}};});};
+}
+
+/* ===== Dialog und Navigation ===== */
+var onClose=null;
+function dialog(html,after,close){$('dlgbox').innerHTML=html;$('dlg').hidden=false;onClose=close||null;$('dlgbox').querySelectorAll('[data-close]').forEach(function(b){b.onclick=closeDlg;});if(after)after();else{var f=$('dlgbox').querySelector('button');if(f)f.focus();}}
+function closeDlg(){$('dlg').hidden=true;var f=onClose;onClose=null;if(f)f();}
+$('dlg').onclick=function(e){if(e.target===$('dlg')&&!onClose)closeDlg();};
+document.querySelectorAll('.tabs button').forEach(function(b){b.onclick=function(){tab=b.dataset.tab;orderMode=false;window.scrollTo(0,0);render();};});
+function render(){
+  applyTheme();
+  if(!S&&!draft){startSetup();return;}
+  $('tabs').hidden=!!draft;
+  if(draft)return renderSetup();
+  document.querySelectorAll('.tabs button').forEach(function(b){b.classList.toggle('on',b.dataset.tab===tab);});
+  if(tab==='plan')renderPlan();else if(tab==='kalender')renderCal();else if(tab==='abgabe')renderGive();else if(tab==='mehr')renderMore();else renderWeek();
+}
+S=load();render();
+})();
+</script>
+<script>if('serviceWorker' in navigator&&location.protocol==='https:'){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
+</body>
+</html>
