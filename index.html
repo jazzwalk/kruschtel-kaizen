@@ -83,7 +83,7 @@ a{color:inherit}
 .scene svg,.cell svg{display:block;width:100%;height:auto;color:var(--ink)}
 .room{font-size:clamp(40px,12vw,56px);line-height:1;margin-top:20px}
 .meth{display:inline-block;margin-top:10px;font-size:15px;font-weight:600;padding:5px 14px;border-radius:999px;color:#faf3ea}
-.m-km{background:var(--rose)}.m-vk{background:var(--saffron);color:#3a2a26}.m-mg{background:var(--olive)}.m-tt{background:var(--teal)}.m-ds{background:var(--plum)}.m-zz{background:#9a6a4e}
+.m-km{background:var(--rose)}.m-vk{background:var(--saffron);color:#3a2a26}.m-mg{background:var(--olive)}.m-tt{background:var(--teal)}.m-ds{background:var(--plum)}.m-fl{background:#a2577e}.m-zz{background:#9a6a4e}
 .count{font-family:var(--serif);font-size:15px;color:var(--soft);white-space:nowrap}
 details.how{background:var(--sheet);border-radius:22px;padding:4px 18px}
 details.how summary{cursor:pointer;list-style:none;padding:14px 0;font-family:var(--serif);font-size:19px;display:flex;justify-content:space-between;align-items:center}
@@ -415,9 +415,10 @@ var METHODS={
   mg:{name:'Minimalism Game',short:'Jeden Schritt ein Teil mehr, 28 insgesamt',text:'Das Spiel von The Minimalists in sieben Schritten: Erst geht ein Teil, dann gehen zwei, am Ende sieben. Zusammen sind es 28 Dinge, in kleinen Schritten.',rule:'Was gehen soll, verlässt bis abends das Haus.'},
   tt:{name:'12-12-12',short:'12 weg, 12 spenden, 12 zurück an ihren Platz',text:'Du suchst 12 Dinge zum Wegwerfen, 12 zum Spenden und 12, die an ihren Platz zurückgehören. Feste Zahlen nehmen dir das Grübeln ab.',rule:'Zählen, nicht abwägen.'},
   ds:{name:'Döstädning',short:'Schwedisch: aufräumen, damit es niemand anders muss',text:'Die schwedische Idee: Räum so auf, dass später niemand anders deine Sachen sortieren muss. Fang mit den großen Dingen an, Fotos und Briefe kommen zuletzt. Was anderen Freude machen kann, verschenkst du jetzt.',rule:'Würde jemand anders das nach dir behalten wollen?'},
+  fl:{name:'FlyLady',short:'15-Minuten-Timer, 27 Dinge raus, Hot Spots',text:'Nach Marla Cilley, der „FlyLady“: Babyschritte statt Großaktion. Du arbeitest immer nur 15 Minuten mit Timer, wirfst beim 27-Fling-Boogie 27 Dinge auf einmal raus und löschst Hot Spots, also Flächen, die ständig zumüllen. Hängst du hinterher, holst du nichts nach, sondern steigst einfach heute wieder ein.',rule:'Du kannst alles 15 Minuten lang.'},
   zz:{name:'20/20-Regel',short:'Unter 20 € und in 20 Minuten ersetzbar? Darf gehen',text:'Für alles, was du „vielleicht mal“ brauchst: Lässt es sich für unter 20 € und in unter 20 Minuten wieder besorgen, darf es gehen. Das Risiko ist klein, der Platz ist sofort frei.',rule:'„Vielleicht mal“ ist kein Grund zum Behalten.'}
 };
-var METHOD_ORDER=['km','vk','mg','tt','ds','zz'];
+var METHOD_ORDER=['km','vk','mg','tt','ds','zz','fl'];
 var PACES={woche:{days:7,name:'Gemütlich',desc:'Ein Raum pro Woche',one:'Woche',many:'Wochen'},zuegig:{days:4,name:'Zügig',desc:'Ein Raum alle 4 Tage',one:'Etappe',many:'Etappen'},sprint:{days:2,name:'Sprint',desc:'Ein Raum alle 2 Tage, z. B. vor einem Umzug',one:'Etappe',many:'Etappen'}};
 function paceOf(s){return PACES[(s&&s.pace)||'woche']||PACES.woche;}
 /* Aufgaben: [Text, Anzahl Dinge, die dabei das Haus verlassen] */
@@ -428,6 +429,7 @@ function methodTasks(m,extra,pace){var step=(pace&&pace!=='woche')?'Schritt':'Ta
   if(m==='mg'){var a=[];for(var d=1;d<=7;d++)a.push(T(step+' '+d+': '+(d===1?'ein Teil':d+' Teile')+' aussortieren'+(d===4?' (Idee: '+extra.charAt(0).toLowerCase()+extra.slice(1)+')':''),d));return a;}
   if(m==='tt')return [T('12 Dinge zum Wegwerfen finden',12),T('12 Dinge zum Spenden finden',12),T('12 Dinge an ihren richtigen Platz bringen'),T(extra),T('Die Spenden-Tüte aus dem Haus bringen')];
   if(m==='ds')return [T('Mit den großen Dingen im Raum anfangen: Möbel, Geräte, Kisten'),T('Bei jedem Teil fragen: Würde jemand anders es nach mir behalten wollen?'),T(extra),T('Eine kleine, beschriftete Kiste nur für dich erlauben'),T('Was anderen Freude macht, jetzt verschenken')];
+  if(m==='fl')return [T('Timer auf 15 Minuten stellen und loslegen. Klingelt er, ist für heute Schluss'),T('27-Fling-Boogie: schnell 27 Dinge aus dem Raum in eine Tüte, Müll oder Spende',27),T(extra),T('Hot Spot finden: die Fläche, die immer wieder zumüllt, in 5 Minuten freiräumen'),T('Hot-Spot-Feuerwehr: am Abend dieselbe Fläche nochmal 5 Minuten'),T('Noch einmal 15 Minuten mit Timer, dann ist der Raum fertig')];
   if(m==='zz')return [T('Alles sammeln, was du „vielleicht mal“ brauchst'),T(extra),T('Für jedes Teil prüfen: unter 20 € und in 20 Minuten ersetzbar?'),T('Was den Test besteht und seit einem Jahr unbenutzt ist, darf gehen'),T('Aussortiertes spenden oder entsorgen')];
   return [];
 }
@@ -496,7 +498,7 @@ function addOut(s,n){var w=s.plan[s.week];w.out=Math.max(0,(w.out||0)+n);return 
 function applyCustom(s,i){var w=s.plan[i];if(!w)return;var key=w.ids.join(),ct=(s.custom||{})[key]||[];ct.forEach(function(t){if(!w.tasks.some(function(x){return x.t===t;}))w.tasks.push({t:t,n:0,done:false,own:true});});
   ((s.spots||{})[key]||[]).forEach(function(sp){var t=spotTask(w.method,sp);if(!w.tasks.some(function(x){return x.t===t;}))w.tasks.push({t:t,n:0,done:false,own:true,spot:sp});});}
 /* Kruschtel-Ecken: konkrete Problemstellen pro Raum, je nach Methode als Aufgabe formuliert */
-function spotTask(m,sp){var q='„'+sp+'“';return {km:'Ecke '+q+': jedes Teil in die Hand nehmen. Macht es Freude?',vk:'Ecke '+q+': komplett leeren und in die vier Kisten sortieren',mg:'Ecke '+q+': hier die Teile für heute suchen',tt:'Ecke '+q+': zählen, was weg, gespendet oder zurück kann',ds:'Ecke '+q+': Würde jemand anders das nach dir behalten wollen?',zz:'Ecke '+q+': 20/20-Test für alles, was „vielleicht mal“ gebraucht wird'}[m]||('Ecke '+q+' durchgehen');}
+function spotTask(m,sp){var q='„'+sp+'“';return {km:'Ecke '+q+': jedes Teil in die Hand nehmen. Macht es Freude?',vk:'Ecke '+q+': komplett leeren und in die vier Kisten sortieren',mg:'Ecke '+q+': hier die Teile für heute suchen',tt:'Ecke '+q+': zählen, was weg, gespendet oder zurück kann',ds:'Ecke '+q+': Würde jemand anders das nach dir behalten wollen?',zz:'Ecke '+q+': 20/20-Test für alles, was „vielleicht mal“ gebraucht wird',fl:'Ecke '+q+': Hot Spot, 5 Minuten freiräumen, abends nochmal'}[m]||('Ecke '+q+' durchgehen');}
 function addSpot(s,key,text){text=String(text).trim().slice(0,60);if(!text)return false;s.spots=s.spots||{};var a=(s.spots[key]=s.spots[key]||[]);if(a.indexOf(text)>=0)return false;a.push(text);
   if(!s.finished&&s.plan[s.week]&&s.plan[s.week].ids.join()===key)applyCustom(s,s.week);return true;}
 function removeSpot(s,key,text){var a=(s.spots||{})[key]||[],j=a.indexOf(text);if(j<0)return false;a.splice(j,1);
