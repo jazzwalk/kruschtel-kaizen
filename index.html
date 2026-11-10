@@ -196,6 +196,35 @@ textarea{width:100%;min-height:120px;border-radius:14px;border:0;box-shadow:inse
 .mascot .spark{animation:spark 1.6s ease-in-out infinite}
 @keyframes spark{50%{opacity:.2}}
 .center{text-align:center}
+.spots{background:var(--sheet);border-radius:22px;padding:16px 18px;margin-top:14px;box-shadow:inset 0 0 0 1px var(--hair)}
+.spots h4,.furt h4{margin:0;font-family:var(--serif);font-weight:400;font-size:17px}
+.spots p{margin:4px 0 0;font-size:14px;color:var(--soft)}
+.schips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.schip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 6px 6px 12px;background:var(--paper);box-shadow:inset 0 0 0 1px var(--hair);font-size:14px;font-weight:500}
+.schip button{background:none;border:0;color:var(--soft);cursor:pointer;width:28px;height:28px;font-size:14px}
+.sadd{display:flex;gap:8px;margin-top:10px}
+.sadd input{flex:1;min-width:0;border:0;border-bottom:1.5px solid var(--ink);background:transparent;padding:9px 2px;font-size:16px;border-radius:0}
+.sadd .btn{width:auto;padding:9px 16px;min-height:42px}
+.furt{background:var(--saffron);color:#3a2a26;border-radius:22px;padding:14px 18px;margin-bottom:12px;display:flex;flex-direction:column;gap:6px}
+.furt p{margin:0;font-size:14px}
+.furt .btn{background:#3a2a26;color:#faf3ea;width:auto;align-self:flex-start;padding:9px 16px;min-height:42px}
+.place{padding:12px 0;border-top:1px solid var(--hair);display:grid;grid-template-columns:1fr auto;gap:2px 10px}
+.place:last-child{border-bottom:1px solid var(--hair)}
+.place b{font-weight:600}
+.place .meta{grid-column:1;font-size:13px;color:var(--soft)}
+.place .note{grid-column:1 / 3;font-size:14px;margin-top:2px}
+.place .acts{grid-column:1 / 3;display:flex;gap:14px;flex-wrap:wrap;font-size:14px;margin-top:2px}
+.place .acts a,.place .acts button{color:var(--soft);background:none;border:0;padding:4px 0;text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-size:14px}
+.cityrow{display:flex;gap:8px}
+.cityrow input{flex:1;min-width:0;border:0;border-bottom:1.5px solid var(--ink);background:transparent;padding:10px 2px;font-size:16px;border-radius:0}
+.cityrow .btn{width:auto;padding:10px 16px;min-height:44px}
+.mapq{display:flex;flex-wrap:wrap;gap:6px}
+.mapq a{border-radius:999px;padding:8px 13px;background:var(--paper);box-shadow:inset 0 0 0 1px var(--hair);font-size:14px;text-decoration:none}
+.give .to{color:var(--teal);font-weight:600}
+html[data-theme=dark] .give .to{color:var(--light)}
+.local{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 0;border-top:1px solid var(--hair)}
+.local i{font-style:normal;font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px;background:var(--saffron);color:#3a2a26;align-self:center;grid-row:1 / 3;grid-column:2}
+.local span{color:var(--soft);font-size:14px}
 .tasks li.own{display:grid;grid-template-columns:1fr auto;align-items:center}
 .tasks .tdel{background:none;border:0;color:var(--soft);font-size:17px;width:40px;height:40px;cursor:pointer}
 .tasks li.own .task{border-top:1px solid var(--hair)}
@@ -405,7 +434,7 @@ function migrate(s){
   if(!s)return s;
   if(s.outPrev==null)s.outPrev=0;if(!s.give)s.give=[];if(s.paused===undefined)s.paused=null;if(!s.theme)s.theme='auto';
   s.plan.forEach(function(w){if(w.out==null)w.out=0;w.tasks.forEach(function(t){if(t.n==null)t.n=0;});});
-  if(!s.started)s.started=new Date().toISOString();if(!s.pace)s.pace='woche';if(!s.cal)s.cal={day:0,time:'10:00'};if(!s.cal.freq)s.cal.freq='weekly';
+  if(!s.started)s.started=new Date().toISOString();if(!s.pace)s.pace='woche';if(!s.cal)s.cal={day:0,time:'10:00'};if(!s.cal.freq)s.cal.freq='weekly';if(!s.spots)s.spots={};if(!s.places)s.places=[];if(s.city==null)s.city='';if(s.furt===undefined)s.furt=null;
   s.v=2;return s;
 }
 function weekDone(w){return w.tasks.every(function(t){return t.done;});}
@@ -413,7 +442,14 @@ function totalOut(s){return s.outPrev+s.plan.reduce(function(a,w){return a+(w.ou
 function toggleTask(s,i){var w=s.plan[s.week],t=w.tasks[i];t.done=!t.done;if(t.n)w.out=Math.max(0,w.out+(t.done?t.n:-t.n));return t;}
 function addOut(s,n){var w=s.plan[s.week];w.out=Math.max(0,(w.out||0)+n);return w.out;}
 /* Eigene Aufgaben: gelten für die aktuelle Woche, auf Wunsch auch für spätere Besuche im selben Raum */
-function applyCustom(s,i){var w=s.plan[i];if(!w)return;var ct=(s.custom||{})[w.ids.join()]||[];ct.forEach(function(t){if(!w.tasks.some(function(x){return x.t===t;}))w.tasks.push({t:t,n:0,done:false,own:true});});}
+function applyCustom(s,i){var w=s.plan[i];if(!w)return;var key=w.ids.join(),ct=(s.custom||{})[key]||[];ct.forEach(function(t){if(!w.tasks.some(function(x){return x.t===t;}))w.tasks.push({t:t,n:0,done:false,own:true});});
+  ((s.spots||{})[key]||[]).forEach(function(sp){var t=spotTask(w.method,sp);if(!w.tasks.some(function(x){return x.t===t;}))w.tasks.push({t:t,n:0,done:false,own:true,spot:sp});});}
+/* Kruschtel-Ecken: konkrete Problemstellen pro Raum, je nach Methode als Aufgabe formuliert */
+function spotTask(m,sp){var q='„'+sp+'“';return {km:'Ecke '+q+': jedes Teil in die Hand nehmen. Macht es Freude?',vk:'Ecke '+q+': komplett leeren und in die vier Kisten sortieren',mg:'Ecke '+q+': hier die Teile für heute suchen',tt:'Ecke '+q+': zählen, was weg, gespendet oder zurück kann',ds:'Ecke '+q+': Würde jemand anders das nach dir behalten wollen?',zz:'Ecke '+q+': 20/20-Test für alles, was „vielleicht mal“ gebraucht wird'}[m]||('Ecke '+q+' durchgehen');}
+function addSpot(s,key,text){text=String(text).trim().slice(0,60);if(!text)return false;s.spots=s.spots||{};var a=(s.spots[key]=s.spots[key]||[]);if(a.indexOf(text)>=0)return false;a.push(text);
+  if(!s.finished&&s.plan[s.week]&&s.plan[s.week].ids.join()===key)applyCustom(s,s.week);return true;}
+function removeSpot(s,key,text){var a=(s.spots||{})[key]||[],j=a.indexOf(text);if(j<0)return false;a.splice(j,1);
+  if(!s.finished&&s.plan[s.week]&&s.plan[s.week].ids.join()===key){var w=s.plan[s.week];w.tasks=w.tasks.filter(function(t){return !(t.spot===text&&!t.done);});}return true;}
 function addTask(s,text,remember){text=String(text).trim().slice(0,120);if(!text)return false;var w=s.plan[s.week];if(w.tasks.some(function(x){return x.t===text;}))return false;w.tasks.push({t:text,n:0,done:false,own:true});
   if(remember){s.custom=s.custom||{};var k=w.ids.join();(s.custom[k]=s.custom[k]||[]);if(s.custom[k].indexOf(text)<0)s.custom[k].push(text);}return true;}
 function removeTask(s,k){var w=s.plan[s.week],t=w.tasks[k];if(!t||!t.own)return false;if(t.done&&t.n)w.out=Math.max(0,w.out-t.n);w.tasks.splice(k,1);var c=(s.custom||{})[w.ids.join()];if(c){var j=c.indexOf(t.t);if(j>=0)c.splice(j,1);}return true;}
@@ -496,8 +532,18 @@ var PORTALS=[
   {cat:['el','bm'],how:['verkaufen'],name:'rebuy',desc:'Handys, Konsolen, Technik und Medien verkaufen',url:'https://www.rebuy.de'},
   {cat:['el'],how:['verkaufen'],name:'geldfuermuell.de',desc:'Altgeräte, Handys und Druckerpatronen einschicken',url:'https://www.geldfuermuell.de'},
   {cat:['hm','sp','so','el','kl','bm'],how:['verschenken','verkaufen'],name:'nebenan.de',desc:'In der Nachbarschaft verschenken oder verkaufen',url:'https://nebenan.de'},
+  {cat:['kl','bm','sp','hm','so'],how:['spenden'],name:'Wohin damit?',desc:'Gemeinnützige Annahmestellen in deiner Nähe nach Postleitzahl finden',url:'https://wohindamit.org'},
   {cat:['hm','sp','so','el','kl','bm'],how:['verkaufen','verschenken'],name:'Kleinanzeigen',desc:'Verkaufen oder unter „Zu verschenken“ einstellen',url:'https://www.kleinanzeigen.de'}
 ];
+/* Lokale Abgabestellen: Vorschläge für Karlsruhe (Stand Nov. 2026), sonst eigene Stellen und Kartensuche */
+var LOCAL_KA=[
+  {id:'ka-ws',name:'Wertstoffstationen (Team Sauberes Karlsruhe)',cats:['hm','el','so'],note:'Bis zu 1 m³ Wertstoffe pro Jahr kostenlos. Große Stationen: Nordbeckenstraße 1 und Maybachstraße 10 b. Ab 2027 neue, einheitliche Öffnungszeiten; Hagsfeld (Schäferstraße) schließt Ende 2026.',url:'https://www.team-sauberes-karlsruhe.de'},
+  {id:'ka-sp',name:'Sperrmüll auf Abruf',cats:['hm'],note:'Ab 1.1.2027 kein Straßensperrmüll mehr, dafür zwei kostenlose Abholtermine pro Jahr (bis 4 m³). Anmeldung online oder über die 115.',url:'https://www.team-sauberes-karlsruhe.de'},
+  {id:'ka-el',name:'Elektrogroßgeräte-Abholung',cats:['el'],note:'Zweimal im Jahr kostenlos vor der Haustür. Nicht zum Sperrmüll stellen.',url:'https://www.team-sauberes-karlsruhe.de'},
+  {id:'ka-dw',name:'Diakonisches Werk Karlsruhe',cats:['hm','kl','sp','bm'],note:'Nimmt gut erhaltene Möbel und Gebrauchtwaren an. Zentrale Annahme laut städtischem Infoblatt: 0721 20397275 (Mo–Fr 10–16 Uhr). Vorher anrufen.',map:'Diakonisches Werk Karlsruhe Secondhand'}
+];
+function localFor(city){return /karlsruhe/i.test(city||'')?LOCAL_KA:[];}
+function furtToday(s,now){return s.furt!=null&&s.furt!==''&&(now||new Date()).getDay()===+s.furt;}
 /* Portale passend zu den offenen Dingen: Gruppen je Art+Weg, Fallback nur nach Art */
 function portalGroups(items){
   var groups=[],key={};
@@ -570,7 +616,7 @@ function stillLife(seedStr,frac,opts){
   s+='</svg>';
   return {svg:s,total:objs.length};
 }
-if(typeof module!=='undefined')module.exports={planWeeks:planWeeks,newState:newState,migrate:migrate,advance:advance,nextRound:nextRound,moveWeek:moveWeek,toggleTask:toggleTask,addOut:addOut,totalOut:totalOut,stillLife:stillLife,icsText:icsText,PRESETS:PRESETS,METHOD_ORDER:METHOD_ORDER,PORTALS:PORTALS,portalGroups:portalGroups,schedule:schedule,planIcs:planIcs,today:today,PACES:PACES,cbType:cbType,tipFor:tipFor,CB:CB,addTask:addTask,removeTask:removeTask,applyCustom:applyCustom,miniTask:miniTask};
+if(typeof module!=='undefined')module.exports={planWeeks:planWeeks,newState:newState,migrate:migrate,advance:advance,nextRound:nextRound,moveWeek:moveWeek,toggleTask:toggleTask,addOut:addOut,totalOut:totalOut,stillLife:stillLife,icsText:icsText,PRESETS:PRESETS,METHOD_ORDER:METHOD_ORDER,PORTALS:PORTALS,portalGroups:portalGroups,schedule:schedule,planIcs:planIcs,today:today,PACES:PACES,cbType:cbType,tipFor:tipFor,CB:CB,addTask:addTask,removeTask:removeTask,applyCustom:applyCustom,miniTask:miniTask,addSpot:addSpot,removeSpot:removeSpot,spotTask:spotTask,LOCAL_KA:LOCAL_KA,localFor:localFor,furtToday:furtToday};
 </script>
 
 <script>
@@ -715,7 +761,7 @@ function renderWeek(){
   h+='<div id="todaybox" style="margin-top:14px"></div>';
   h+='<section class="strip" aria-label="Zähler"><div class="sn"><b id="tw">'+(w.out||0)+'</b><span>weg '+(U().one==='Woche'?'diese Woche':'in dieser Etappe')+'<br>insgesamt <span id="tt">'+num(totalOut(S))+'</span></span></div><div class="pm"><button id="minus" aria-label="Eins weniger">−</button><button class="plus" id="plus" aria-label="Eins mehr">+1</button></div></section>';
   h+='<div class="links"><button id="togive">Auf die Abgabe-Liste</button><button id="where">Wohin damit?</button></div>';
-  h+='<div id="tipbox"></div>';
+  h+='<div id="spotbox"></div><div id="tipbox"></div>';
   h+='<details class="how list" id="all"><summary>Alle Aufgaben <span class="soft" id="cnt"></span></summary><ul class="tasks">';
   w.tasks.forEach(function(t,k){h+='<li'+(t.own?' class="own"':'')+'><button class="task" data-t="'+k+'" aria-pressed="'+t.done+'"><span class="c">'+TICK+'</span><span class="t">'+esc(t.t)+(t.own?'<span class="ownb">eigene</span>':'')+'</span>'+(t.n?'<span class="n">+'+t.n+'</span>':'<span></span>')+'</button>'+(t.own?'<button class="tdel" data-del="'+k+'" aria-label="Eigene Aufgabe löschen">✕</button>':'')+'</li>';});
   h+='</ul><div class="addt"><div class="row2"><input type="text" id="nt" maxlength="120" placeholder="Eigene Aufgabe, z. B. Kartons von Opa durchsehen" aria-label="Eigene Aufgabe"><button class="btn" id="ntadd">Hinzufügen</button></div><label><input type="checkbox" id="ntrem" checked> Auch beim nächsten Mal in diesem Raum</label></div><p class="gate">Die nächste '+U().one+' öffnet sich, sobald alle Aufgaben abgehakt sind.</p></details>';
@@ -745,7 +791,28 @@ function renderWeek(){
   $('togive').onclick=function(){addGiveDialog();};
   $('where').onclick=function(){tab='abgabe';window.scrollTo(0,0);render();};
   $('pause').onclick=function(){S.paused=new Date().toISOString();save();window.scrollTo(0,0);renderWeek();};
-  refresh(false);tipBox(0);
+  refresh(false);tipBox(0);spotBox();
+}
+function spotBox(){
+  var b=$('spotbox');if(!b)return;var w=S.plan[S.week],key=w.ids.join(),sp=(S.spots||{})[key]||[];
+  b.innerHTML='<section class="spots"><h4>Deine Kruschtel-Ecken hier</h4><p>'+(sp.length?'Daraus macht Kurumi Aufgaben für '+esc(w.room)+', passend zu '+METHODS[w.method].name+'.':'Wo liegt in '+esc(w.room)+' der meiste Kruschtel? Nenne die Stelle, dann wird daraus eine Aufgabe.')+'</p>'+
+    (sp.length?'<div class="schips">'+sp.map(function(s,i){return '<span class="schip">'+esc(s)+'<button data-sx="'+i+'" aria-label="Ecke entfernen">✕</button></span>';}).join('')+'</div>':'')+
+    '<div class="sadd"><input type="text" id="spn" maxlength="60" placeholder="z. B. Schublade unterm Herd" aria-label="Neue Kruschtel-Ecke"><button class="btn" id="spadd">Dazu</button></div></section>';
+  var add=function(){var v=$('spn').value;if(addSpot(S,key,v)){save();var y=window.scrollY;renderWeek();window.scrollTo(0,y);toast('Ecke ist jetzt eine Aufgabe');var f=$('spn');if(f)f.focus();}};
+  $('spadd').onclick=add;$('spn').onkeydown=function(e){if(e.key==='Enter')add();};
+  b.querySelectorAll('[data-sx]').forEach(function(x){x.onclick=function(){removeSpot(S,key,sp[+x.dataset.sx]);save();var y=window.scrollY;renderWeek();window.scrollTo(0,y);};});
+}
+function spotsDialog(i){
+  var w=S.plan[i],key=w.ids.join();
+  var draw=function(){var sp=(S.spots||{})[key]||[];
+    dialog('<h3>Kruschtel-Ecken: '+esc(w.room)+'</h3><p class="soft small">Welche Stellen in diesem Raum quellen über? Sie werden zu Aufgaben, sobald '+esc(w.room)+' dran ist.</p>'+
+      (sp.length?'<div class="schips">'+sp.map(function(s,k){return '<span class="schip">'+esc(s)+'<button data-dx="'+k+'" aria-label="Ecke entfernen">✕</button></span>';}).join('')+'</div>':'')+
+      '<div class="sadd"><input type="text" id="dsn" maxlength="60" placeholder="z. B. Kiste mit Kabeln" aria-label="Neue Kruschtel-Ecke"><button class="btn" id="dsadd">Dazu</button></div><button class="btn" data-close>Fertig</button>',function(){
+      var add=function(){if(addSpot(S,key,$('dsn').value)){save();draw();setTimeout(function(){var f=$('dsn');if(f)f.focus();},30);}};
+      $('dsadd').onclick=add;$('dsn').onkeydown=function(e){if(e.key==='Enter')add();};
+      $('dlgbox').querySelectorAll('[data-dx]').forEach(function(x){x.onclick=function(){removeSpot(S,key,sp[+x.dataset.dx]);save();draw();};});
+    },function(){if(tab==='plan')renderPlan();});};
+  draw();
 }
 var WK=null,tipN=0,openAll=false,miniN=0,miniTimer=null;
 var ACORN='<svg viewBox="0 0 30 30" aria-hidden="true"><ellipse cx="15" cy="18" rx="8" ry="9" fill="#e0a43a"/><path d="M6 13q9-8 18 0v-2.5q-9-7-18 0z" fill="#9a6a4e"/><path d="M15 4v3.5" stroke="#9a6a4e" stroke-width="2" stroke-linecap="round"/></svg>';
@@ -779,7 +846,10 @@ function todayBox(){
   }else{
     h='<section class="today light">'+bud+'<div class="tl"><span>Für heute geschafft</span>'+dots(t)+'</div><p class="tt2 sm">Morgen: '+esc(w.tasks[t.next].t)+'</p><button class="btn line" id="tmore">Schon jetzt erledigen</button><button class="mini" id="mini5">Noch Lust? 5-Minuten-Einsatz</button>'+bar+'</section>';
   }
+  var openG=S.give.filter(function(g){return !g.done;});
+  if(furtToday(S)&&openG.length)h='<section class="furt"><h4>Heute ist Furt-Tag!</h4><p>'+openG.length+(openG.length===1?' Ding wartet':' Dinge warten')+' auf die Abgabe: '+openG.slice(0,3).map(function(g){return esc(g.t);}).join(', ')+(openG.length>3?' …':'')+'</p><button class="btn" id="gofurt">Zur Abgabe-Liste</button></section>'+h;
   box.innerHTML=h;
+  if($('gofurt'))$('gofurt').onclick=function(){tab='abgabe';window.scrollTo(0,0);render();};
   $('deerbtn').onclick=function(){say(buddyLine(w),buddyMood(w));};
   if($('tdone'))$('tdone').onclick=function(){WK.toggle(t.task);};
   if($('tmore'))$('tmore').onclick=function(){WK.toggle(t.next);};
@@ -849,7 +919,7 @@ function renderFinished(){
 
 /* ===== Plan ===== */
 function renderPlan(){
-  var h='<h2>Zwölf '+U().many+'</h2><p class="soft small" style="margin-top:6px">'+(S.round>1?'Runde '+S.round+'. ':'')+S.rooms.length+' Räume, '+S.methods.map(function(k){return METHODS[k].name;}).join(', ')+'.</p>'+(S.finished?'':'<button class="btn line sm" id="om" style="margin-top:14px">'+(orderMode?'Fertig':'Reihenfolge ändern')+'</button>');
+  var h='<h2>Zwölf '+U().many+'</h2><p class="soft small" style="margin-top:6px">'+(S.round>1?'Runde '+S.round+'. ':'')+S.rooms.length+' Räume, '+S.methods.map(function(k){return METHODS[k].name;}).join(', ')+'. Tipp auf einen kommenden Raum, um seine Kruschtel-Ecken einzutragen.</p>'+(S.finished?'':'<button class="btn line sm" id="om" style="margin-top:14px">'+(orderMode?'Fertig':'Reihenfolge ändern')+'</button>');
   if(orderMode){
     h+='<p class="soft small" style="margin-top:14px">Kommende '+U().many+' lassen sich verschieben. Erledigte und die aktuelle bleiben fest.</p><ul class="order" style="margin-top:14px">';
     S.plan.forEach(function(w,i){
@@ -861,12 +931,13 @@ function renderPlan(){
     h+='<div class="grid" style="margin-top:22px">';
     S.plan.forEach(function(w,i){
       var st=S.finished||i<S.week?'done':i===S.week?'now':'lock',f=st==='done'?1:st==='now'?frac(w):0;
-      h+='<div class="cell '+st+'"'+(st==='done'?' data-share="'+i+'" role="button" tabindex="0" aria-label="'+esc(w.room)+' als Bild teilen"':'')+'>'+stillLife(seed(i),f,{label:w.room,room:rid(w),dim:st==='lock',uid:'g'+i}).svg+'<b>'+esc(w.room)+'</b><span>'+(st==='done'?'<span class="shr">Teilen</span> Erledigt'+(w.out?', '+w.out+' Dinge weg':''):st==='now'?(S.paused?'Pausiert':'Diese '+U().one):U().one+' '+(i+1))+', '+METHODS[w.method].name+'</span></div>';
+      h+='<div class="cell '+st+'"'+(st==='done'?' data-share="'+i+'" role="button" tabindex="0" aria-label="'+esc(w.room)+' als Bild teilen"':' data-spots="'+i+'" role="button" tabindex="0" aria-label="Kruschtel-Ecken für '+esc(w.room)+'"')+'>'+stillLife(seed(i),f,{label:w.room,room:rid(w),dim:st==='lock',uid:'g'+i}).svg+'<b>'+esc(w.room)+'</b><span>'+(st==='done'?'<span class="shr">Teilen</span> Erledigt'+(w.out?', '+w.out+' Dinge weg':''):st==='now'?(S.paused?'Pausiert':'Diese '+U().one):U().one+' '+(i+1))+', '+METHODS[w.method].name+'</span></div>';
     });
     h+='</div>';
   }
   $('app').innerHTML=h;
   if($('om'))$('om').onclick=function(){orderMode=!orderMode;renderPlan();};
+  $('app').querySelectorAll('[data-spots]').forEach(function(c){c.style.cursor='pointer';c.onclick=function(){spotsDialog(+c.dataset.spots);};c.onkeydown=function(e){if(e.key==='Enter')spotsDialog(+c.dataset.spots);};});
   $('app').querySelectorAll('[data-share]').forEach(function(c){c.onclick=function(){shareCard(+c.dataset.share);};c.onkeydown=function(e){if(e.key==='Enter')shareCard(+c.dataset.share);};});
   $('app').querySelectorAll('[data-up]').forEach(function(b){b.onclick=function(){moveWeek(S,+b.dataset.up,-1);save();renderPlan();};});
   $('app').querySelectorAll('[data-dn]').forEach(function(b){b.onclick=function(){moveWeek(S,+b.dataset.dn,1);save();renderPlan();};});
@@ -879,6 +950,7 @@ function giveForm(){
   return '<div class="form"><input type="text" id="gt" placeholder="Was soll weg? z. B. Wintermantel, Kinderbücher" maxlength="60" aria-label="Was soll weg?">'+
     '<div class="seg" role="group" aria-label="Art">'+GIVE_CATS.map(function(c){return '<button data-gc="'+c[0]+'" aria-pressed="'+(giveDraft.cat===c[0])+'">'+c[1]+'</button>';}).join('')+'</div>'+
     '<div class="seg" role="group" aria-label="Weg">'+GIVE_HOW.map(function(c){return '<button data-gh="'+c[0]+'" aria-pressed="'+(giveDraft.how===c[0])+'">'+c[1]+'</button>';}).join('')+'</div>'+
+    ((S.places||[]).length?'<select id="gto" aria-label="Wohin damit?"><option value="">Wohin? (optional)</option>'+S.places.map(function(p){return '<option value="'+p.id+'">'+esc(p.name)+'</option>';}).join('')+'</select>':'')+
     '<button class="btn" id="gadd">Auf die Liste</button></div>';
 }
 function bindGiveForm(after){
@@ -886,7 +958,7 @@ function bindGiveForm(after){
   root.querySelectorAll('[data-gc]').forEach(function(b){b.onclick=function(){giveDraft.cat=b.dataset.gc;root.querySelectorAll('[data-gc]').forEach(function(x){x.setAttribute('aria-pressed',x===b);});};});
   root.querySelectorAll('[data-gh]').forEach(function(b){b.onclick=function(){giveDraft.how=b.dataset.gh;root.querySelectorAll('[data-gh]').forEach(function(x){x.setAttribute('aria-pressed',x===b);});};});
   var add=function(){var v=root.querySelector('#gt').value.trim();if(!v){root.querySelector('#gt').focus();return;}
-    S.give.unshift({id:Date.now(),t:v,cat:giveDraft.cat,how:giveDraft.how,done:false,room:S.plan[S.week]?S.plan[S.week].room:''});save();toast('Auf der Abgabe-Liste');after();};
+    var to=root.querySelector('#gto');S.give.unshift({id:Date.now(),t:v,cat:giveDraft.cat,how:giveDraft.how,done:false,room:S.plan[S.week]?S.plan[S.week].room:'',to:to&&to.value||''});save();toast('Auf der Abgabe-Liste');after();};
   root.querySelector('#gadd').onclick=add;root.querySelector('#gt').onkeydown=function(e){if(e.key==='Enter')add();};
 }
 function addGiveDialog(){dialog('<h3>Auf die Abgabe-Liste</h3>'+giveForm()+'<button class="btn text" data-close>Abbrechen</button>',function(){bindGiveForm(closeDlg);setTimeout(function(){var g=$('gt');if(g)g.focus();},50);});}
@@ -897,7 +969,7 @@ function renderGive(){
   h+='<section class="panel">'+giveForm()+'</section>';
   if(S.give.length){
     h+='<ul class="give">';
-    S.give.forEach(function(g,i){h+='<li class="'+(g.done?'done':'')+'"><button class="c" data-gd="'+i+'" aria-pressed="'+g.done+'" aria-label="Abgegeben">'+TICK+'</button><span class="tt">'+esc(g.t)+'<small>'+catName(g.cat)+', '+howName(g.how)+(g.room?', aus '+esc(g.room):'')+'</small></span><button class="del" data-gx="'+i+'" aria-label="Löschen">✕</button></li>';});
+    S.give.forEach(function(g,i){h+='<li class="'+(g.done?'done':'')+'"><button class="c" data-gd="'+i+'" aria-pressed="'+g.done+'" aria-label="Abgegeben">'+TICK+'</button><span class="tt">'+esc(g.t)+'<small>'+catName(g.cat)+', '+howName(g.how)+(g.room?', aus '+esc(g.room):'')+(g.to&&placeById(g.to)?', <span class="to">zu '+esc(placeById(g.to).name)+'</span>':'')+'</small></span><button class="del" data-gx="'+i+'" aria-label="Löschen">✕</button></li>';});
     h+='</ul>';
   }
   var plinkHTML=function(p){return '<a class="plink" href="'+p.url+'" target="_blank" rel="noopener"><b>'+esc(p.name)+'</b><span>'+esc(p.desc)+'</span><i>'+p.how.map(howName).join(', ')+'</i></a>';};
@@ -911,17 +983,53 @@ function renderGive(){
     h+='Passend zu '+(open.length===1?'dem, was':'den '+open.length+' Dingen, die')+' noch abgegeben werden '+(open.length===1?'soll':'sollen')+'.</p></div><div class="portals">';
     groups.forEach(function(gr){
       h+='<div class="pgroup"><h3>'+catName(gr.cat)+' '+({spenden:'spenden',verschenken:'verschenken',verkaufen:'verkaufen'}[gr.how])+'</h3><p class="soft small">Für: '+gr.items.map(esc).join(', ')+'</p>'+
-        (gr.exact?'':'<p class="soft small">Zum '+howName(gr.how)+' gibt es dafür kein eigenes Portal. Diese nehmen '+catName(gr.cat)+' an:</p>')+gr.portals.map(plinkHTML).join('')+'</div>';
+        localMatch(gr.cat).map(localHTML).join('')+(gr.exact?'':'<p class="soft small">Zum '+howName(gr.how)+' gibt es dafür kein eigenes Portal. Diese nehmen '+catName(gr.cat)+' an:</p>')+gr.portals.map(plinkHTML).join('')+'</div>';
     });
     h+='</div><button class="btn line" id="allp">Alle Portale zeigen</button>';
   }
+  h+=placesHTML()+furtHTML();
   h+='<p class="soft small">Für Sperrmüll, Elektroschrott und Sondermüll ist der Wertstoffhof deiner Stadt zuständig.</p></div>';
   $('app').innerHTML=h;
-  bindGiveForm(renderGive);
+  bindGiveForm(renderGive);bindPlaces();
   if($('allp'))$('allp').onclick=function(){allPortals=!allPortals;renderGive();};
   $('deerbtn').onclick=function(){say(pick(LINES.give));};
   $('app').querySelectorAll('[data-gd]').forEach(function(b){b.onclick=function(){var g=S.give[+b.dataset.gd];g.done=!g.done;save();if(g.done)toast('Abgegeben');renderGive();};});
   $('app').querySelectorAll('[data-gx]').forEach(function(b){b.onclick=function(){S.give.splice(+b.dataset.gx,1);save();renderGive();};});
+}
+
+/* ===== Lokale Abgabestellen und Furt-Tag ===== */
+var DAYN=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],placeDraft={cats:['hm']};
+function placeById(id){return (S.places||[]).filter(function(p){return p.id===id;})[0];}
+function mapUrl(q){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);}
+function localMatch(cat){var own=(S.places||[]).filter(function(p){return p.cats.indexOf(cat)>=0;});var sug=localFor(S.city).filter(function(p){return p.cats.indexOf(cat)>=0&&!placeById(p.id);});return own.concat(sug);}
+function localHTML(p){return '<div class="local"><b>'+esc(p.name)+'</b><span>'+esc(p.note||'')+'</span><i>'+(placeById(p.id)?'Deine Stelle':'In '+esc(S.city))+'</i></div>';}
+function placesHTML(){
+  var city=S.city||'',sug=localFor(city).filter(function(p){return !placeById(p.id);}),h='<section class="panel"><h3>Abgabestellen bei dir</h3>';
+  h+='<div class="cityrow"><input type="text" id="city" value="'+esc(city)+'" placeholder="Deine Stadt oder PLZ" maxlength="40" aria-label="Stadt"><button class="btn line" id="citysave">Speichern</button></div>';
+  if(city){h+='<p class="soft small">Schnell suchen in '+esc(city)+':</p><div class="mapq">'+['Sozialkaufhaus','Wertstoffhof','Kleiderkammer','Umsonstladen','Repair Café','Bücherschrank'].map(function(q){return '<a href="'+mapUrl(q+' '+city)+'" target="_blank" rel="noopener">'+q+'</a>';}).join('')+'</div>';}
+  if(sug.length){h+='<p class="soft small" style="margin-top:6px">Vorschläge für '+esc(city)+' (Stand November 2026, Angaben vor dem Hinfahren prüfen):</p><div>'+sug.map(function(p){return '<div class="place"><b>'+esc(p.name)+'</b><span class="meta">'+p.cats.map(catName).join(', ')+'</span><p class="note">'+esc(p.note)+'</p><div class="acts">'+(p.url?'<a href="'+p.url+'" target="_blank" rel="noopener">Website</a>':'')+'<a href="'+mapUrl(p.map||p.name)+'" target="_blank" rel="noopener">Karte</a><button data-adopt="'+p.id+'">Zu meinen Stellen</button></div></div>';}).join('')+'</div>';}
+  var mine=S.places||[];
+  h+='<h3 style="margin-top:8px">Meine Abgabestellen</h3>'+(mine.length?'<div>'+mine.map(function(p,i){return '<div class="place"><b>'+esc(p.name)+'</b><span class="meta">'+p.cats.map(catName).join(', ')+'</span>'+(p.note?'<p class="note">'+esc(p.note)+'</p>':'')+'<div class="acts">'+(p.url?'<a href="'+p.url+'" target="_blank" rel="noopener">Website</a>':'')+'<a href="'+mapUrl((p.map||p.name)+(city&&!p.map?' '+city:''))+'" target="_blank" rel="noopener">Karte</a><button data-pdel="'+i+'">Entfernen</button></div></div>';}).join('')+'</div>':'<p class="soft small">Noch keine. Trag deinen Lieblings-Secondhandladen, die Kleiderkammer um die Ecke oder den Wertstoffhof ein.</p>');
+  h+='<div class="form" style="margin-top:6px"><input type="text" id="pn" maxlength="60" placeholder="Name, z. B. Kleiderkammer St. Peter" aria-label="Name der Abgabestelle"><input type="text" id="pnote" maxlength="120" placeholder="Notiz, z. B. Di und Do 14–17 Uhr" aria-label="Notiz">'+
+    '<div class="seg" role="group" aria-label="Nimmt an">'+GIVE_CATS.map(function(c){return '<button data-pc="'+c[0]+'" aria-pressed="'+(placeDraft.cats.indexOf(c[0])>=0)+'">'+c[1]+'</button>';}).join('')+'</div><button class="btn line" id="padd">Abgabestelle speichern</button></div></section>';
+  return h;
+}
+function furtHTML(){
+  var f=S.furt;
+  return '<section class="panel"><h3>Furt-Tag</h3><p class="soft small">Ein fester Tag pro Woche, an dem alles auf der Liste aus dem Haus kommt. Kurumi erinnert dich dann im Heute-Tab.</p><div class="seg" role="group" aria-label="Furt-Tag">'+
+    [1,2,3,4,5,6,0].map(function(d){return '<button data-fd="'+d+'" aria-pressed="'+(f!==null&&f!==''&&+f===d)+'">'+DAYN[d].slice(0,2)+'</button>';}).join('')+'<button data-fd="" aria-pressed="'+(f===null||f==='')+'">Aus</button></div>'+
+    (f!==null&&f!==''?'<button class="btn line" id="furtics">Furt-Tag in den Kalender</button>':'')+'</section>';
+}
+function bindPlaces(){
+  var q=function(s){return $('app').querySelectorAll(s);};
+  $('citysave').onclick=function(){S.city=$('city').value.trim();save();var y=window.scrollY;renderGive();window.scrollTo(0,y);};
+  $('city').onkeydown=function(e){if(e.key==='Enter')$('citysave').click();};
+  q('[data-adopt]').forEach(function(b){b.onclick=function(){var p=LOCAL_KA.filter(function(x){return x.id===b.dataset.adopt;})[0];if(p){S.places.push(JSON.parse(JSON.stringify(p)));save();var y=window.scrollY;renderGive();window.scrollTo(0,y);toast('Gespeichert');}};});
+  q('[data-pdel]').forEach(function(b){b.onclick=function(){var p=S.places[+b.dataset.pdel];S.places.splice(+b.dataset.pdel,1);S.give.forEach(function(g){if(g.to===p.id)g.to='';});save();var y=window.scrollY;renderGive();window.scrollTo(0,y);};});
+  q('[data-pc]').forEach(function(b){b.onclick=function(){var c=b.dataset.pc,i=placeDraft.cats.indexOf(c);if(i>=0){if(placeDraft.cats.length>1)placeDraft.cats.splice(i,1);}else placeDraft.cats.push(c);q('[data-pc]').forEach(function(x){x.setAttribute('aria-pressed',placeDraft.cats.indexOf(x.dataset.pc)>=0);});};});
+  $('padd').onclick=function(){var n=$('pn').value.trim();if(!n){$('pn').focus();return;}S.places.push({id:'p'+Date.now(),name:n.slice(0,60),note:$('pnote').value.trim().slice(0,120),cats:placeDraft.cats.slice()});save();var y=window.scrollY;renderGive();window.scrollTo(0,y);toast('Abgabestelle gespeichert');};
+  q('[data-fd]').forEach(function(b){b.onclick=function(){S.furt=b.dataset.fd===''?null:+b.dataset.fd;save();var y=window.scrollY;renderGive();window.scrollTo(0,y);if(S.furt!=null)toast('Furt-Tag: '+DAYN[S.furt]);};});
+  if($('furtics'))$('furtics').onclick=function(){download('kruschtel-furt-tag.ics',icsText(S.furt,'10:00','weekly').replace('SUMMARY:Kruschtel-Kaizen: Aufgaben der Woche','SUMMARY:Kruschtel-Kaizen: Furt-Tag').replace('DESCRIPTION:Kruschtel-Kaizen öffnen und die Aufgabe für heute abhaken.','DESCRIPTION:Heute kommt alles von der Abgabe-Liste aus dem Haus.'));};
 }
 
 /* ===== Kalender ===== */
