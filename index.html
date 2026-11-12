@@ -167,7 +167,8 @@ textarea{width:100%;min-height:120px;border-radius:14px;border:0;box-shadow:inse
 /* Navigation */
 .tabs{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;padding:14px 12px calc(12px + env(safe-area-inset-bottom,0));background:linear-gradient(transparent,var(--paper) 40%);z-index:5;pointer-events:none}
 .tabs div{display:flex;gap:2px;background:var(--ink);border-radius:999px;padding:5px;pointer-events:auto;box-shadow:0 10px 30px rgba(42,30,26,.28)}
-.tabs button{border:0;background:none;color:var(--paper2);border-radius:999px;padding:10px 11px;font-weight:600;font-size:13.5px;cursor:pointer;min-height:44px}
+.tabs button{border:0;background:none;color:var(--paper2);border-radius:999px;padding:10px clamp(6px,2.1vw,11px);font-weight:600;font-size:clamp(12px,3.35vw,13.5px);cursor:pointer;min-height:44px;white-space:nowrap}
+.tabs{padding-left:8px!important;padding-right:8px!important}
 .tabs button.on{background:var(--paper);color:var(--ink)}
 /* Dialog */
 .modal{position:fixed;inset:0;background:rgba(42,30,26,.5);display:flex;align-items:flex-end;justify-content:center;z-index:10}
@@ -196,6 +197,14 @@ textarea{width:100%;min-height:120px;border-radius:14px;border:0;box-shadow:inse
 .mascot .spark{animation:spark 1.6s ease-in-out infinite}
 @keyframes spark{50%{opacity:.2}}
 .center{text-align:center}
+.nuts{display:flex;gap:6px}
+.nuts button{width:44px;height:44px;border-radius:50%;border:0;background:var(--paper);box-shadow:inset 0 0 0 1px var(--hair);display:grid;place-items:center;cursor:pointer;padding:0}
+.nuts button svg{width:24px;height:24px;filter:grayscale(1) opacity(.35);transition:filter .2s}
+.nuts button[aria-pressed=true]{box-shadow:inset 0 0 0 1.5px var(--saffron)}
+.nuts button[aria-pressed=true] svg{filter:none}
+.fbt{min-height:150px;font:16px/1.45 var(--sans)!important;resize:vertical}
+.fbinfo{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--soft);line-height:1.4}
+.fbinfo input{accent-color:var(--olive);width:18px;height:18px;flex:none;margin-top:1px}
 /* Kompakt: weniger scrollen */
 .head2 .room{font-size:clamp(28px,8.5vw,36px)!important;margin-top:0!important}
 .head2 .wk{font-size:13px}
@@ -379,6 +388,7 @@ html[data-theme=dark] .danger{color:#e89b8f;box-shadow:inset 0 0 0 1.5px #e89b8f
   <button data-tab="plan">Plan</button>
   <button data-tab="kalender">Kalender</button>
   <button data-tab="abgabe">Abgabe</button>
+  <button data-tab="feedback">Feedback</button>
   <button data-tab="mehr">Mehr</button>
 </div></nav>
 <div class="modal" id="dlg" hidden><div class="sheetd" id="dlgbox" role="dialog" aria-modal="true"></div></div>
@@ -1110,6 +1120,44 @@ function renderCal(){
   $('ics').onclick=function(){download('kruschtel-erinnerung.ics',icsText(S.cal.day,S.cal.time,S.cal.freq));};
 }
 
+/* ===== Feedback ===== */
+var APP_VERSION='kk-v5';
+var FB_TO=['steffen','kiefer'].join('.')+String.fromCharCode(64)+['gmail','com'].join('.');
+var fb={kind:'idee',stars:0,text:'',info:true};
+function fbBody(){
+  var kinds={idee:'Idee',fehler:'Fehler',lob:'Lob',frage:'Frage'},b=fb.text.trim()+'\n\n';
+  if(fb.stars)b+='Bewertung: '+fb.stars+' von 5 Nüssen\n';
+  if(fb.info){var w=S&&S.plan&&S.plan[S.week];b+='---\nApp-Version: '+APP_VERSION+'\nTempo: '+(S?U().name:'-')+', '+(S?S.methods.length:0)+' Methoden, '+(S?S.rooms.length:0)+' Räume\nStand: '+(S?(S.finished?'Runde fertig':U().one+' '+(S.week+1)+' von '+S.plan.length):'-')+(w?', Methode '+METHODS[w.method].name:'')+'\nBildschirm: '+(window.innerWidth||0)+' px breit\nAnsicht: '+(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches?'installierte App':'Browser')+'\n';}
+  return {subject:'Kruschtel-Kaizen: '+kinds[fb.kind]+(fb.stars?' ('+fb.stars+'/5)':''),body:b};
+}
+function renderFeedback(){
+  var kinds=[['idee','Idee'],['fehler','Fehler'],['lob','Lob'],['frage','Frage']];
+  var h='<h2>Feedback</h2>'+buddyHTML('Was soll besser werden? Ich lese alles, versprochen. Auch Kritik, die macht die App besser.','happy');
+  h+='<div class="stack" style="margin-top:14px"><section class="panel"><div class="seg" role="group" aria-label="Art">'+kinds.map(function(k){return '<button data-fk="'+k[0]+'" aria-pressed="'+(fb.kind===k[0])+'">'+k[1]+'</button>';}).join('')+'</div>';
+  h+='<div><p class="soft small" style="margin:0 0 6px">Wie gefällt dir die App? (optional)</p><div class="nuts" role="group" aria-label="Bewertung">'+[1,2,3,4,5].map(function(n){return '<button data-st="'+n+'" aria-label="'+n+' von 5" aria-pressed="'+(fb.stars>=n)+'">'+ACORN+'</button>';}).join('')+'</div></div>';
+  h+='<textarea id="fbt" class="fbt" maxlength="2000" placeholder="'+({idee:'Was fehlt dir? Was würdest du dir wünschen?',fehler:'Was ist passiert? Was hast du davor gemacht?',lob:'Was gefällt dir besonders?',frage:'Was möchtest du wissen?'})[fb.kind]+'">'+esc(fb.text)+'</textarea>';
+  h+='<label class="fbinfo"><input type="checkbox" id="fbi"'+(fb.info?' checked':'')+'> App-Version, Bildschirmbreite und Planstand mitschicken. Deine Räume, Aufgaben und Listen werden nicht verschickt.</label>';
+  h+='<button class="btn" id="fbsend">Per E-Mail senden</button><button class="btn text" id="fbcopy">Kein Mailprogramm? Text kopieren</button></section>';
+  h+='<p class="soft small">Das Feedback geht per E-Mail direkt an den Entwickler der App. Du siehst die Mail vor dem Absenden in deiner Mail-App.</p></div>';
+  $('app').innerHTML=h;
+  $('deerbtn').onclick=function(){say(pick(['Jede Idee zählt. Auch die verrückten.','Fehler gefunden? Her damit, ich jag ihn raus.','Lob nehm ich auch gern. Und Nüsse.']));};
+  $('fbt').oninput=function(){fb.text=this.value;};
+  $('fbi').onchange=function(){fb.info=this.checked;};
+  $('app').querySelectorAll('[data-fk]').forEach(function(b){b.onclick=function(){fb.kind=b.dataset.fk;fb.text=$('fbt').value;renderFeedback();};});
+  $('app').querySelectorAll('[data-st]').forEach(function(b){b.onclick=function(){var n=+b.dataset.st;fb.stars=fb.stars===n?0:n;$('app').querySelectorAll('[data-st]').forEach(function(x){x.setAttribute('aria-pressed',fb.stars>=+x.dataset.st);});};});
+  $('fbsend').onclick=function(){
+    fb.text=$('fbt').value;if(!fb.text.trim()){toast('Schreib kurz, worum es geht.');$('fbt').focus();return;}
+    var m=fbBody(),a=document.createElement('a');a.href='mailto:'+FB_TO+'?subject='+encodeURIComponent(m.subject)+'&body='+encodeURIComponent(m.body);a.rel='noopener';document.body.appendChild(a);a.click();a.remove();
+    S.fbSent=(S.fbSent||0)+1;save();
+    setTimeout(function(){dialog('<div class="center" style="width:96px;margin:0 auto">'+happs(tines(),'proud')+'</div><h3 class="center">Danke!</h3><p class="center soft">Deine Mail-App sollte jetzt mit der fertigen Nachricht offen sein. Tippe dort nur noch auf Senden.</p><p class="center soft small">Nichts passiert? Dann nutze „Text kopieren“ und schick ihn an '+esc(FB_TO)+'.</p><div class="row"><button class="btn line" id="fbagain">Text kopieren</button><button class="btn" data-close>Fertig</button></div>',function(){$('fbagain').onclick=function(){copyFb();};},function(){fb.text='';fb.stars=0;if(tab==='feedback')renderFeedback();});},400);
+  };
+  $('fbcopy').onclick=function(){fb.text=$('fbt').value;copyFb();};
+}
+function copyFb(){
+  var m=fbBody(),txt='An: '+FB_TO+'\nBetreff: '+m.subject+'\n\n'+m.body,p=navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(txt):Promise.reject();
+  p.then(function(){toast('Kopiert. Jetzt in eine Mail einfügen.');},function(){dialog('<h3>Feedback-Text</h3><p class="soft small">Alles markieren, kopieren und an '+esc(FB_TO)+' schicken.</p><textarea readonly>'+esc(txt)+'</textarea><button class="btn" data-close>Fertig</button>');});
+}
+
 /* ===== Mehr ===== */
 function renderMore(){
   var days=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
@@ -1151,7 +1199,7 @@ function render(){
   $('tabs').hidden=!!draft;
   if(draft)return renderSetup();
   document.querySelectorAll('.tabs button').forEach(function(b){b.classList.toggle('on',b.dataset.tab===tab);});
-  if(tab==='plan')renderPlan();else if(tab==='kalender')renderCal();else if(tab==='abgabe')renderGive();else if(tab==='mehr')renderMore();else renderWeek();
+  if(tab==='plan')renderPlan();else if(tab==='kalender')renderCal();else if(tab==='abgabe')renderGive();else if(tab==='mehr')renderMore();else if(tab==='feedback')renderFeedback();else renderWeek();
 }
 S=load();render();
 })();
