@@ -224,6 +224,35 @@ textarea{width:100%;min-height:120px;border-radius:14px;border:0;box-shadow:inse
 .strip .pm .lst svg{width:20px;height:20px}
 .accs{margin-top:10px;border-radius:20px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--hair);background:var(--sheet)}
 .acc{background:transparent}
+.phs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.ph{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:var(--paper2);border:0;padding:0;cursor:pointer;display:grid;place-items:center;color:var(--ink)}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ph.empty{background:transparent;box-shadow:inset 0 0 0 1.5px var(--hair);border:0}
+.ph .pe{display:grid;justify-items:center;gap:6px;font-size:14px;font-weight:600;padding:8px;text-align:center}
+.ph .pe svg{width:28px;height:28px}
+.ph .pe small{font-weight:400;color:var(--soft);font-size:12px}
+.ph .tag{position:absolute;left:8px;bottom:8px;background:rgba(42,32,29,.72);color:#faf3ea;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px}
+.phrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.phrow .btn{width:auto;flex:1;min-height:44px;padding:10px 14px;font-size:15px}
+.cmp{position:relative;height:min(54vh,calc((min(100vw,520px) - 76px)*1.25));border-radius:18px;overflow:hidden;background:var(--paper2);margin:12px 0 6px;touch-action:pan-y}
+.cmp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.cmp .cv{position:absolute;inset:0}
+.cmp .ln{position:absolute;top:0;bottom:0;width:3px;margin-left:-1.5px;background:#faf3ea;box-shadow:0 0 0 1px rgba(42,32,29,.25);pointer-events:none}
+.cmp .ln:after{content:"‹ ›";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:#faf3ea;color:#3a2a26;display:grid;place-items:center;font-weight:700;font-size:15px;letter-spacing:2px;box-shadow:0 2px 8px rgba(42,32,29,.3)}
+.cmp input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:ew-resize}
+.cmp .tag{position:absolute;top:10px;background:rgba(42,32,29,.72);color:#faf3ea;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;pointer-events:none}
+.cmp .tag.l{left:10px}.cmp .tag.r{right:10px}
+.cmp:focus-within{outline:2px solid var(--teal);outline-offset:3px}
+.cell .cam{display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:3px}
+.album{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.album button{border:0;padding:0;background:none;text-align:left;cursor:pointer;color:var(--ink)}
+.album .th{position:relative;aspect-ratio:4/5;border-radius:12px;overflow:hidden;background:var(--paper2)}
+.album .th img{position:absolute;top:0;bottom:0;width:50%;height:100%;object-fit:cover}
+.album .th img.one{width:100%}
+.album .th img+img{left:50%;border-left:2px solid var(--sheet)}
+.album b{display:block;font-family:var(--serif);font-weight:400;font-size:14px;margin-top:5px;line-height:1.2}
+.album span{font-size:12px;color:var(--soft)}
+
 .accs .acc+.acc,.accs div+div .acc,.accs #tipbox .acc,.accs #all{border-top:1px solid var(--hair)}
 .accs #spotbox .acc{border-top:0}
 .acc>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:13px 16px;font-family:var(--serif);font-size:17px;min-height:50px}
@@ -497,7 +526,7 @@ function migrate(s){
   if(!s)return s;
   if(s.outPrev==null)s.outPrev=0;if(!s.give)s.give=[];if(s.paused===undefined)s.paused=null;if(!s.theme)s.theme='auto';
   s.plan.forEach(function(w){if(w.out==null)w.out=0;w.tasks.forEach(function(t){if(t.n==null)t.n=0;});});
-  if(!s.started)s.started=new Date().toISOString();if(!s.pace)s.pace='woche';if(!s.cal)s.cal={day:0,time:'10:00'};if(!s.cal.freq)s.cal.freq='weekly';if(!s.spots)s.spots={};if(!s.places)s.places=[];if(s.city==null)s.city='';if(s.furt===undefined)s.furt=null;
+  if(!s.started)s.started=new Date().toISOString();if(!s.pace)s.pace='woche';if(!s.cal)s.cal={day:0,time:'10:00'};if(!s.cal.freq)s.cal.freq='weekly';if(!s.spots)s.spots={};if(!s.places)s.places=[];if(s.city==null)s.city='';if(s.furt===undefined)s.furt=null;if(!s.album)s.album=[];
   s.v=2;return s;
 }
 function weekDone(w){return w.tasks.every(function(t){return t.done;});}
@@ -679,7 +708,12 @@ function stillLife(seedStr,frac,opts){
   s+='</svg>';
   return {svg:s,total:objs.length};
 }
-if(typeof module!=='undefined')module.exports={planWeeks:planWeeks,newState:newState,migrate:migrate,advance:advance,nextRound:nextRound,moveWeek:moveWeek,toggleTask:toggleTask,addOut:addOut,totalOut:totalOut,stillLife:stillLife,icsText:icsText,PRESETS:PRESETS,METHOD_ORDER:METHOD_ORDER,PORTALS:PORTALS,portalGroups:portalGroups,schedule:schedule,planIcs:planIcs,today:today,PACES:PACES,cbType:cbType,tipFor:tipFor,CB:CB,addTask:addTask,removeTask:removeTask,applyCustom:applyCustom,miniTask:miniTask,addSpot:addSpot,removeSpot:removeSpot,spotTask:spotTask,LOCAL_KA:LOCAL_KA,localFor:localFor,furtToday:furtToday};
+/* Vorher/Nachher: Album-Einträge im Zustand, die Fotos selbst liegen in IndexedDB */
+function fidOf(w){if(!w.fid)w.fid='f'+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36);return w.fid;}
+function albumOf(s,fid){return (s.album||[]).filter(function(a){return a.fid===fid;})[0]||null;}
+function notePhoto(s,i,side,now){var w=s.plan[i],f=fidOf(w);s.album=s.album||[];var a=albumOf(s,f);if(!a){a={fid:f,room:w.room,method:w.method,round:s.round,v:0,n:0};s.album.unshift(a);}a[side]=now||Date.now();return a;}
+function dropPhoto(s,fid,side){var a=albumOf(s,fid);if(!a)return false;a[side]=0;if(!a.v&&!a.n)s.album=s.album.filter(function(x){return x!==a;});return true;}
+if(typeof module!=='undefined')module.exports={fidOf:fidOf,albumOf:albumOf,notePhoto:notePhoto,dropPhoto:dropPhoto,planWeeks:planWeeks,newState:newState,migrate:migrate,advance:advance,nextRound:nextRound,moveWeek:moveWeek,toggleTask:toggleTask,addOut:addOut,totalOut:totalOut,stillLife:stillLife,icsText:icsText,PRESETS:PRESETS,METHOD_ORDER:METHOD_ORDER,PORTALS:PORTALS,portalGroups:portalGroups,schedule:schedule,planIcs:planIcs,today:today,PACES:PACES,cbType:cbType,tipFor:tipFor,CB:CB,addTask:addTask,removeTask:removeTask,applyCustom:applyCustom,miniTask:miniTask,addSpot:addSpot,removeSpot:removeSpot,spotTask:spotTask,LOCAL_KA:LOCAL_KA,localFor:localFor,furtToday:furtToday};
 </script>
 
 <script>
@@ -823,10 +857,11 @@ function renderWeek(){
   }
   h+='<div id="todaybox" style="margin-top:14px"></div>';
   h+='<section class="strip" aria-label="Zähler"><div class="sn"><b id="tw">'+(w.out||0)+'</b><span>weg '+(U().one==='Woche'?'diese Woche':'in dieser Etappe')+'<br>insgesamt <span id="tt">'+num(totalOut(S))+'</span></span></div><div class="pm"><button id="togive" class="lst" aria-label="Auf die Abgabe-Liste"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11M4 12h11M4 17h7M18 14v6M15 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button><button id="minus" aria-label="Eins weniger">−</button><button class="plus" id="plus" aria-label="Eins mehr">+1</button></div></section>';
-  h+='<div class="accs"><div id="spotbox"></div><div id="tipbox"></div>';
+  h+='<div class="accs"><div id="spotbox"></div><div id="photobox"></div><div id="tipbox"></div>';
   h+='<details class="acc" id="all"><summary>Alle Aufgaben <span class="soft" id="cnt"></span></summary><div class="accb"><ul class="tasks">';
   w.tasks.forEach(function(t,k){h+='<li'+(t.own?' class="own"':'')+'><button class="task" data-t="'+k+'" aria-pressed="'+t.done+'"><span class="c">'+TICK+'</span><span class="t">'+esc(t.t)+(t.own?'<span class="ownb">eigene</span>':'')+'</span>'+(t.n?'<span class="n">+'+t.n+'</span>':'<span></span>')+'</button>'+(t.own?'<button class="tdel" data-del="'+k+'" aria-label="Eigene Aufgabe löschen">✕</button>':'')+'</li>';});
   h+='</ul><div class="addt"><div class="row2"><input type="text" id="nt" maxlength="120" placeholder="Eigene Aufgabe, z. B. Kartons von Opa durchsehen" aria-label="Eigene Aufgabe"><button class="btn" id="ntadd">Hinzufügen</button></div><label><input type="checkbox" id="ntrem" checked> Auch beim nächsten Mal in diesem Raum</label></div><p class="gate">Die nächste '+U().one+' öffnet sich, sobald alle Aufgaben abgehakt sind.</p><button class="btn text" id="pause">'+U().one+' pausieren</button></div></details></div>';
+  if(photoWeek!==S.plan[i]){photoWeek=S.plan[i];openPh=null;}
   $('app').innerHTML=h;bindHow(m);
   var refresh=function(bump){
     var tmp=document.createElement('div');tmp.innerHTML=scene(i,frac(w));
@@ -851,7 +886,7 @@ function renderWeek(){
   $('minus').onclick=function(){addOut(S,-1);save();refresh(false);};
   $('togive').onclick=function(){addGiveDialog();};
   $('pause').onclick=function(){S.paused=new Date().toISOString();save();window.scrollTo(0,0);renderWeek();};
-  refresh(false);tipBox(0);spotBox();
+  refresh(false);tipBox(0);spotBox();photoBox();
 }
 function spotBox(){
   var b=$('spotbox');if(!b)return;var w=S.plan[S.week],key=w.ids.join(),sp=(S.spots||{})[key]||[];
@@ -875,7 +910,7 @@ function spotsDialog(i){
     },function(){if(tab==='plan')renderPlan();});};
   draw();
 }
-var WK=null,tipN=0,openSpots=false,openTip=false,openAll=false,miniN=0,miniTimer=null;
+var photoWeek=null,WK=null,tipN=0,openSpots=false,openTip=false,openAll=false,miniN=0,miniTimer=null;
 var ACORN='<svg viewBox="0 0 30 30" aria-hidden="true"><ellipse cx="15" cy="18" rx="8" ry="9" fill="#e0a43a"/><path d="M6 13q9-8 18 0v-2.5q-9-7-18 0z" fill="#9a6a4e"/><path d="M15 4v3.5" stroke="#9a6a4e" stroke-width="2" stroke-linecap="round"/></svg>';
 function tipBox(step){
   tipN+=step;var t=tipFor(S,tipN),b=$('tipbox');if(!b)return;var cb=S.cb&&CB[S.cb];
@@ -932,10 +967,119 @@ function fiveMin(){
   };
   show();
 }
+/* ===== Vorher/Nachher-Fotos: nur auf diesem Gerät, in IndexedDB ===== */
+var PDB=null,PMEM=null,PURL={},openPh=null;
+var CAM='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5h3l1.6-2.3h6.8L17 8.5h3v10H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13.3" r="3.3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+function pdb(){
+  if(PDB)return PDB;
+  PDB=new Promise(function(ok,no){try{if(!window.indexedDB)throw 0;var r=indexedDB.open('kruschtel-fotos',1);r.onupgradeneeded=function(){r.result.createObjectStore('p');};r.onsuccess=function(){ok(r.result);};r.onerror=function(){no(r.error);};r.onblocked=function(){no('blocked');};}catch(e){no(e);}});
+  PDB=PDB.catch(function(){PMEM=PMEM||{};return null;});return PDB;
+}
+function ptx(mode,fn){return pdb().then(function(db){return new Promise(function(ok,no){
+  if(!db){var r0=fn(null);ok(r0&&r0.result!==undefined?r0.result:r0);return;}
+  var t=db.transaction('p',mode),st=t.objectStore('p'),res=fn(st);t.oncomplete=function(){ok(res&&res.result!==undefined?res.result:res);};t.onerror=function(){no(t.error);};t.onabort=function(){no(t.error);};});});}
+function pput(k,b){return ptx('readwrite',function(st){if(!st){PMEM[k]=b;return;}st.put(b,k);});}
+function pget(k){return ptx('readonly',function(st){if(!st)return {result:PMEM[k]||null};return st.get(k);}).then(function(r){return r||null;});}
+function pdel(k){if(PURL[k]){URL.revokeObjectURL(PURL[k]);delete PURL[k];}return ptx('readwrite',function(st){if(!st){delete PMEM[k];return;}st.delete(k);});}
+function pclear(){Object.keys(PURL).forEach(function(k){URL.revokeObjectURL(PURL[k]);});PURL={};return ptx('readwrite',function(st){if(!st){PMEM={};return;}st.clear();}).catch(function(){});}
+function purl(k){if(PURL[k])return Promise.resolve(PURL[k]);return pget(k).then(function(b){if(!b)return null;PURL[k]=URL.createObjectURL(b);return PURL[k];}).catch(function(){return null;});}
+/* Bilder füllen, sobald sie geladen sind: <img data-pk="fid|v"> */
+function fillPhotos(root){(root||document).querySelectorAll('img[data-pk]').forEach(function(im){purl(im.dataset.pk).then(function(u){if(u)im.src=u;else{im.removeAttribute('src');im.alt='Foto nicht auf diesem Gerät';}});});}
+function shrink(file){return new Promise(function(ok,no){
+  var u=URL.createObjectURL(file),img=new Image();
+  img.onload=function(){try{var M=1280,k=Math.min(1,M/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(function(b){b?ok(b):no('blob');},'image/jpeg',0.74);}catch(e){no(e);}};
+  img.onerror=function(){URL.revokeObjectURL(u);no('img');};img.src=u;});}
+function pickPhoto(i,side,after){
+  var inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.style.display='none';document.body.appendChild(inp);
+  inp.onchange=function(){var f=inp.files&&inp.files[0];inp.remove();if(!f)return;
+    var w=S.plan[i],fid=fidOf(w),k=fid+'|'+side;
+    shrink(f).then(function(b){if(PURL[k]){URL.revokeObjectURL(PURL[k]);delete PURL[k];}return pput(k,b);}).then(function(){
+      notePhoto(S,i,side);save();
+      if(!PMEM&&navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){});
+      toast(side==='v'?'Vorher-Foto gespeichert':'Nachher-Foto gespeichert');if(after)after(fid);
+    }).catch(function(){toast('Das Foto ließ sich nicht speichern.');});};
+  inp.click();
+}
+function phTile(fid,side,a,i){
+  var lbl=side==='v'?'Vorher':'Nachher';
+  if(a&&a[side])return '<button class="ph" data-phc="'+fid+'" aria-label="'+lbl+'-Foto ansehen"><img data-pk="'+fid+'|'+side+'" alt="'+lbl+'-Foto"><span class="tag">'+lbl+'</span></button>';
+  return '<button class="ph empty" data-php="'+side+'" data-pi="'+i+'"><span class="pe">'+CAM+lbl+'-Foto<small>'+(side==='v'?'bevor du loslegst':'wenn alles abgehakt ist')+'</small></span></button>';
+}
+function photoBox(){
+  var b=$('photobox');if(!b)return;var i=S.week,w=S.plan[i],a=w.fid?albumOf(S,w.fid):null,fid=w.fid||'';
+  var started=w.tasks.some(function(t){return t.done;});
+  if(openPh===null)openPh=!started&&!(a&&a.v);
+  var st=a&&a.v&&a.n?'vergleichen':a&&a.v?'Vorher ✓':started?'noch kein Foto':'Vorher-Foto machen';
+  b.innerHTML='<details class="acc" id="phacc"'+(openPh?' open':'')+'><summary>Vorher/Nachher <span class="soft">'+st+'</span></summary><div class="accb"><p class="soft small" style="margin-top:0">'+
+    (a&&a.v&&a.n?'Schieb den Regler und sieh, was furt ist.':'Fotografiere '+esc(w.room)+' vorher und nachher, immer von derselben Stelle aus.')+' Die Fotos bleiben auf diesem Gerät.'+(PMEM?' <b>In dieser Vorschau nur bis zum Schließen.</b>':'')+'</p>'+
+    '<div class="phs">'+phTile(fid,'v',a,i)+phTile(fid,'n',a,i)+'</div>'+
+    (a&&a.v&&a.n?'<div class="phrow"><button class="btn" data-phc="'+fid+'">Vergleichen</button></div>':'')+'</div></details>';
+  $('phacc').ontoggle=function(){openPh=$('phacc').open;};
+  bindPhotoTiles(b,function(){openPh=true;photoBox();});
+  fillPhotos(b);
+}
+function bindPhotoTiles(root,after){
+  root.querySelectorAll('[data-php]').forEach(function(x){x.onclick=function(){pickPhoto(+x.dataset.pi,x.dataset.php,after);};});
+  root.querySelectorAll('[data-phc]').forEach(function(x){x.onclick=function(){compareDialog(x.dataset.phc);};});
+}
+function planIdx(fid){for(var k=0;k<S.plan.length;k++)if(S.plan[k].fid===fid)return k;return -1;}
+function compareDialog(fid,back){
+  var a=albumOf(S,fid);if(!a){toast('Keine Fotos gefunden.');return;}
+  var i=planIdx(fid),both=a.v&&a.n,d=new Date(a.n||a.v);
+  var h='<h3>'+esc(a.room)+'</h3><p class="soft small" style="margin:2px 0 0">'+METHODS[a.method].name+(a.round>1?', Runde '+a.round:'')+', '+d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear()+'</p>';
+  if(both)h+='<div class="cmp" id="cmp"><img data-pk="'+fid+'|n" alt="Nachher"><div class="cv" id="cv" style="clip-path:inset(0 50% 0 0)"><img data-pk="'+fid+'|v" alt="Vorher"></div><span class="ln" id="ln" style="left:50%"></span><span class="tag l">Vorher</span><span class="tag r">Nachher</span><input type="range" id="cr" min="0" max="100" value="50" aria-label="Regler zwischen Vorher und Nachher"></div>';
+  else h+='<div class="phs" style="margin:12px 0 6px">'+phTile(fid,'v',a,i)+phTile(fid,'n',a,i)+'</div>';
+  if(both)h+='<button class="btn" id="phshare">Vorher/Nachher teilen</button>';
+  if(i>=0&&(both||!S.finished))h+='<div class="row"><button class="btn line" data-php2="v">Vorher neu</button><button class="btn line" data-php2="n">Nachher neu</button></div>';
+  h+='<div class="row"><button class="btn line" id="phdel">Fotos löschen</button><button class="btn line" data-close>Fertig</button></div>';
+  dialog(h,function(){
+    var box=$('dlgbox');fillPhotos(box);
+    if($('cr'))$('cr').oninput=function(){var v=this.value;$('cv').style.clipPath='inset(0 '+(100-v)+'% 0 0)';$('ln').style.left=v+'%';};
+    if($('phshare'))$('phshare').onclick=function(){shareBA(fid);};
+    var again=function(){compareDialog(fid,back);};
+    box.querySelectorAll('[data-php]').forEach(function(x){x.onclick=function(){pickPhoto(+x.dataset.pi,x.dataset.php,again);};});
+    box.querySelectorAll('[data-php2]').forEach(function(x){x.onclick=function(){pickPhoto(i,x.dataset.php2,again);};});
+    $('phdel').onclick=function(){dialog('<h3>Fotos von '+esc(a.room)+' löschen?</h3><p class="soft">Vorher- und Nachher-Foto werden von diesem Gerät entfernt.</p><div class="row"><button class="btn line" id="phno">Abbrechen</button><button class="btn" id="phyes">Löschen</button></div>',function(){
+      $('phno').onclick=again;
+      $('phyes').onclick=function(){Promise.all([pdel(fid+'|v'),pdel(fid+'|n')]).catch(function(){}).then(function(){dropPhoto(S,fid,'v');dropPhoto(S,fid,'n');save();closeDlg();toast('Fotos gelöscht');});};
+    },back||function(){render();});};
+  },back||function(){render();});
+}
+/* Teilen: beide Fotos nebeneinander, Raum und Zahl darunter */
+function loadImg(u){return new Promise(function(ok,no){var im=new Image();im.onload=function(){ok(im);};im.onerror=no;im.src=u;});}
+function coverDraw(ctx,im,x,y,w,h){var r=Math.max(w/im.naturalWidth,h/im.naturalHeight),sw=w/r,sh=h/r;ctx.drawImage(im,(im.naturalWidth-sw)/2,(im.naturalHeight-sh)/2,sw,sh,x,y,w,h);}
+function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function shareBA(fid){
+  var a=albumOf(S,fid),i=planIdx(fid),out=i>=0?S.plan[i].out||0:0;
+  Promise.all([purl(fid+'|v'),purl(fid+'|n')]).then(function(u){if(!u[0]||!u[1])throw 0;return Promise.all([loadImg(u[0]),loadImg(u[1])]);}).then(function(ims){
+    var H=out?1350:1190,c=document.createElement('canvas');c.width=1080;c.height=H;var x=c.getContext('2d');
+    x.fillStyle='#f1e4d4';x.fillRect(0,0,1080,H);x.fillStyle='#faf3ea';rrect(x,50,50,980,H-100,56);x.fill();
+    x.fillStyle='#7a645b';x.font='38px Georgia,serif';x.fillText('Kruschtel-Kaizen',100,140);
+    x.fillStyle='#3a2a26';x.font='84px Georgia,serif';var nm=a.room;while(x.measureText(nm).width>880&&nm.length>3)nm=nm.slice(0,-2)+'…';x.fillText(nm,100,235);
+    [[ims[0],100,'Vorher'],[ims[1],550,'Nachher']].forEach(function(p){x.save();rrect(x,p[1],290,430,560,30);x.clip();coverDraw(x,p[0],p[1],290,430,560);x.restore();
+      x.fillStyle='rgba(42,32,29,.75)';rrect(x,p[1]+18,290+560-70,p[2]==='Vorher'?150:172,50,25);x.fill();x.fillStyle='#faf3ea';x.font='600 28px Helvetica,Arial,sans-serif';x.fillText(p[2],p[1]+38,290+560-35);});
+    if(out){x.fillStyle='#3a2a26';x.font='110px Georgia,serif';x.fillText(String(out),100,1000);var ow=x.measureText(String(out)).width;x.font='38px Helvetica,Arial,sans-serif';x.fillText(out===1?'Ding ist furt':'Dinge sind furt',100+ow+24,990);}
+    x.fillStyle='#7a645b';x.font='32px Helvetica,Arial,sans-serif';x.fillText(METHODS[a.method].name+', '+new Date(a.n).toLocaleDateString('de-DE'),100,out?1070:920);
+    x.fillStyle='#3a2a26';x.font='42px Georgia,serif';x.fillText('Furt demit!',100,out?1200:1050);
+    c.toBlob(function(b){
+      var name='kruschtel-kaizen-vorher-nachher-'+a.room.toLowerCase().replace(/[^a-z0-9äöüß]+/g,'-')+'.jpg',url=b&&URL.createObjectURL(b);
+      var fb=function(){dialog('<h3>Vorher/Nachher</h3><img class="shareimg" src="'+url+'" alt="Vorher/Nachher '+esc(a.room)+'"><p class="soft small">Lange auf das Bild drücken, um es zu speichern oder zu teilen.</p><button class="btn" data-close>Fertig</button>',null,function(){compareDialog(fid);});};
+      if(!b){toast('Das Bild ließ sich nicht erstellen.');return;}
+      var f=new File([b],name,{type:'image/jpeg'});
+      if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f],title:a.room+' vorher und nachher',text:'Kruschtel-Kaizen: '+a.room+' vorher und nachher'}).catch(function(e){if(!e||e.name!=='AbortError')fb();});else fb();
+    },'image/jpeg',0.88);
+  }).catch(function(){toast('Dafür braucht es beide Fotos auf diesem Gerät.');});
+}
+function albumHTML(){
+  var al=S.album||[];if(!al.length)return '';
+  return '<section style="margin-top:28px"><h3>Vorher/Nachher</h3><p class="soft small" style="margin-top:4px">'+al.length+(al.length===1?' Raum':' Räume')+' mit Fotos, auch aus früheren Runden. Nur auf diesem Gerät.</p><div class="album">'+al.map(function(a){
+    var im=a.v&&a.n?'<img data-pk="'+a.fid+'|v" alt=""><img data-pk="'+a.fid+'|n" alt="">':'<img class="one" data-pk="'+a.fid+'|'+(a.v?'v':'n')+'" alt="">';
+    return '<button data-alb="'+a.fid+'" aria-label="'+esc(a.room)+' vorher und nachher"><div class="th">'+im+'</div><b>'+esc(a.room)+'</b><span>'+(a.v&&a.n?'vorher/nachher':a.v?'nur vorher':'nur nachher')+(a.round>1?', Runde '+a.round:'')+'</span></button>';}).join('')+'</div></section>';
+}
 function finishWeek(){
-    var w=S.plan[S.week],room=w.room,out=w.out,r=advance(S);save();
+    var w=S.plan[S.week],room=w.room,out=w.out,pa=w.fid?albumOf(S,w.fid):null,r=advance(S);save();
     var grew=tines()>Math.min(5,1+Math.floor((weeksDone()-1)/3)+(S.round-1));
-    dialog('<div class="center" style="width:120px;margin:0 auto">'+happs(tines(),'proud')+'</div><h2>'+esc(room)+' hat wieder Luft.</h2>'+(grew?'<p><b>Vorrat aufgeräumt!</b> Kurumis Kruschtel-Stapel ist eine Kiste kleiner.</p>':'')+'<p class="soft">'+(out?out+(out===1?' Ding hat':' Dinge haben')+' das Haus verlassen. ':'')+(r==='next'?'Als Nächstes: '+esc(S.plan[S.week].room)+' mit '+METHODS[S.plan[S.week].method].name+'.':'Das war die letzte '+U().one+'.')+'</p><button class="btn" data-close>'+(r==='next'?U().one+' '+(S.week+1)+' öffnen':'Weiter')+'</button><button class="btn line" id="shr">Als Bild teilen</button>',function(){hop2();var idx=S.finished?S.plan.length-1:S.week-1;$('shr').onclick=function(){shareCard(idx);};},function(){render();window.scrollTo(0,0);});
+    dialog('<div class="center" style="width:120px;margin:0 auto">'+happs(tines(),'proud')+'</div><h2>'+esc(room)+' hat wieder Luft.</h2>'+(grew?'<p><b>Vorrat aufgeräumt!</b> Kurumis Kruschtel-Stapel ist eine Kiste kleiner.</p>':'')+'<p class="soft">'+(out?out+(out===1?' Ding hat':' Dinge haben')+' das Haus verlassen. ':'')+(r==='next'?'Als Nächstes: '+esc(S.plan[S.week].room)+' mit '+METHODS[S.plan[S.week].method].name+'.':'Das war die letzte '+U().one+'.')+'</p><button class="btn" data-close>'+(r==='next'?U().one+' '+(S.week+1)+' öffnen':'Weiter')+'</button>'+(pa&&pa.v&&!pa.n?'<button class="btn line" id="nph">Jetzt Nachher-Foto machen</button>':'')+'<button class="btn line" id="shr">Als Bild teilen</button>',function(){hop2();var idx=S.finished?S.plan.length-1:S.week-1;$('shr').onclick=function(){shareCard(idx);};if($('nph'))$('nph').onclick=function(){pickPhoto(idx,'n',function(fid){compareDialog(fid);});};},function(){render();window.scrollTo(0,0);});
 }
 /* Abschlusskarte als Bild: Stillleben, Kurumi, Zahlen */
 var CARD_VARS={'var(--wall)':'#f6ebdd','var(--sky1)':'#f9d9a8','var(--sky2)':'#fbefe0','var(--light)':'#f6c66b','var(--paper2)':'#e8d6c2','currentColor':'#3a2a26'};
@@ -993,11 +1137,13 @@ function renderPlan(){
     h+='<div class="grid" style="margin-top:22px">';
     S.plan.forEach(function(w,i){
       var st=S.finished||i<S.week?'done':i===S.week?'now':'lock',f=st==='done'?1:st==='now'?frac(w):0;
-      h+='<div class="cell '+st+'"'+(st==='done'?' data-share="'+i+'" role="button" tabindex="0" aria-label="'+esc(w.room)+' als Bild teilen"':' data-spots="'+i+'" role="button" tabindex="0" aria-label="Kruschtel-Ecken für '+esc(w.room)+'"')+'>'+stillLife(seed(i),f,{label:w.room,room:rid(w),dim:st==='lock',uid:'g'+i}).svg+'<b>'+esc(w.room)+'</b><span>'+(st==='done'?'<span class="shr">Teilen</span> Erledigt'+(w.out?', '+w.out+' Dinge weg':''):st==='now'?(S.paused?'Pausiert':'Diese '+U().one):U().one+' '+(i+1))+', '+METHODS[w.method].name+'</span></div>';
+      var pa=w.fid?albumOf(S,w.fid):null;
+      h+='<div class="cell '+st+'"'+(st==='done'&&pa?' data-alb="'+w.fid+'" role="button" tabindex="0" aria-label="'+esc(w.room)+': Vorher/Nachher ansehen"':st==='done'?' data-share="'+i+'" role="button" tabindex="0" aria-label="'+esc(w.room)+' als Bild teilen"':' data-spots="'+i+'" role="button" tabindex="0" aria-label="Kruschtel-Ecken für '+esc(w.room)+'"')+'>'+stillLife(seed(i),f,{label:w.room,room:rid(w),dim:st==='lock',uid:'g'+i}).svg+'<b>'+esc(w.room)+'</b><span>'+(pa?'<span class="cam">'+CAM+'</span>':'')+(st==='done'?(pa?'':'<span class="shr">Teilen</span> ')+'Erledigt'+(w.out?', '+w.out+' Dinge weg':''):st==='now'?(S.paused?'Pausiert':'Diese '+U().one):U().one+' '+(i+1))+', '+METHODS[w.method].name+'</span></div>';
     });
-    h+='</div>';
+    h+='</div>'+albumHTML();
   }
-  $('app').innerHTML=h;
+  $('app').innerHTML=h;fillPhotos($('app'));
+  $('app').querySelectorAll('[data-alb]').forEach(function(c){c.style.cursor='pointer';var go=function(){compareDialog(c.dataset.alb,function(){if(tab==='plan')renderPlan();});};c.onclick=go;c.onkeydown=function(e){if(e.key==='Enter')go();};});
   if($('om'))$('om').onclick=function(){orderMode=!orderMode;renderPlan();};
   $('app').querySelectorAll('[data-spots]').forEach(function(c){c.style.cursor='pointer';c.onclick=function(){spotsDialog(+c.dataset.spots);};c.onkeydown=function(e){if(e.key==='Enter')spotsDialog(+c.dataset.spots);};});
   $('app').querySelectorAll('[data-share]').forEach(function(c){c.onclick=function(){shareCard(+c.dataset.share);};c.onkeydown=function(e){if(e.key==='Enter')shareCard(+c.dataset.share);};});
@@ -1121,7 +1267,7 @@ function renderCal(){
 }
 
 /* ===== Feedback ===== */
-var APP_VERSION='kk-v5';
+var APP_VERSION='kk-v6';
 var FB_TO=['steffen','kiefer'].join('.')+String.fromCharCode(64)+['gmail','com'].join('.');
 var fb={kind:'idee',stars:0,text:'',info:true};
 function fbBody(){
@@ -1166,7 +1312,7 @@ function renderMore(){
   h+='<section class="panel"><h3>Dein Aufräumstil</h3><p class="soft small">'+(cb?'<b style="color:var(--ink)">'+cb.name+' ('+cb.en+')</b>: '+cb.store+' und '+cb.sys+'. '+cb.desc:'Noch nicht bestimmt. Zwei Fragen, dann passen Kurumis Tipps zu dir.')+'</p><p class="soft small">Nach den Clutterbug-Stilen von Cas Aarssen.</p><button class="btn line" id="cbq">'+(cb?'Test wiederholen':'Aufräumtyp finden')+'</button></section>';
   h+='<section class="panel"><h3>Erscheinungsbild</h3><div class="seg" role="group" aria-label="Erscheinungsbild">'+[['auto','Wie das Handy'],['light','Hell'],['dark','Dunkel']].map(function(t){return '<button data-th="'+t[0]+'" aria-pressed="'+(S.theme===t[0])+'">'+t[1]+'</button>';}).join('')+'</div></section>';
   h+='<section class="panel"><h3>Räume, Methoden, Tempo</h3><p class="soft small">Aktuell: '+U().name+', '+U().desc.charAt(0).toLowerCase()+U().desc.slice(1)+'. Eine Änderung erstellt einen neuen Plan. Dein Zähler und die Abgabe-Liste bleiben.</p><button class="btn line" id="edit">Ändern</button></section>';
-  h+='<section class="panel"><h3>Sicherung</h3><p class="soft small">Dein Fortschritt liegt nur auf diesem Gerät. Kopiere die Sicherung ab und zu in eine Notiz.</p><div class="row"><button class="btn line" id="exp">Kopieren</button><button class="btn line" id="imp">Einfügen</button></div></section>';
+  h+='<section class="panel"><h3>Sicherung</h3><p class="soft small">Dein Fortschritt liegt nur auf diesem Gerät. Kopiere die Sicherung ab und zu in eine Notiz. Fotos sind darin nicht enthalten.</p><div class="row"><button class="btn line" id="exp">Kopieren</button><button class="btn line" id="imp">Einfügen</button></div></section>';
   var live=/github\.io$/.test(location.hostname);
   h+='<section class="panel"><h3>Als App aufs Handy</h3><p class="soft small">iPhone: Teilen, dann „Zum Home-Bildschirm“. Android: Menü, dann „App installieren“.</p></section>';
   h+='<section class="panel"><h3>App weiterempfehlen</h3><p class="soft small">'+(live?'Schick den Link an Freunde. Jeder bekommt seinen eigenen Plan, die Daten bleiben auf dem eigenen Handy.':'Das Weiterempfehlen klappt, sobald die App live online ist.')+'</p>'+(live?'<button class="btn line" id="shareapp">Link teilen</button>':'')+'</section>';
@@ -1178,8 +1324,8 @@ function renderMore(){
     if(navigator.share)navigator.share({title:'Kruschtel-Kaizen',text:txt,url:url}).catch(function(){});
     else if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(function(){toast('Link kopiert');},function(){toast(url);});
     else toast(url);};
-  $('reset').onclick=function(){dialog('<div class="center" style="width:96px;margin:0 auto">'+happs(tines(),'sleepy')+'</div><h3>Wirklich neu starten?</h3><p class="soft">Plan, Zähler ('+num(totalOut(S))+' Dinge) und Abgabe-Liste werden gelöscht. Das lässt sich nicht rückgängig machen. Kopiere vorher die Sicherung, wenn du sie behalten willst.</p><div class="row"><button class="btn line" data-close>Abbrechen</button><button class="btn" id="resetok">Neu starten</button></div>',function(){
-    $('resetok').onclick=function(){try{localStorage.removeItem(KEY);}catch(e){}S=null;draft=null;tab='woche';closeDlg();render();window.scrollTo(0,0);toast('Alles auf Anfang');};});};
+  $('reset').onclick=function(){dialog('<div class="center" style="width:96px;margin:0 auto">'+happs(tines(),'sleepy')+'</div><h3>Wirklich neu starten?</h3><p class="soft">Plan, Zähler ('+num(totalOut(S))+' Dinge), Abgabe-Liste und Fotos werden gelöscht. Das lässt sich nicht rückgängig machen. Kopiere vorher die Sicherung, wenn du sie behalten willst.</p><div class="row"><button class="btn line" data-close>Abbrechen</button><button class="btn" id="resetok">Neu starten</button></div>',function(){
+    $('resetok').onclick=function(){try{localStorage.removeItem(KEY);}catch(e){}pclear();S=null;draft=null;tab='woche';closeDlg();render();window.scrollTo(0,0);toast('Alles auf Anfang');};});};
   $('edit').onclick=function(){startSetup(S);};
   $('exp').onclick=function(){var j=JSON.stringify(S),p=navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(j):Promise.reject();
     p.then(function(){toast('Sicherung kopiert');},function(){dialog('<h3>Sicherung</h3><p class="soft small">Alles markieren und kopieren.</p><textarea readonly>'+esc(j)+'</textarea><button class="btn" data-close>Fertig</button>');});};
