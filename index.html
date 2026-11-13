@@ -20,11 +20,11 @@
   --paper:#f1e4d4; --paper2:#e8d6c2; --sheet:#faf3ea; --ink:#3a2a26; --soft:#7a645b; --hair:#dcc8b4; --wall:#f6ebdd;
   --teal:#2f6f6a; --saffron:#e0a43a; --rose:#c97a7e; --olive:#8a8f45; --plum:#5b3d55; --light:#f6c66b; --sky1:#f9d9a8; --sky2:#fbefe0;
   --serif:"Young Serif",Georgia,serif; --sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
-  --grain:.07; color-scheme:light;
+  --grain:.07; --hanko:#b8392c; color-scheme:light;
 }
 html[data-theme=dark]{
   --paper:#2a201d; --paper2:#3a2d28; --sheet:#352823; --ink:#f3e6d6; --soft:#bba696; --hair:#54443d; --wall:#30251f;
-  --sky1:#e98f5a; --sky2:#5b3d55; --light:#ffcf7a; --grain:.12; color-scheme:dark;
+  --sky1:#e98f5a; --sky2:#5b3d55; --light:#ffcf7a; --grain:.12; --hanko:#e0675a; color-scheme:dark;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -150,6 +150,7 @@ details.how p{padding-bottom:12px;max-width:62ch}
 .form{display:flex;flex-direction:column;gap:10px}
 .form input[type=text]{border:0;border-bottom:1.5px solid var(--ink);background:transparent;padding:10px 2px;font-size:16px;border-radius:0;width:100%}
 .seg{display:flex;flex-wrap:wrap;gap:6px}
+.fxrows{display:grid;gap:8px}.fxr{display:flex;align-items:center;justify-content:space-between;gap:10px}.fxr>span{font-weight:600}
 .seg button{border:0;border-radius:999px;padding:8px 14px;background:var(--paper);box-shadow:inset 0 0 0 1px var(--hair);cursor:pointer;font-size:14px;min-height:40px}
 .seg button[aria-pressed=true]{background:var(--ink);color:var(--paper);box-shadow:none}
 .portals{display:flex;flex-direction:column;gap:18px}
@@ -224,6 +225,35 @@ textarea{width:100%;min-height:120px;border-radius:14px;border:0;box-shadow:inse
 .strip .pm .lst svg{width:20px;height:20px}
 .accs{margin-top:10px;border-radius:20px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--hair);background:var(--sheet)}
 .acc{background:transparent}
+.visitors{position:absolute;right:18px;bottom:4px;display:flex;gap:2px;align-items:flex-end}
+.vis{border:0;background:none;padding:0;width:clamp(34px,10vw,46px);cursor:pointer}
+.vis svg,.fv svg{display:block;width:100%;height:auto}
+.fvisit{display:flex;justify-content:center;align-items:flex-end;gap:6px}
+.fv{width:84px;animation:fvin .7s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes fvin{0%{transform:translateX(-60px);opacity:0}100%{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.fv{animation:none}}
+.hanko{display:block;width:100%;height:auto;overflow:visible}
+.hbook{margin-top:28px;padding:16px 16px 6px;border-radius:20px;background:var(--sheet);box-shadow:inset 0 0 0 1px var(--hair)}
+.hhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.hgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 8px;margin:12px 0 10px}
+.hslot{border:0;background:none;padding:0;color:var(--ink);cursor:pointer;display:grid;justify-items:center;gap:3px;min-width:0}
+.hslot span{font-size:11.5px;line-height:1.2;color:var(--soft);text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hslot.empty{cursor:default}
+.hslot.empty i{display:grid;place-items:center;width:100%;aspect-ratio:1;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--hair);border:0;font-style:normal;font-family:var(--serif);color:var(--hair);font-size:18px;background-image:radial-gradient(circle,transparent 62%,transparent 63%)}
+.hslot.empty i{outline:1.5px dashed var(--hair);outline-offset:-7px;box-shadow:none}
+.hold{border-top:1px solid var(--hair)}
+.hold>summary{list-style:none;cursor:pointer;display:flex;gap:8px;padding:12px 0;font-family:var(--serif)}
+.hold>summary::-webkit-details-marker{display:none}
+.hold>summary .soft{margin-left:auto;font-family:var(--sans);font-size:13px}
+.hbig{width:150px;margin:6px auto 12px}
+.fhead{display:flex;align-items:flex-end;justify-content:center;gap:4px}
+.hnew{width:84px;margin-bottom:6px;animation:stampin .55s cubic-bezier(.2,1.6,.4,1) .35s both}
+@keyframes stampin{0%{transform:scale(2.4) rotate(-14deg);opacity:0}60%{opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
+@media (prefers-reduced-motion:reduce){.hnew{animation:none}}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:80;overflow:hidden}
+.confetti i{position:absolute;top:-40px;display:block;animation:nutfall 2s cubic-bezier(.3,.6,.5,1) forwards}
+.confetti i svg{width:100%;height:100%;display:block}
+@keyframes nutfall{0%{transform:translate(0,0) rotate(0);opacity:1}85%{opacity:1}100%{transform:translate(var(--dx),105vh) rotate(var(--r));opacity:0}}
 .phs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
 .ph{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:var(--paper2);border:0;padding:0;cursor:pointer;display:grid;place-items:center;color:var(--ink)}
 .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -458,14 +488,15 @@ var METHODS={
   zz:{name:'20/20-Regel',short:'Unter 20 € und in 20 Minuten ersetzbar? Darf gehen',text:'Für alles, was du „vielleicht mal“ brauchst: Lässt es sich für unter 20 € und in unter 20 Minuten wieder besorgen, darf es gehen. Das Risiko ist klein, der Platz ist sofort frei.',rule:'„Vielleicht mal“ ist kein Grund zum Behalten.'}
 };
 var METHOD_ORDER=['km','vk','mg','tt','ds','zz','fl'];
-var PACES={woche:{days:7,name:'Gemütlich',desc:'Ein Raum pro Woche',one:'Woche',many:'Wochen'},zuegig:{days:4,name:'Zügig',desc:'Ein Raum alle 4 Tage',one:'Etappe',many:'Etappen'},sprint:{days:2,name:'Sprint',desc:'Ein Raum alle 2 Tage, z. B. vor einem Umzug',one:'Etappe',many:'Etappen'}};
+var PACES={woche:{days:7,name:'Gemütlich',desc:'Ein Raum pro Woche',one:'Woche',many:'Wochen',dies:'Diese Woche',inthis:'diese Woche',ofthis:'dieser Woche'},zuegig:{days:4,name:'Zügig',desc:'Ein Raum alle 4 Tage',one:'Etappe',many:'Etappen',dies:'Diese Etappe',inthis:'in dieser Etappe',ofthis:'dieser Etappe'},sprint:{days:2,name:'Sprint',desc:'Ein Raum alle 2 Tage, z. B. vor einem Umzug',one:'Etappe',many:'Etappen',dies:'Diese Etappe',inthis:'in dieser Etappe',ofthis:'dieser Etappe'},tag:{days:1,name:'Täglich',desc:'Jeden Tag ein anderer Raum, alle Aufgaben an einem Tag',one:'Tag',many:'Tage',dies:'Heute',inthis:'heute',ofthis:'für heute'}};
+var PACE_ORDER=['tag','sprint','zuegig','woche'];
 function paceOf(s){return PACES[(s&&s.pace)||'woche']||PACES.woche;}
 /* Aufgaben: [Text, Anzahl Dinge, die dabei das Haus verlassen] */
 function methodTasks(m,extra,pace){var step=(pace&&pace!=='woche')?'Schritt':'Tag';
   var T=function(t,n){return {t:t,n:n||0,done:false};};
   if(m==='vk')return [T('Vier Kisten beschriften: Behalten, Spenden, Müll, Woanders hin'),T('Den ersten Bereich komplett leeren und alles in die Kisten sortieren'),T(extra),T('Den Rest des Raums genauso durchgehen'),T('Die Woanders-Kiste leeren: alles an seinen Platz'),T('Müll entsorgen und die Spenden-Kiste ins Auto stellen')];
   if(m==='km')return [T('Eine Kategorie wählen (Bücher, Kabel, Deko …) und alles davon an einem Ort sammeln'),T('Jedes Teil einzeln in die Hand nehmen: Macht es Freude?'),T(extra),T('Aussortiertes mit Danke verabschieden: Spende oder Müll'),T('Behaltenes einräumen: Jedes Ding bekommt einen festen Platz')];
-  if(m==='mg'){var a=[];for(var d=1;d<=7;d++)a.push(T(step+' '+d+': '+(d===1?'ein Teil':d+' Teile')+' aussortieren'+(d===4?' (Idee: '+extra.charAt(0).toLowerCase()+extra.slice(1)+')':''),d));return a;}
+  if(m==='mg'){var a=[];for(var d=1;d<=7;d++)a.push(T(step+' '+d+': '+(d===1?'ein Teil':d+' Teile')+' aussortieren'+(d===4?' (Idee: '+extra+')':''),d));return a;}
   if(m==='tt')return [T('12 Dinge zum Wegwerfen finden',12),T('12 Dinge zum Spenden finden',12),T('12 Dinge an ihren richtigen Platz bringen'),T(extra),T('Die Spenden-Tüte aus dem Haus bringen')];
   if(m==='ds')return [T('Mit den großen Dingen im Raum anfangen: Möbel, Geräte, Kisten'),T('Bei jedem Teil fragen: Würde jemand anders es nach mir behalten wollen?'),T(extra),T('Eine kleine, beschriftete Kiste nur für dich erlauben'),T('Was anderen Freude macht, jetzt verschenken')];
   if(m==='fl')return [T('Timer auf 15 Minuten stellen und loslegen. Klingelt er, ist für heute Schluss'),T('27-Fling-Boogie: schnell 27 Dinge aus dem Raum in eine Tüte, Müll oder Spende',27),T(extra),T('Hot Spot finden: die Fläche, die immer wieder zumüllt, in 5 Minuten freiräumen'),T('Hot-Spot-Feuerwehr: am Abend dieselbe Fläche nochmal 5 Minuten'),T('Noch einmal 15 Minuten mit Timer, dann ist der Raum fertig')];
@@ -521,12 +552,12 @@ function planWeeks(rooms,methods,weeks,seed,pace){
   });
 }
 function newSeed(){return Math.floor(Math.random()*1e9);}
-function newState(rooms,methods,seed,pace){seed=seed==null?newSeed():seed;pace=pace||'woche';return {v:2,app:'leerraum',seed:seed,pace:pace,rooms:rooms,methods:methods,plan:planWeeks(rooms,methods,12,seed,pace),week:0,round:1,outPrev:0,give:[],paused:null,cal:{day:0,time:'10:00',freq:'daily'},theme:'auto',started:new Date().toISOString()};}
+function newState(rooms,methods,seed,pace){seed=seed==null?newSeed():seed;pace=pace||'woche';return {v:2,app:'leerraum',seed:seed,pace:pace,rooms:rooms,methods:methods,plan:planWeeks(rooms,methods,12,seed,pace),week:0,round:1,stamps:[],outPrev:0,give:[],paused:null,cal:{day:0,time:'10:00',freq:'daily'},theme:'auto',started:new Date().toISOString()};}
 function migrate(s){
   if(!s)return s;
   if(s.outPrev==null)s.outPrev=0;if(!s.give)s.give=[];if(s.paused===undefined)s.paused=null;if(!s.theme)s.theme='auto';
   s.plan.forEach(function(w){if(w.out==null)w.out=0;w.tasks.forEach(function(t){if(t.n==null)t.n=0;});});
-  if(!s.started)s.started=new Date().toISOString();if(!s.pace)s.pace='woche';if(!s.cal)s.cal={day:0,time:'10:00'};if(!s.cal.freq)s.cal.freq='weekly';if(!s.spots)s.spots={};if(!s.places)s.places=[];if(s.city==null)s.city='';if(s.furt===undefined)s.furt=null;if(!s.album)s.album=[];
+  if(!s.started)s.started=new Date().toISOString();if(!s.pace)s.pace='woche';if(!s.cal)s.cal={day:0,time:'10:00'};if(!s.cal.freq)s.cal.freq='weekly';if(!s.spots)s.spots={};if(!s.places)s.places=[];if(s.city==null)s.city='';if(s.furt===undefined)s.furt=null;if(!s.album)s.album=[];if(!s.stamps){s.stamps=[];s.plan.forEach(function(w){if(w.doneAt)addStamp(s,w,w.doneAt);});if(s.finished)s.stamps.push({kaizen:true,round:s.round||1,at:s.plan[s.plan.length-1].doneAt||new Date().toISOString(),out:totalOut(s)-(s.outPrev||0)});}
   s.v=2;return s;
 }
 function weekDone(w){return w.tasks.every(function(t){return t.done;});}
@@ -548,7 +579,12 @@ function removeTask(s,k){var w=s.plan[s.week],t=w.tasks[k];if(!t||!t.own)return 
 /* Nur 5 Minuten: Mini-Aufgaben für Tage mit wenig Energie */
 var MINI=['Nur die oberste Schublade: Was darf raus?','Fünf Dinge finden, die eindeutig Müll sind.','Eine einzige Fläche freiräumen, nur eine.','Drei Dinge zurück an ihren Platz bringen.','Ein Teil, das du nie benutzt, in die Spenden-Tüte.','Alles Abgelaufene aus einem einzigen Fach.','Die Kabel-Ecke: Was gehört zu nichts mehr?','Eine Tasche oder ein Korb: komplett ausleeren, nur Gutes zurück.','Stifte und Kleinkram: Was schreibt nicht mehr, was ist kaputt?','Einen Stapel Papier durchgehen, nur einen.'];
 function miniTask(n){return MINI[(Math.floor(Date.now()/86400000)+(n||0))%MINI.length];}
-function advance(s,now){if(!weekDone(s.plan[s.week]))return false;now=(now||new Date()).toISOString();s.plan[s.week].doneAt=now;if(!s.plan[s.week].startAt)s.plan[s.week].startAt=s.week?s.plan[s.week-1].doneAt||s.started:s.started;if(s.week<s.plan.length-1){s.week++;s.plan[s.week].startAt=now;applyCustom(s,s.week);return 'next';}s.finished=true;return 'finish';}
+function advance(s,now){if(!weekDone(s.plan[s.week]))return false;now=(now||new Date()).toISOString();s.plan[s.week].doneAt=now;if(!s.plan[s.week].startAt)s.plan[s.week].startAt=s.week?s.plan[s.week-1].doneAt||s.started:s.started;addStamp(s,s.plan[s.week],now);if(s.week<s.plan.length-1){s.week++;s.plan[s.week].startAt=now;applyCustom(s,s.week);return 'next';}s.finished=true;s.stamps.push({kaizen:true,round:s.round,at:now,out:totalOut(s)-s.outPrev});return 'finish';}
+/* Tempo umstellen: Plan und Haken bleiben, der aktuelle Raum zählt ab heute neu */
+function setPace(s,k,now){if(!PACES[k]||s.pace===k)return false;s.pace=k;var w=s.plan[s.week];if(w&&!s.finished)w.startAt=(now||new Date()).toISOString();return true;}
+/* Hanko-Stempelheft: ein Stempel pro fertigem Raum, einer pro fertiger Runde */
+function addStamp(s,w,at){s.stamps=s.stamps||[];s.stamps.push({room:w.room,method:w.method,round:s.round,at:at,out:w.out||0});}
+function stampsOf(s,round){return (s.stamps||[]).filter(function(x){return x.round===round;});}
 function nextRound(s){s.outPrev=totalOut(s);s.round++;s.seed=newSeed();s.plan=planWeeks(s.rooms,s.methods,12,s.seed,s.pace);s.week=0;s.finished=false;s.started=new Date().toISOString();applyCustom(s,0);return s;}
 function moveWeek(s,i,dir){var j=i+dir;if(i<=s.week||j<=s.week||j>=s.plan.length)return false;var t=s.plan[i];s.plan[i]=s.plan[j];s.plan[j]=t;return true;}
 /* Kalender: erledigte Wochen mit echten Daten, die aktuelle läuft bis mindestens heute, kommende schließen an */
@@ -611,7 +647,26 @@ var TIPS=['Erst ausmisten, dann Aufbewahrung kaufen. Sonst sortierst du Kruschte
   'Was du ein Jahr nicht benutzt hast, brauchst du sehr wahrscheinlich nicht mehr.',
   'Duplikate zuerst: Zwei Schneebesen, drei Scheren? Behalte die beste.'];
 function cbType(store,sys){return store==='sichtbar'?(sys==='einfach'?'bf':'be'):(sys==='einfach'?'lb':'cr');}
-function tipFor(s,n){var k=Math.floor(Date.now()/86400000)+(n||0);if(s&&s.cb&&CB[s.cb]){var own=CB[s.cb].tips;if(k%2===0)return {text:own[(k/2)%own.length],own:true};return {text:TIPS[((k-1)/2)%TIPS.length],own:false};}return {text:TIPS[k%TIPS.length],own:false};}
+/* Jahreszeiten-Tipps: passend zum Monat */
+var MONTHS=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+var SEASON=[
+ ['Geschenke, die nicht passen: gleich weitergeben oder umtauschen, bevor sie im Schrank landen.','Alte Kalender, Planer und Gutscheine von letztem Jahr: Was abgelaufen ist, darf furt.','Beim Wegräumen der Weihnachtsdeko aussortieren: Was dieses Jahr nicht hing, darf gehen.'],
+ ['Papierkram-Monat: Belege fürs letzte Jahr in eine Mappe, Werbepost und alte Anleitungen raus.','Winterkleidung der Kinder: Was ist schon zu klein? Jetzt weitergeben, solange es noch kalt ist.','Medikamentenkiste durchsehen: Abgelaufenes gehört in die Apotheke oder den Restmüll, nicht in den Schrank.'],
+ ['Frühjahrsputz: Fenster auf und eine Schublade nach der anderen, nicht alles auf einmal.','Bevor die Wintersachen in den Keller wandern: Was wurde diesen Winter kein einziges Mal getragen?','Putzmittel-Sammlung: Ein Allzweckreiniger ersetzt oft fünf halb leere Flaschen.'],
+ ['Balkon und Garten: kaputte Töpfe, alte Erde und verblichene Kissen dürfen weg.','Osterdeko auf eine Kiste begrenzen. Was nicht reinpasst, wird verschenkt.','Fahrradsaison: Platten Schlauch flicken oder das Rad, das keiner fährt, weitergeben.'],
+ ['Flohmarkt-Zeit: Jetzt eine Verkaufskiste füllen, die Termine kommen schneller als gedacht.','Sport- und Freizeitsachen: Was hast du letzten Sommer nicht benutzt?','Grillecke: Ein guter Grillrost reicht, rostige Spieße und Einweg-Reste können weg.'],
+ ['Vor dem Urlaub: Koffer, Kulturbeutel und Kosmetikproben aussortieren.','Sommerkleidung anprobieren statt nur ansehen: Was nicht passt, gleich in die Spendentüte.','Sonnencreme von letztem Jahr prüfen: Abgelaufen schützt sie nicht mehr richtig.'],
+ ['Sommerferien: Das Kinderzimmer mit den Kindern ausmisten, Aussortiertes dürfen sie selbst verkaufen.','Hitze-Tipp: Morgens ausmisten, wenn es noch kühl ist. 15 Minuten reichen.','Strandtaschen, Luftmatratzen, Schwimmsachen: Was ist kaputt oder ungenutzt?'],
+ ['Vor dem Schulstart: Hefte, Stifte und Ranzen prüfen, bevor Neues gekauft wird.','Urlaubsmitbringsel: Nur behalten, was du wirklich ansehen willst. Ein Foto bewahrt die Erinnerung auch.','Kühlschrank und Vorräte: Grillsoßen und Reste vom Sommer durchsehen.'],
+ ['Sommerkleidung durchsehen, bevor sie verstaut wird: Was wurde diesen Sommer nicht angezogen?','Einmachgläser und Dosen: Nur so viele behalten, wie in ein Fach passen.','Gartenmöbel und Planschbecken: Was nicht über den Winter soll, jetzt weitergeben.'],
+ ['Flur-Check: Pro Person eine Jacke und ein Paar Schuhe draußen, der Rest kommt in den Schrank.','Gartengeräte und Grill winterfest machen und dabei aussortieren.','Halloween-Deko: eine Kiste, nicht mehr. Kaputtes gleich furt.'],
+ ['Vor Weihnachten Platz schaffen, bevor Neues kommt. Spielzeug jetzt spenden, Sozialkaufhäuser freuen sich.','Eins rein, eins raus gilt auch für Wunschzettel: Was darf für jedes neue Geschenk gehen?','Wintersachen hervorholen und gleich prüfen: Passt es noch, ist es noch warm?'],
+ ['Weihnachtsdeko beim Aufhängen sortieren: Kaputtes und Ungeliebtes gleich aussortieren.','Geschenkpapier, Bänder und Tüten: nur so viel behalten, wie in eine Kiste passt.','Zwischen den Jahren: ein Raum, ein Nachmittag, und du startest leichter ins neue Jahr.']];
+function seasonTip(d,n){d=d||new Date();var m=d.getMonth(),a=SEASON[m];return {text:a[((n||0)%a.length+a.length)%a.length],season:MONTHS[m],own:false};}
+function tipFor(s,n,now){var d=now||new Date(),k=Math.floor(d.getTime()/86400000)+(n||0);
+  if(k%3===0)return seasonTip(d,Math.floor(k/3));
+  var j=k-Math.floor(k/3)-1;
+  if(s&&s.cb&&CB[s.cb]){var own=CB[s.cb].tips;if(j%2===0)return {text:own[(j/2)%own.length],own:true};return {text:TIPS[Math.floor(j/2)%TIPS.length],own:false};}return {text:TIPS[((j%TIPS.length)+TIPS.length)%TIPS.length],own:false};}
 var GIVE_CATS=[['kl','Kleidung & Schuhe'],['bm','Bücher & Medien'],['sp','Spielzeug'],['hm','Haushalt & Möbel'],['el','Elektro'],['so','Sonstiges']];
 var GIVE_HOW=[['spenden','Spenden'],['verschenken','Verschenken'],['verkaufen','Verkaufen']];
 var PORTALS=[
@@ -713,7 +768,7 @@ function fidOf(w){if(!w.fid)w.fid='f'+Date.now().toString(36)+Math.floor(Math.ra
 function albumOf(s,fid){return (s.album||[]).filter(function(a){return a.fid===fid;})[0]||null;}
 function notePhoto(s,i,side,now){var w=s.plan[i],f=fidOf(w);s.album=s.album||[];var a=albumOf(s,f);if(!a){a={fid:f,room:w.room,method:w.method,round:s.round,v:0,n:0};s.album.unshift(a);}a[side]=now||Date.now();return a;}
 function dropPhoto(s,fid,side){var a=albumOf(s,fid);if(!a)return false;a[side]=0;if(!a.v&&!a.n)s.album=s.album.filter(function(x){return x!==a;});return true;}
-if(typeof module!=='undefined')module.exports={fidOf:fidOf,albumOf:albumOf,notePhoto:notePhoto,dropPhoto:dropPhoto,planWeeks:planWeeks,newState:newState,migrate:migrate,advance:advance,nextRound:nextRound,moveWeek:moveWeek,toggleTask:toggleTask,addOut:addOut,totalOut:totalOut,stillLife:stillLife,icsText:icsText,PRESETS:PRESETS,METHOD_ORDER:METHOD_ORDER,PORTALS:PORTALS,portalGroups:portalGroups,schedule:schedule,planIcs:planIcs,today:today,PACES:PACES,cbType:cbType,tipFor:tipFor,CB:CB,addTask:addTask,removeTask:removeTask,applyCustom:applyCustom,miniTask:miniTask,addSpot:addSpot,removeSpot:removeSpot,spotTask:spotTask,LOCAL_KA:LOCAL_KA,localFor:localFor,furtToday:furtToday};
+if(typeof module!=='undefined')module.exports={addStamp:addStamp,stampsOf:stampsOf,tipFor:tipFor,seasonTip:seasonTip,SEASON:SEASON,setPace:setPace,fidOf:fidOf,albumOf:albumOf,notePhoto:notePhoto,dropPhoto:dropPhoto,planWeeks:planWeeks,newState:newState,migrate:migrate,advance:advance,nextRound:nextRound,moveWeek:moveWeek,toggleTask:toggleTask,addOut:addOut,totalOut:totalOut,stillLife:stillLife,icsText:icsText,PRESETS:PRESETS,METHOD_ORDER:METHOD_ORDER,PORTALS:PORTALS,portalGroups:portalGroups,schedule:schedule,planIcs:planIcs,today:today,PACES:PACES,cbType:cbType,tipFor:tipFor,CB:CB,addTask:addTask,removeTask:removeTask,applyCustom:applyCustom,miniTask:miniTask,addSpot:addSpot,removeSpot:removeSpot,spotTask:spotTask,LOCAL_KA:LOCAL_KA,localFor:localFor,furtToday:furtToday};
 </script>
 
 <script>
@@ -735,8 +790,12 @@ function num(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
 /* ===== Maskottchen: Kurumi von der Kruschtel-Kaizen ===== */
 function weeksDone(){return S?(S.finished?S.plan.length:S.week):0;}
 function tines(){if(!S)return 1;return Math.min(5,1+Math.floor(weeksDone()/3)+(S.round-1));}
+/* Kurumi nach Tages- und Jahreszeit */
+function kNow(){return window.__kNow?new Date(window.__kNow):new Date();}
+function nightTime(d){var hr=(d||kNow()).getHours();return hr>=22||hr<6;}
+function seasonAcc(d){var m=(d||kNow()).getMonth();return m===11?'xmas':m<=1||m===10?'scarf':m<=4?'sakura':m<=7?'straw':'momiji';}
 function happs(n,mood){
-  n=n||1;var happy=mood==='happy'||mood==='proud',pile=5-n;
+  n=n||1;if(!mood&&nightTime())mood='sleepy';var happy=mood==='happy'||mood==='proud',pile=5-n,acc=seasonAcc();
   var s='<svg viewBox="0 0 112 106" class="mascot" aria-hidden="true">';
   s+='<ellipse cx="56" cy="102" rx="44" ry="3.2" fill="#3a2a26" fill-opacity=".15"/>';
   var cols=['#c49a64','#2f6f6a','#c97a7e','#8a8f45'],by=101;
@@ -759,6 +818,11 @@ function happs(n,mood){
   else s+='<path d="M50.5 56.5q3.5 2.5 7 0" stroke="#3a2a26" stroke-width="1.7" fill="none" stroke-linecap="round"/><rect x="52.2" y="57.2" width="3.6" height="2.8" rx=".7" fill="#fff"/>';
   if(happy)s+='<ellipse cx="54" cy="70" rx="5.5" ry="6.2" fill="#e0a43a"/><path d="M48.5 66q5.5-5 11 0v-1.6q-5.5-4.6-11 0z" fill="#9a6a4e"/>';
   s+='<ellipse cx="46" cy="70" rx="4.5" ry="3.5" fill="#c56a3a"/><ellipse cx="62" cy="70" rx="4.5" ry="3.5" fill="#c56a3a"/>';
+  if(acc==='scarf'||acc==='xmas')s+='<path d="M38 61q16 8 32 0l1 6q-17 8-34 0z" fill="#2f6f6a"/><path d="M60 64l3 16 6-2-3-14z" fill="#2f6f6a"/><path d="M63 80l.6 3M66 79l1 3" stroke="#2f6f6a" stroke-width="1.4" stroke-linecap="round"/><path d="M42 64q12 5 26 0" stroke="#fbf5ec" stroke-opacity=".45" stroke-width="1.2" fill="none" stroke-dasharray="2 2"/>';
+  if(acc==='xmas')s+='<path d="M40 35q14-9 28 0q-4-14-14-17q-8 4-14 17z" fill="#c8483c"/><path d="M54 18q10-4 16 6" stroke="#c8483c" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="71" cy="26" r="3.6" fill="#fbf5ec"/><path d="M39 35.5q15-6 30 0" stroke="#fbf5ec" stroke-width="3.4" fill="none" stroke-linecap="round"/>';
+  if(acc==='sakura')s+='<g transform="translate(70 22)"><circle r="2.2" fill="#e0a43a"/>'+[0,72,144,216,288].map(function(a){return '<ellipse cx="0" cy="-4.2" rx="2.6" ry="3.4" fill="#f2b8c6" transform="rotate('+a+')"/>';}).join('')+'<circle r="1.6" fill="#e0a43a"/></g>';
+  if(acc==='straw')s+='<ellipse cx="54" cy="31" rx="21" ry="4.5" fill="#e8c27a"/><path d="M42 31q0-11 12-11t12 11z" fill="#e8c27a"/><path d="M42.4 28.5q11.6 3 23.2 0" stroke="#c8483c" stroke-width="2.4" fill="none"/>';
+  if(acc==='momiji')s+='<path transform="translate(71 21) rotate(18) scale(.9)" d="M0 7L-1.2 2.4-6.4 4.2-4 0.2-8.4-2.4-3.2-2.6-4.4-7.6 0-4.4 4.4-7.6 3.2-2.6 8.4-2.4 4 .2 6.4 4.2 1.2 2.4z" fill="#d0612f"/>';
   s+='</g>';
   if(mood==='proud')s+='<g class="spark" fill="#f6c66b"><path d="M96 14l1.6 3.4 3.4 1.6-3.4 1.6L96 24l-1.6-3.4L91 19l3.4-1.6z"/><path d="M26 18l1.2 2.6 2.6 1.2-2.6 1.2L26 26l-1.2-2.6-2.6-1.2 2.6-1.2z"/></g>';
   if(mood==='sleepy')s+='<text x="78" y="26" font-family="Young Serif,Georgia,serif" font-size="12" fill="#7a645b">z</text><text x="86" y="16" font-family="Young Serif,Georgia,serif" font-size="9" fill="#7a645b">z</text>';
@@ -769,13 +833,15 @@ var LINES={
   some:['Sauber! Ich seh schon wieder Boden.','Weniger Kruschtel, mehr Platz. Weiter so!','Du sortierst, ich trag raus. Gutes Team.','Gut gemacht. Kurze Nusspause ist erlaubt, Aufgeben nicht.'],
   last:['Nur noch eine Aufgabe. Endspurt! Gleich ist der Raum kruschtelfrei.','Fast geschafft. Ich hör schon den Applaus.'],
   done:['Geschafft! Hier liegt kein Kruschtel mehr rum.','Raum erledigt. Ich bin stolz auf dich!'],
+  night:['Schaffsch du noch? I bin scho halb am Schlofe. Morge isch au no en Dag.','Oyasumi! Gute Nacht. Der Kruschtel läuft nicht weg.','Psst, i schlof scho fast. Eine Aufgabe noch, dann ab ins Bett.'],
+  morning:['Ohayō! Gude Morge. Erst Kaffee, dann Kruschtel.','Ohayō gozaimasu! Früh dran, des gfallt mir.','Morgens geht Ausmisten am leichtesten. Kumm, eine Aufgabe.'],
   plus:['Furt demit!','Weg ist weg.','Eins weniger zum Abstauben.','Tschüss, Kruschtel!','Abtransport läuft.'],
   pause:['Ich halt die Stellung. Komm zurück, wenn es passt.','Pause ist auch ein Plan. Ich knabber so lang an meiner Nuss.'],
   give:['Was im Flur steht, ist noch nicht weg. Ab damit!','Spenden macht doppelt froh: dich und jemand anderen.'],
   grow:['Früher hab ich gehortet wie verrückt. Alle drei geschafften Räume wird mein Vorrat eine Kiste kleiner.']
 };
 function pick(a){return a[Math.floor(Math.random()*a.length)];}
-function buddyLine(w){var d=w.tasks.filter(function(t){return t.done;}).length,n=w.tasks.length;if(d===n)return pick(LINES.done);if(d===n-1)return pick(LINES.last);if(d===0)return pick(LINES.start.concat(weeksDone()?LINES.grow:[]));return pick(LINES.some);}
+function buddyLine(w){var d=w.tasks.filter(function(t){return t.done;}).length,n=w.tasks.length,hr=kNow().getHours();if(d<n&&nightTime()&&Math.random()<.6)return pick(LINES.night);if(d===0&&hr>=6&&hr<10&&Math.random()<.6)return pick(LINES.morning);if(d===n)return pick(LINES.done);if(d===n-1)return pick(LINES.last);if(d===0)return pick(LINES.start.concat(weeksDone()?LINES.grow:[]));return pick(LINES.some);}
 function buddyMood(w){var d=w.tasks.filter(function(t){return t.done;}).length;return d===w.tasks.length?'proud':d>0?'happy':'';}
 function buddyHTML(line,mood,big){return '<div class="buddy'+(big?' big':'')+'"><button id="deerbtn" aria-label="Kurumi antippen">'+happs(tines(),mood)+'</button><p class="bubble" id="say" aria-live="polite">'+line+'</p></div>';}
 function hop(){var d=document.querySelector('#deerbtn .mascot');if(!d)return;d.classList.remove('hop');void d.getBoundingClientRect();d.classList.add('hop');}
@@ -808,7 +874,7 @@ function renderSetup(){
     h+=steps(2)+'<div class="stack" style="margin-top:26px"><h2>Nach welchen Methoden?</h2><p class="soft small">Die Methoden werden auf die Räume verteilt. Eine reicht auch.</p><div class="mlist">';
     METHOD_ORDER.forEach(function(k){var m=METHODS[k],on=d.methods.indexOf(k)>=0;h+='<button class="mopt" data-m="'+k+'" aria-pressed="'+on+'"><div><b>'+m.name+'</b><span>'+m.short+'</span></div><span class="ck">'+TICK+'</span></button>';});
     h+='</div><h2 style="margin-top:34px">Wie schnell?</h2><p class="soft small">Egal welches Tempo: Jeden Tag steht eine kleine Aufgabe für heute bereit.</p><div class="mlist">';
-    Object.keys(PACES).forEach(function(k){var pc=PACES[k];h+='<button class="mopt" data-pace="'+k+'" aria-pressed="'+(d.pace===k)+'"><div><b>'+pc.name+'</b><span>'+pc.desc+', 12 Räume in etwa '+Math.round(pc.days*12/7)+' Wochen</span></div><span class="ck">'+TICK+'</span></button>';});
+    PACE_ORDER.slice().reverse().forEach(function(k){var pc=PACES[k];h+='<button class="mopt" data-pace="'+k+'" aria-pressed="'+(d.pace===k)+'"><div><b>'+pc.name+'</b><span>'+pc.desc+', 12 Räume in '+(pc.days*12<14?pc.days*12+' Tagen':'etwa '+Math.round(pc.days*12/7)+' Wochen')+'</span></div><span class="ck">'+TICK+'</span></button>';});
     h+='</div><button class="btn" id="next"'+(d.methods.length?'':' disabled')+'>Plan ansehen</button><button class="btn text" id="back">Zurück</button></div>';
   }else{
     var rooms=d.rooms.filter(function(r){return r.on;}),plan=planWeeks(rooms,d.methods,12,d.seed,d.pace);
@@ -842,7 +908,7 @@ function renderSetup(){
 /* ===== Woche ===== */
 function scene(i,f){var w=S.plan[i];return stillLife(seed(i),f,{label:w.room,room:rid(w),uid:'w'}).svg;}
 function tallyHTML(w){
-  return '<section class="tally" aria-label="Zähler"><div><div class="big" id="tw">'+(w.out||0)+'</div><div class="lbl">Dinge haben '+(U().one==='Woche'?'diese Woche':'in dieser Etappe')+' das Haus verlassen. Insgesamt <b id="tt">'+num(totalOut(S))+'</b>.</div></div>'+
+  return '<section class="tally" aria-label="Zähler"><div><div class="big" id="tw">'+(w.out||0)+'</div><div class="lbl">Dinge haben '+U().inthis+' das Haus verlassen. Insgesamt <b id="tt">'+num(totalOut(S))+'</b>.</div></div>'+
     '<div class="pm"><button id="minus" aria-label="Eins weniger">−</button><button class="plus" id="plus" aria-label="Eins mehr">+1</button></div>'+
     '<div class="links"><button id="togive">Auf die Abgabe-Liste</button><button id="where">Wohin damit?</button></div></section>';
 }
@@ -850,17 +916,17 @@ function renderWeek(){
   if(S.finished)return renderFinished();
   var i=S.week,w=S.plan[i],m=METHODS[w.method],f=frac(w);
   var h='<div class="head2"><div><span class="wk">'+U().one+' '+(i+1)+' von '+S.plan.length+(S.round>1?', Runde '+S.round:'')+'</span><h1 class="room">'+esc(w.room)+'</h1></div><button class="meth m-'+w.method+' mbtn" id="mhow" aria-label="So geht '+m.name+'">'+m.name+' <span aria-hidden="true">ⓘ</span></button></div>';
-  h+='<div class="scene" id="scene">'+scene(i,f)+'</div>';
+  h+='<div class="scene" id="scene">'+scene(i,f)+visitorsHTML()+'</div>';
   if(S.paused){
     h+='<section class="today light" style="margin-top:14px">'+buddyHTML(pick(LINES.pause),'sleepy')+'<p class="tt2">Pausiert seit '+fmtDate(S.paused)+'</p><p class="soft small">Der Plan wartet, deine Haken bleiben.</p><button class="btn" id="resume">Weitermachen</button></section>';
     $('app').innerHTML=h;bindHow(m);$('resume').onclick=function(){S.paused=null;save();renderWeek();};$('deerbtn').onclick=function(){say(pick(LINES.pause));};return;
   }
   h+='<div id="todaybox" style="margin-top:14px"></div>';
-  h+='<section class="strip" aria-label="Zähler"><div class="sn"><b id="tw">'+(w.out||0)+'</b><span>weg '+(U().one==='Woche'?'diese Woche':'in dieser Etappe')+'<br>insgesamt <span id="tt">'+num(totalOut(S))+'</span></span></div><div class="pm"><button id="togive" class="lst" aria-label="Auf die Abgabe-Liste"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11M4 12h11M4 17h7M18 14v6M15 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button><button id="minus" aria-label="Eins weniger">−</button><button class="plus" id="plus" aria-label="Eins mehr">+1</button></div></section>';
+  h+='<section class="strip" aria-label="Zähler"><div class="sn"><b id="tw">'+(w.out||0)+'</b><span>weg '+U().inthis+'<br>insgesamt <span id="tt">'+num(totalOut(S))+'</span></span></div><div class="pm"><button id="togive" class="lst" aria-label="Auf die Abgabe-Liste"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11M4 12h11M4 17h7M18 14v6M15 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button><button id="minus" aria-label="Eins weniger">−</button><button class="plus" id="plus" aria-label="Eins mehr">+1</button></div></section>';
   h+='<div class="accs"><div id="spotbox"></div><div id="photobox"></div><div id="tipbox"></div>';
   h+='<details class="acc" id="all"><summary>Alle Aufgaben <span class="soft" id="cnt"></span></summary><div class="accb"><ul class="tasks">';
   w.tasks.forEach(function(t,k){h+='<li'+(t.own?' class="own"':'')+'><button class="task" data-t="'+k+'" aria-pressed="'+t.done+'"><span class="c">'+TICK+'</span><span class="t">'+esc(t.t)+(t.own?'<span class="ownb">eigene</span>':'')+'</span>'+(t.n?'<span class="n">+'+t.n+'</span>':'<span></span>')+'</button>'+(t.own?'<button class="tdel" data-del="'+k+'" aria-label="Eigene Aufgabe löschen">✕</button>':'')+'</li>';});
-  h+='</ul><div class="addt"><div class="row2"><input type="text" id="nt" maxlength="120" placeholder="Eigene Aufgabe, z. B. Kartons von Opa durchsehen" aria-label="Eigene Aufgabe"><button class="btn" id="ntadd">Hinzufügen</button></div><label><input type="checkbox" id="ntrem" checked> Auch beim nächsten Mal in diesem Raum</label></div><p class="gate">Die nächste '+U().one+' öffnet sich, sobald alle Aufgaben abgehakt sind.</p><button class="btn text" id="pause">'+U().one+' pausieren</button></div></details></div>';
+  h+='</ul><div class="addt"><div class="row2"><input type="text" id="nt" maxlength="120" placeholder="Eigene Aufgabe, z. B. Kartons von Opa durchsehen" aria-label="Eigene Aufgabe"><button class="btn" id="ntadd">Hinzufügen</button></div><label><input type="checkbox" id="ntrem" checked> Auch beim nächsten Mal in diesem Raum</label></div><p class="gate">Der nächste Raum öffnet sich, sobald alle Aufgaben abgehakt sind.</p><button class="btn text" id="pause">'+U().one+' pausieren</button></div></details></div>';
   if(photoWeek!==S.plan[i]){photoWeek=S.plan[i];openPh=null;}
   $('app').innerHTML=h;bindHow(m);
   var refresh=function(bump){
@@ -874,10 +940,10 @@ function renderWeek(){
     if(bump){$('tw').classList.remove('bump');void $('tw').offsetWidth;$('tw').classList.add('bump');}
     todayBox();
   };
-  var toggle=function(k){var t=toggleTask(S,k);save();if(t.done&&navigator.vibrate)try{navigator.vibrate(12);}catch(e){}refresh(!!t.n);if(t.done)say(buddyLine(w),buddyMood(w));};
+  var toggle=function(k){var t=toggleTask(S,k);save();if(t.done)FX.tick();else FX.untick();refresh(!!t.n);if(t.n)checkFriends();if(t.done)say(buddyLine(w),buddyMood(w));};
   WK={toggle:toggle};
   $('app').querySelectorAll('[data-t]').forEach(function(b){b.onclick=function(){toggle(+b.dataset.t);};});
-  $('plus').onclick=function(){addOut(S,1);save();refresh(true);say(pick(LINES.plus),'happy');};
+  $('plus').onclick=function(){FX.plus();addOut(S,1);save();refresh(true);say(pick(LINES.plus),'happy');checkFriends();};
   if(openAll)$('all').open=true;
   $('all').ontoggle=function(){openAll=$('all').open;};
   var addOwn=function(){var v=$('nt').value;if(addTask(S,v,$('ntrem').checked)){save();openAll=true;var y=window.scrollY;renderWeek();window.scrollTo(0,y);toast('Aufgabe hinzugefügt');var f=$('nt');if(f)f.focus();}else if(v.trim())toast('Diese Aufgabe gibt es schon.');};
@@ -887,6 +953,8 @@ function renderWeek(){
   $('togive').onclick=function(){addGiveDialog();};
   $('pause').onclick=function(){S.paused=new Date().toISOString();save();window.scrollTo(0,0);renderWeek();};
   refresh(false);tipBox(0);spotBox();photoBox();
+  $('app').querySelectorAll('[data-vis]').forEach(function(b){b.onclick=function(){friendDialog(FRIENDS.filter(function(x){return x.id===b.dataset.vis;})[0],false);};});
+  checkFriends();
 }
 function spotBox(){
   var b=$('spotbox');if(!b)return;var w=S.plan[S.week],key=w.ids.join(),sp=(S.spots||{})[key]||[];
@@ -914,7 +982,7 @@ var photoWeek=null,WK=null,tipN=0,openSpots=false,openTip=false,openAll=false,mi
 var ACORN='<svg viewBox="0 0 30 30" aria-hidden="true"><ellipse cx="15" cy="18" rx="8" ry="9" fill="#e0a43a"/><path d="M6 13q9-8 18 0v-2.5q-9-7-18 0z" fill="#9a6a4e"/><path d="M15 4v3.5" stroke="#9a6a4e" stroke-width="2" stroke-linecap="round"/></svg>';
 function tipBox(step){
   tipN+=step;var t=tipFor(S,tipN),b=$('tipbox');if(!b)return;var cb=S.cb&&CB[S.cb];
-  b.innerHTML='<details class="acc tipacc" id="tipacc"'+(openTip?' open':'')+'><summary>'+ACORN+'<span class="tprev">'+esc(t.text)+'</span></summary><div class="accb"><p class="soft small">Kurumis Tipp'+(t.own?' für '+cb.name:'')+'</p><p>'+esc(t.text)+'</p><div class="acts"><button id="tipnext">Noch ein Tipp</button>'+(cb?'':'<button id="tipquiz">Welcher Aufräumtyp bin ich?</button>')+'</div></div></details>';
+  b.innerHTML='<details class="acc tipacc" id="tipacc"'+(openTip?' open':'')+'><summary>'+ACORN+'<span class="tprev">'+esc(t.text)+'</span></summary><div class="accb"><p class="soft small">Kurumis Tipp'+(t.own?' für '+cb.name:t.season?' für den '+t.season:'')+'</p><p>'+esc(t.text)+'</p><div class="acts"><button id="tipnext">Noch ein Tipp</button>'+(cb?'':'<button id="tipquiz">Welcher Aufräumtyp bin ich?</button>')+'</div></div></details>';
   $('tipacc').ontoggle=function(){openTip=$('tipacc').open;};
   $('tipnext').onclick=function(){openTip=true;tipBox(1);};
   if($('tipquiz'))$('tipquiz').onclick=function(){quiz();};
@@ -934,7 +1002,7 @@ function bindHow(m){$('mhow').onclick=function(){dialog('<h3>So geht '+m.name+'<
 function dots(t){var s='<span class="dots" aria-label="Tag '+Math.min(t.day+1,t.days)+' von '+t.days+'">';for(var d=0;d<t.days;d++)s+='<i class="'+(d<t.day?'past':d===t.day?'cur':'')+'"></i>';if(t.late)s+='<em>+'+(t.day-t.days+1)+'</em>';return s+'</span>';}
 function todayBox(){
   var w=S.plan[S.week],t=today(S),box=$('todaybox'),h,d=w.tasks.filter(function(x){return x.done;}).length,n=w.tasks.length;if(!box)return;
-  var bar='<div class="tbar"><i style="width:'+(d/n*100)+'%"></i></div><p class="tsub">'+d+' von '+n+' Aufgaben '+(U().one==='Woche'?'dieser Woche':'dieser Etappe')+'</p>';
+  var bar='<div class="tbar"><i style="width:'+(d/n*100)+'%"></i></div><p class="tsub">'+d+' von '+n+' Aufgaben '+U().ofthis+'</p>';
   var bud=buddyHTML(buddyLine(w),buddyMood(w));
   if(weekDone(w)){
     h='<section class="today light">'+bud+'<p class="tt2">'+esc(w.room)+' ist geschafft.</p><button class="btn" id="fin">'+esc(w.room)+' abschließen</button></section>';
@@ -963,7 +1031,7 @@ function fiveMin(){
     },function(){stop();});};
   var done=function(){
     dialog('<div class="center" style="width:96px;margin:0 auto">'+happs(tines(),'proud')+'</div><h3 class="center">Kaizen! Kleine Schritte zählen.</h3><p class="soft center">Wie viele Dinge sind dabei rausgeflogen?</p><div class="qty"><button data-q="0">Keins</button><button data-q="1">+1</button><button data-q="3">+3</button><button data-q="5">+5</button></div>',function(){hop2();
-      $('dlgbox').querySelectorAll('[data-q]').forEach(function(b){b.onclick=function(){var q=+b.dataset.q;S.minis=(S.minis||0)+1;if(q)addOut(S,q);save();closeDlg();if(tab==='woche')renderWeek();toast(q?'Furt demit! +'+q:'Auch Sortieren zählt.');};});});
+      $('dlgbox').querySelectorAll('[data-q]').forEach(function(b){b.onclick=function(){var q=+b.dataset.q;S.minis=(S.minis||0)+1;FX.small();if(q)addOut(S,q);save();closeDlg();if(tab==='woche')renderWeek();toast(q?'Furt demit! +'+q:'Auch Sortieren zählt.');};});});
   };
   show();
 }
@@ -1076,10 +1144,83 @@ function albumHTML(){
     var im=a.v&&a.n?'<img data-pk="'+a.fid+'|v" alt=""><img data-pk="'+a.fid+'|n" alt="">':'<img class="one" data-pk="'+a.fid+'|'+(a.v?'v':'n')+'" alt="">';
     return '<button data-alb="'+a.fid+'" aria-label="'+esc(a.room)+' vorher und nachher"><div class="th">'+im+'</div><b>'+esc(a.room)+'</b><span>'+(a.v&&a.n?'vorher/nachher':a.v?'nur vorher':'nur nachher')+(a.round>1?', Runde '+a.round:'')+'</span></button>';}).join('')+'</div></section>';
 }
+/* ===== Besuch bei Meilensteinen ===== */
+var FRIENDS=[
+ {id:'pon',at:25,name:'Pon',kind:'Tanuki',line:'Grüß dich! I bin Pon, en Tanuki. Bei mir im Bau isch\'s au voller Kruschtel. 25 Dinge furt? Zeig mir, wie du des machsch!'},
+ {id:'hari',at:100,name:'Hari',kind:'Igel',line:'Hari heißt auf Japanisch Nadel. Hundert Dinge furt! Do stell i vor Freud die Stacheln auf.'},
+ {id:'fuku',at:250,name:'Fuku',kind:'Eule',line:'Fukurō heißt Eule, und Fuku heißt Glück. 250 Dinge furt, des bringt Glück ins Haus.'},
+ {id:'tsuru',at:500,name:'Tsuru',kind:'Origami-Kranich',line:'Ich bin aus einem einzigen Blatt gefaltet, mehr brauch ich nicht. 500 Dinge furt: Du wirst so leicht wie ich.'}];
+function friendSVG(id){
+  var s='<svg viewBox="0 0 60 60" class="friend" aria-hidden="true"><ellipse cx="30" cy="57" rx="18" ry="2.4" fill="#3a2a26" fill-opacity=".14"/>';
+  if(id==='pon')s+='<path d="M44 50q12-2 10-14" stroke="#7a6555" stroke-width="7" stroke-linecap="round" fill="none"/><path d="M49 45l4-2M52 40l4 0" stroke="#3a2a26" stroke-width="2.4" stroke-linecap="round"/><ellipse cx="29" cy="44" rx="14" ry="12" fill="#8b7462"/><ellipse cx="29" cy="47" rx="8" ry="7" fill="#e9dccb"/><circle cx="18" cy="17" r="5" fill="#5b4a3f"/><circle cx="40" cy="17" r="5" fill="#5b4a3f"/><circle cx="29" cy="27" r="13" fill="#8b7462"/><path d="M17 27q5-7 11 0q-3 5-11 0zM30 27q6-7 11 0q-8 5-11 0z" fill="#4a3a31"/><circle cx="23" cy="26" r="1.8" fill="#fff"/><circle cx="35" cy="26" r="1.8" fill="#fff"/><ellipse cx="29" cy="33" rx="5" ry="3.6" fill="#e9dccb"/><ellipse cx="29" cy="31.6" rx="1.8" ry="1.3" fill="#3a2a26"/>';
+  else if(id==='hari')s+='<path d="M8 50Q6 22 30 18Q52 20 52 46Z" fill="#7a5a3e"/>'+[[12,30],[18,22],[27,17],[37,18],[45,24],[50,33],[9,40]].map(function(p){return '<path d="M'+p[0]+' '+p[1]+'l-3-5 6 1z" fill="#5b4330"/>';}).join('')+'<path d="M30 50q-2-16 12-18q12 2 12 14q-10 6-24 4z" fill="#ecd7b8"/><circle cx="45" cy="38" r="1.7" fill="#3a2a26"/><circle cx="54.5" cy="44" r="2" fill="#3a2a26"/><circle cx="41" cy="44" r="2.4" fill="#c97a7e" fill-opacity=".5"/><ellipse cx="26" cy="53" rx="4" ry="2" fill="#5b4330"/><ellipse cx="42" cy="53" rx="4" ry="2" fill="#5b4330"/>';
+  else if(id==='fuku')s+='<path d="M14 18l5 7M46 18l-5 7" stroke="#8a6a52" stroke-width="4" stroke-linecap="round"/><ellipse cx="30" cy="36" rx="17" ry="20" fill="#a07b5c"/><ellipse cx="30" cy="42" rx="10" ry="12" fill="#ecd7b8"/><path d="M24 40l2 2M30 44l2 2M34 39l2 2M27 48l2 2" stroke="#a07b5c" stroke-width="1.3" stroke-linecap="round"/><circle cx="23" cy="27" r="6.5" fill="#fbf5ec"/><circle cx="37" cy="27" r="6.5" fill="#fbf5ec"/><circle cx="23" cy="27.5" r="3.4" fill="#3a2a26"/><circle cx="37" cy="27.5" r="3.4" fill="#3a2a26"/><circle cx="24" cy="26.3" r="1" fill="#fff"/><circle cx="38" cy="26.3" r="1" fill="#fff"/><path d="M28 32l2 3.6 2-3.6z" fill="#e0a43a"/><path d="M24 55h4M32 55h4" stroke="#e0a43a" stroke-width="2.4" stroke-linecap="round"/>';
+  else s+='<path d="M30 52L12 34 30 38z" fill="#e7d4c0"/><path d="M30 52L48 34 30 38z" fill="#f6ebdd"/><path d="M30 38L22 12 34 30z" fill="#c8483c"/><path d="M30 38L50 20 38 34z" fill="#f2c9cc"/><path d="M22 12l-6 4 7-1z" fill="#c8483c"/><path d="M30 38L8 24 24 36z" fill="#d9a6a8"/><path d="M30 38v14" stroke="#3a2a26" stroke-opacity=".18"/>';
+  return s+'</svg>';
+}
+function visitorsHTML(){var met=S.friends||[];if(!met.length)return '';return '<div class="visitors">'+FRIENDS.filter(function(f){return met.indexOf(f.id)>=0;}).map(function(f){return '<button class="vis" data-vis="'+f.id+'" aria-label="'+f.name+' der '+f.kind+'">'+friendSVG(f.id)+'</button>';}).join('')+'</div>';}
+function friendDialog(f,isNew){
+  dialog('<div class="fvisit"><div class="fv">'+friendSVG(f.id)+'</div><div style="width:92px">'+happs(tines(),'happy')+'</div></div><p class="soft small center" style="margin-top:4px">'+(isNew?'Besuch! Ab '+f.at+' Dingen furt':f.kind+', zu Besuch seit '+f.at+' Dingen')+'</p><h3 class="center">'+f.name+' der '+f.kind+'</h3><p class="center" style="margin:10px 0 18px">'+esc(f.line)+'</p><button class="btn" data-close>'+(isNew?'Willkommen, '+f.name+'!':'Fertig')+'</button>',function(){if(isNew)FX.small();},function(){if(tab==='woche')renderWeek();});
+}
+function checkFriends(){
+  if(!S||!$('dlg').hidden)return;S.friends=S.friends||[];var t=totalOut(S);
+  var f=FRIENDS.filter(function(x){return t>=x.at&&S.friends.indexOf(x.id)<0;})[0];
+  if(!f)return;S.friends.push(f.id);save();setTimeout(function(){friendDialog(f,true);},350);
+}
+/* ===== Hanko-Stempelheft ===== */
+var HANKO={km:['喜','Freude','Bei KonMari bleibt nur, was Freude macht.'],vk:['四','Vier','Vier Kisten: behalten, spenden, Müll, woanders hin.'],mg:['減','Weniger','Jeden Tag ein Teil mehr: Es wird weniger.'],tt:['十二','Zwölf','Zwölf zum Wegwerfen, zwölf zum Spenden, zwölf zurück an ihren Platz.'],ds:['終','Abschluss','Döstädning heißt auf Japanisch Shūkatsu: in Ruhe abschließen.'],zz:['二十','Zwanzig','In 20 Minuten für unter 20 Euro ersetzbar? Dann darf es gehen.'],fl:['舞','Tanz','FlyLadys 27-Fling-Boogie: Ausmisten als kleiner Tanz.'],kaizen:['改善','Kaizen','Stetige kleine Verbesserung. Eine ganze Runde geschafft.']};
+var HSQ={vk:1,tt:1,zz:1,kaizen:1};
+function hankoSVG(st,uid){
+  var k=st.kaizen?'kaizen':st.method,g=HANKO[k]||HANKO.vk,ch=g[0],n=hash(String(st.room||'')+st.at)%997,rot=(n%15)-7,sq=HSQ[k];
+  var f='hk'+uid,ink='var(--hanko)';
+  var s='<svg viewBox="0 0 100 100" class="hanko" role="img" aria-label="Stempel '+g[1]+'"><defs><filter id="'+f+'" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="'+n+'" result="t"/><feColorMatrix in="t" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3.2 2.45" result="m"/><feComposite in="SourceGraphic" in2="m" operator="in" result="c"/><feTurbulence type="fractalNoise" baseFrequency=".05" seed="'+(n+3)+'" result="w"/><feDisplacementMap in="c" in2="w" scale="2.6" xChannelSelector="R" yChannelSelector="G"/></filter></defs><g filter="url(#'+f+')" transform="rotate('+rot+' 50 50)" fill="none" stroke="'+ink+'">';
+  s+=sq?'<rect x="9" y="9" width="82" height="82" rx="7" stroke-width="5.5"/><rect x="16" y="16" width="68" height="68" rx="3" stroke-width="1.6"/>':'<circle cx="50" cy="50" r="42" stroke-width="5.5"/><circle cx="50" cy="50" r="35" stroke-width="1.6"/>';
+  var font='font-family="\'Hiragino Mincho ProN\',\'Yu Mincho\',\'Noto Serif CJK JP\',\'Noto Serif JP\',serif" font-weight="700" fill="'+ink+'" stroke="none" text-anchor="middle"';
+  if(ch.length===1)s+='<text x="50" y="66" font-size="46" '+font+'>'+ch+'</text>';
+  else s+='<text x="50" y="47" font-size="30" '+font+'>'+ch.charAt(0)+'</text><text x="50" y="78" font-size="30" '+font+'>'+ch.charAt(1)+'</text>';
+  return s+'</g></svg>';
+}
+function stampBookHTML(){
+  var cur=stampsOf(S,S.round),left=Math.max(0,S.plan.length-cur.filter(function(x){return !x.kaizen;}).length);
+  if(S.finished)left=0;
+  var cell=function(st,idx){return '<button class="hslot" data-hk="'+idx+'" aria-label="Stempel '+esc(st.kaizen?'Kaizen, Runde '+st.round:st.room)+'">'+hankoSVG(st,'b'+idx)+'<span>'+esc(st.kaizen?'Runde '+st.round:st.room)+'</span></button>';};
+  var all=S.stamps||[],h='<section class="hbook"><div class="hhead"><h3>Stempelheft</h3><span class="soft small">'+cur.filter(function(x){return !x.kaizen;}).length+' von '+S.plan.length+(S.round>1?', Runde '+S.round:'')+'</span></div><div class="hgrid">';
+  all.forEach(function(st,i){if(st.round===S.round)h+=cell(st,i);});
+  for(var k=0;k<left;k++)h+='<div class="hslot empty" aria-hidden="true"><i>'+(S.plan.length-left+k+1)+'</i><span>'+(k===0&&!S.finished?esc(S.plan[S.week].room):'&nbsp;')+'</span></div>';
+  h+='</div>';
+  var old=[];for(var r=1;r<S.round;r++){var rs=[];all.forEach(function(st,i){if(st.round===r)rs.push(cell(st,i));});if(rs.length)old.push('<details class="hold"><summary>Runde '+r+' <span class="soft">'+rs.length+' Stempel</span></summary><div class="hgrid">'+rs.join('')+'</div></details>');}
+  return h+old.join('')+'</section>';
+}
+function stampDialog(i,back){
+  var st=(S.stamps||[])[i];if(!st)return;var k=st.kaizen?'kaizen':st.method,g=HANKO[k],d=new Date(st.at);
+  dialog('<div class="hbig">'+hankoSVG(st,'d'+i)+'</div><h3 class="center">'+g[0]+' heißt '+g[1]+'</h3><p class="soft center small" style="margin-top:6px">'+esc(g[2])+'</p><p class="center" style="margin:14px 0 18px">'+(st.kaizen?'Runde '+st.round+' komplett':esc(st.room)+', '+METHODS[st.method].name)+'<br><span class="soft small">'+d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear()+(st.out?', '+st.out+(st.out===1?' Ding':' Dinge')+' furt':'')+'</span></p><button class="btn" data-close>Fertig</button>',null,back);
+}
+/* ===== Klang, Vibration, Nuss-Konfetti ===== */
+var ACX=null;
+function fxOn(k){return !S||S[k]!==false;}
+function tone(seq){if(!fxOn('sound'))return;try{ACX=ACX||new (window.AudioContext||window.webkitAudioContext)();if(ACX.state==='suspended')ACX.resume();var t0=ACX.currentTime+.01;
+  seq.forEach(function(n){var o=ACX.createOscillator(),g=ACX.createGain();o.type=n[3]||'sine';o.frequency.setValueAtTime(n[0],t0+n[2]);if(n[4])o.frequency.exponentialRampToValueAtTime(n[4],t0+n[2]+n[1]);
+    g.gain.setValueAtTime(0.0001,t0+n[2]);g.gain.exponentialRampToValueAtTime(n[5]||.16,t0+n[2]+.012);g.gain.exponentialRampToValueAtTime(0.0001,t0+n[2]+n[1]);o.connect(g);g.connect(ACX.destination);o.start(t0+n[2]);o.stop(t0+n[2]+n[1]+.02);});}catch(e){}}
+function buzz(p){if(fxOn('buzz')&&navigator.vibrate)try{navigator.vibrate(p);}catch(e){}}
+var FX={
+  tick:function(){tone([[620,.09,0,'sine',260,.18]]);buzz(12);},
+  untick:function(){tone([[300,.06,0,'sine',220,.08]]);},
+  plus:function(){tone([[520,.07,0,'triangle',760,.12]]);buzz(8);},
+  done:function(){tone([[523,.14,0,'triangle',0,.14],[659,.14,.11,'triangle',0,.14],[784,.16,.22,'triangle',0,.14],[1047,.32,.34,'triangle',0,.12]]);buzz([30,50,30,50,60]);confetti(26);},
+  small:function(){tone([[659,.1,0,'triangle',0,.12],[880,.18,.09,'triangle',0,.12]]);buzz([20,40,20]);confetti(10);}
+};
+function confetti(n){
+  if(!fxOn('confetti')||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;
+  var box=document.createElement('div');box.className='confetti';box.setAttribute('aria-hidden','true');
+  for(var i=0;i<n;i++){var e=document.createElement('i'),leaf=i%3===2;e.innerHTML=leaf?'<svg viewBox="0 0 30 30"><path d="M15 3c7 5 9 14 0 24C6 17 8 8 15 3z" fill="'+(['#c97a7e','#8a8f45','#e0a43a'][i%3])+'"/></svg>':ACORN;
+    e.style.left=(Math.random()*100)+'%';e.style.animationDelay=(Math.random()*.5)+'s';e.style.animationDuration=(1.6+Math.random()*1.2)+'s';e.style.setProperty('--dx',(Math.random()*120-60)+'px');e.style.setProperty('--r',(Math.random()*720-360)+'deg');var sz=18+Math.random()*16;e.style.width=e.style.height=sz+'px';box.appendChild(e);}
+  document.body.appendChild(box);setTimeout(function(){box.remove();},3400);
+}
 function finishWeek(){
     var w=S.plan[S.week],room=w.room,out=w.out,pa=w.fid?albumOf(S,w.fid):null,r=advance(S);save();
     var grew=tines()>Math.min(5,1+Math.floor((weeksDone()-1)/3)+(S.round-1));
-    dialog('<div class="center" style="width:120px;margin:0 auto">'+happs(tines(),'proud')+'</div><h2>'+esc(room)+' hat wieder Luft.</h2>'+(grew?'<p><b>Vorrat aufgeräumt!</b> Kurumis Kruschtel-Stapel ist eine Kiste kleiner.</p>':'')+'<p class="soft">'+(out?out+(out===1?' Ding hat':' Dinge haben')+' das Haus verlassen. ':'')+(r==='next'?'Als Nächstes: '+esc(S.plan[S.week].room)+' mit '+METHODS[S.plan[S.week].method].name+'.':'Das war die letzte '+U().one+'.')+'</p><button class="btn" data-close>'+(r==='next'?U().one+' '+(S.week+1)+' öffnen':'Weiter')+'</button>'+(pa&&pa.v&&!pa.n?'<button class="btn line" id="nph">Jetzt Nachher-Foto machen</button>':'')+'<button class="btn line" id="shr">Als Bild teilen</button>',function(){hop2();var idx=S.finished?S.plan.length-1:S.week-1;$('shr').onclick=function(){shareCard(idx);};if($('nph'))$('nph').onclick=function(){pickPhoto(idx,'n',function(fid){compareDialog(fid);});};},function(){render();window.scrollTo(0,0);});
+    var lst=S.stamps[S.stamps.length-1];if(lst&&lst.kaizen)lst=S.stamps[S.stamps.length-2];
+    dialog('<div class="fhead"><div style="width:120px">'+happs(tines(),'proud')+'</div>'+(lst?'<div class="hnew">'+hankoSVG(lst,'fin')+'</div>':'')+'</div><h2>'+esc(room)+' hat wieder Luft.</h2>'+(lst?'<p class="soft small" style="margin-top:6px">Neuer Stempel: '+HANKO[lst.method][0]+' heißt '+HANKO[lst.method][1]+'.</p>':'')+(grew?'<p><b>Vorrat aufgeräumt!</b> Kurumis Kruschtel-Stapel ist eine Kiste kleiner.</p>':'')+'<p class="soft">'+(out?out+(out===1?' Ding hat':' Dinge haben')+' das Haus verlassen. ':'')+(r==='next'?'Als Nächstes: '+esc(S.plan[S.week].room)+' mit '+METHODS[S.plan[S.week].method].name+'.':'Das war der letzte Raum.')+'</p><button class="btn" data-close>'+(r==='next'?U().one+' '+(S.week+1)+' öffnen':'Weiter')+'</button>'+(pa&&pa.v&&!pa.n?'<button class="btn line" id="nph">Jetzt Nachher-Foto machen</button>':'')+'<button class="btn line" id="shr">Als Bild teilen</button>',function(){hop2();FX.done();var idx=S.finished?S.plan.length-1:S.week-1;$('shr').onclick=function(){shareCard(idx);};if($('nph'))$('nph').onclick=function(){pickPhoto(idx,'n',function(fid){compareDialog(fid);});};},function(){render();window.scrollTo(0,0);});
 }
 /* Abschlusskarte als Bild: Stillleben, Kurumi, Zahlen */
 var CARD_VARS={'var(--wall)':'#f6ebdd','var(--sky1)':'#f9d9a8','var(--sky2)':'#fbefe0','var(--light)':'#f6c66b','var(--paper2)':'#e8d6c2','currentColor':'#3a2a26'};
@@ -1115,7 +1256,7 @@ function shareCard(i){
 function hop2(){var d=$('dlgbox').querySelector('.mascot');if(d)d.classList.add('hop');}
 function renderFinished(){
   var h='<span class="wk">Runde '+S.round+' abgeschlossen</span><div class="scene">'+stillLife('fin|'+S.round,1,{label:'Leerer Raum',room:'wz',uid:'f'}).svg+'</div>';
-  h+='<h1 class="room">Alles hat wieder Luft.</h1>'+buddyHTML('Zwölf '+U().many+'! Alles kruschtelfrei, Kaizen wie im Buche. Sogar mein Vorrat ist aufgeräumt.','proud')+'<div class="stack" style="margin-top:20px"><p class="soft">'+num(totalOut(S))+' Dinge haben dein Zuhause verlassen. Mit der Zeit kommt wieder etwas dazu, darum geht die nächste Runde schneller.</p>';
+  var kz=stampsOf(S,S.round).filter(function(x){return x.kaizen;})[0];h+='<h1 class="room">Alles hat wieder Luft.</h1>'+(kz?'<div class="hnew" style="width:110px;margin:16px auto 0">'+hankoSVG(kz,'kz')+'</div><p class="soft small center">'+HANKO.kaizen[0]+' heißt Kaizen: stetige kleine Verbesserung.</p>':'')+buddyHTML('Zwölf '+U().many+'! Alles kruschtelfrei, Kaizen wie im Buche. Sogar mein Vorrat ist aufgeräumt.','proud')+'<div class="stack" style="margin-top:20px"><p class="soft">'+num(totalOut(S))+' Dinge haben dein Zuhause verlassen. Mit der Zeit kommt wieder etwas dazu, darum geht die nächste Runde schneller.</p>';
   h+='<button class="btn" id="again">Runde '+(S.round+1)+' beginnen</button><button class="btn line" id="chg">Räume oder Methoden ändern</button></div>';
   $('app').innerHTML=h;
   $('again').onclick=function(){nextRound(S);save();render();};
@@ -1138,11 +1279,12 @@ function renderPlan(){
     S.plan.forEach(function(w,i){
       var st=S.finished||i<S.week?'done':i===S.week?'now':'lock',f=st==='done'?1:st==='now'?frac(w):0;
       var pa=w.fid?albumOf(S,w.fid):null;
-      h+='<div class="cell '+st+'"'+(st==='done'&&pa?' data-alb="'+w.fid+'" role="button" tabindex="0" aria-label="'+esc(w.room)+': Vorher/Nachher ansehen"':st==='done'?' data-share="'+i+'" role="button" tabindex="0" aria-label="'+esc(w.room)+' als Bild teilen"':' data-spots="'+i+'" role="button" tabindex="0" aria-label="Kruschtel-Ecken für '+esc(w.room)+'"')+'>'+stillLife(seed(i),f,{label:w.room,room:rid(w),dim:st==='lock',uid:'g'+i}).svg+'<b>'+esc(w.room)+'</b><span>'+(pa?'<span class="cam">'+CAM+'</span>':'')+(st==='done'?(pa?'':'<span class="shr">Teilen</span> ')+'Erledigt'+(w.out?', '+w.out+' Dinge weg':''):st==='now'?(S.paused?'Pausiert':'Diese '+U().one):U().one+' '+(i+1))+', '+METHODS[w.method].name+'</span></div>';
+      h+='<div class="cell '+st+'"'+(st==='done'&&pa?' data-alb="'+w.fid+'" role="button" tabindex="0" aria-label="'+esc(w.room)+': Vorher/Nachher ansehen"':st==='done'?' data-share="'+i+'" role="button" tabindex="0" aria-label="'+esc(w.room)+' als Bild teilen"':' data-spots="'+i+'" role="button" tabindex="0" aria-label="Kruschtel-Ecken für '+esc(w.room)+'"')+'>'+stillLife(seed(i),f,{label:w.room,room:rid(w),dim:st==='lock',uid:'g'+i}).svg+'<b>'+esc(w.room)+'</b><span>'+(pa?'<span class="cam">'+CAM+'</span>':'')+(st==='done'?(pa?'':'<span class="shr">Teilen</span> ')+'Erledigt'+(w.out?', '+w.out+' Dinge weg':''):st==='now'?(S.paused?'Pausiert':U().dies):U().one+' '+(i+1))+', '+METHODS[w.method].name+'</span></div>';
     });
-    h+='</div>'+albumHTML();
+    h+='</div>'+stampBookHTML()+albumHTML();
   }
   $('app').innerHTML=h;fillPhotos($('app'));
+  $('app').querySelectorAll('[data-hk]').forEach(function(c){c.onclick=function(){stampDialog(+c.dataset.hk,function(){if(tab==='plan')renderPlan();});};});
   $('app').querySelectorAll('[data-alb]').forEach(function(c){c.style.cursor='pointer';var go=function(){compareDialog(c.dataset.alb,function(){if(tab==='plan')renderPlan();});};c.onclick=go;c.onkeydown=function(e){if(e.key==='Enter')go();};});
   if($('om'))$('om').onclick=function(){orderMode=!orderMode;renderPlan();};
   $('app').querySelectorAll('[data-spots]').forEach(function(c){c.style.cursor='pointer';c.onclick=function(){spotsDialog(+c.dataset.spots);};c.onkeydown=function(e){if(e.key==='Enter')spotsDialog(+c.dataset.spots);};});
@@ -1247,15 +1389,15 @@ var MON=['Jan.','Feb.','März','Apr.','Mai','Juni','Juli','Aug.','Sep.','Okt.','
 function dm(d){return d.getDate()+'.'+(d.getMonth()+1)+'.';}
 function renderCal(){
   var sc=schedule(S),last=sc[sc.length-1],days=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
-  var h='<h2>Kalender</h2><p class="soft small" style="margin-top:6px">'+(S.finished?'Runde '+S.round+' ist geschafft.':'Wenn du so weitermachst, bist du um den '+dm(last.end)+last.end.getFullYear()+' durch.')+' Eine '+U().one+' dauert so lange, bis alle Aufgaben abgehakt sind.</p>';
+  var h='<h2>Kalender</h2><p class="soft small" style="margin-top:6px">'+(S.finished?'Runde '+S.round+' ist geschafft.':'Wenn du so weitermachst, bist du um den '+dm(last.end)+last.end.getFullYear()+' durch.')+' Ein Raum ist erst fertig, wenn alle Aufgaben abgehakt sind.</p>';
   var mon=-1;
   sc.forEach(function(e){
     var m=e.start.getMonth();if(m!==mon){if(mon>=0)h+='</ul>';h+='<h3 class="month">'+MONL[m]+(e.start.getFullYear()!==new Date().getFullYear()?' '+e.start.getFullYear():'')+'</h3><ul class="cal">';mon=m;}
-    var lab={done:'Erledigt am '+dm(e.end)+(e.out?', '+e.out+' Dinge weg':''),now:'Diese '+U().one,paused:'Pausiert',next:'Geplant'}[e.st];
+    var lab={done:'Erledigt am '+dm(e.end)+(e.out?', '+e.out+' Dinge weg':''),now:U().dies,paused:'Pausiert',next:'Geplant'}[e.st];
     h+='<li class="'+e.st+'"><div class="dt"><b>'+e.start.getDate()+'</b><span>'+MON[m]+'</span></div><div><div class="rm">'+esc(e.room)+'</div><div class="sub"><span class="meth m-'+e.method+'">'+METHODS[e.method].name+'</span><span>'+dm(e.start)+' bis '+dm(e.end)+', '+lab+'</span></div></div></li>';
   });
   h+='</ul><div class="stack" style="margin-top:26px">';
-  h+='<section class="panel"><h3>Plan in deinen Kalender</h3><p class="soft small">Jede kommende '+U().one+' als ganztägiger Eintrag mit Raum und Methode. Verschiebt sich etwas, lade den Plan einfach neu.</p><button class="btn" id="planics">Plan in den Kalender</button></section>';
+  h+='<section class="panel"><h3>Plan in deinen Kalender</h3><p class="soft small">Jeder kommende Raum als ganztägiger Eintrag mit Raum und Methode. Verschiebt sich etwas, lade den Plan einfach neu.</p><button class="btn" id="planics">Plan in den Kalender</button></section>';
   h+='<section class="panel"><h3>Erinnerung</h3><p class="soft small">Ein Termin in deinem Kalender, der dich an die Aufgabe für heute erinnert.</p><div class="seg" role="group" aria-label="Wie oft">'+[['daily','Täglich'],['weekly','Wöchentlich']].map(function(f){return '<button data-fq="'+f[0]+'" aria-pressed="'+(S.cal.freq===f[0])+'">'+f[1]+'</button>';}).join('')+'</div><div class="row">'+(S.cal.freq==='weekly'?'<select id="cd" aria-label="Tag">'+days.map(function(d,i){return '<option value="'+i+'"'+(S.cal.day===i?' selected':'')+'>'+d+'</option>';}).join('')+'</select>':'')+'<select id="ct" aria-label="Uhrzeit">'+['07:00','08:00','09:00','10:00','12:00','14:00','16:00','18:00','19:00','20:00'].map(function(t){return '<option'+(S.cal.time===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select></div><button class="btn" id="ics">Erinnerung in den Kalender</button></section>';
   h+='</div>';
   $('app').innerHTML=h;
@@ -1267,7 +1409,7 @@ function renderCal(){
 }
 
 /* ===== Feedback ===== */
-var APP_VERSION='kk-v6';
+var APP_VERSION='kk-v7';
 var FB_TO=['steffen','kiefer'].join('.')+String.fromCharCode(64)+['gmail','com'].join('.');
 var fb={kind:'idee',stars:0,text:'',info:true};
 function fbBody(){
@@ -1311,13 +1453,17 @@ function renderMore(){
   var cb=S.cb&&CB[S.cb];
   h+='<section class="panel"><h3>Dein Aufräumstil</h3><p class="soft small">'+(cb?'<b style="color:var(--ink)">'+cb.name+' ('+cb.en+')</b>: '+cb.store+' und '+cb.sys+'. '+cb.desc:'Noch nicht bestimmt. Zwei Fragen, dann passen Kurumis Tipps zu dir.')+'</p><p class="soft small">Nach den Clutterbug-Stilen von Cas Aarssen.</p><button class="btn line" id="cbq">'+(cb?'Test wiederholen':'Aufräumtyp finden')+'</button></section>';
   h+='<section class="panel"><h3>Erscheinungsbild</h3><div class="seg" role="group" aria-label="Erscheinungsbild">'+[['auto','Wie das Handy'],['light','Hell'],['dark','Dunkel']].map(function(t){return '<button data-th="'+t[0]+'" aria-pressed="'+(S.theme===t[0])+'">'+t[1]+'</button>';}).join('')+'</div></section>';
-  h+='<section class="panel"><h3>Räume, Methoden, Tempo</h3><p class="soft small">Aktuell: '+U().name+', '+U().desc.charAt(0).toLowerCase()+U().desc.slice(1)+'. Eine Änderung erstellt einen neuen Plan. Dein Zähler und die Abgabe-Liste bleiben.</p><button class="btn line" id="edit">Ändern</button></section>';
+  h+='<section class="panel"><h3>Klang und Effekte</h3><p class="soft small">Ein Plopp beim Abhaken, Nuss-Konfetti beim Abschließen eines Raums.</p><div class="fxrows">'+[['sound','Ton'],['buzz','Vibration'],['confetti','Konfetti']].map(function(x){var on=fxOn(x[0]);return '<div class="fxr"><span>'+x[1]+'</span><div class="seg" role="group" aria-label="'+x[1]+'"><button data-fx="'+x[0]+'" data-v="1" aria-pressed="'+on+'">An</button><button data-fx="'+x[0]+'" data-v="0" aria-pressed="'+(!on)+'">Aus</button></div></div>';}).join('')+'</div></section>';
+  h+='<section class="panel"><h3>Tempo</h3><p class="soft small">Wie lange bleibt ein Raum dran? Gilt sofort, dein Plan und deine Haken bleiben.</p><div class="seg" role="group" aria-label="Tempo">'+PACE_ORDER.map(function(k){var pc=PACES[k];return '<button data-pc="'+k+'" aria-pressed="'+(S.pace===k)+'">'+(pc.days===1?'1 Tag':pc.days===7?'1 Woche':pc.days+' Tage')+'</button>';}).join('')+'</div><p class="soft small" style="margin-bottom:0">'+U().name+': '+U().desc+'.</p></section>';
+  h+='<section class="panel"><h3>Räume und Methoden</h3><p class="soft small">Eine Änderung erstellt einen neuen Plan. Dein Zähler und die Abgabe-Liste bleiben.</p><button class="btn line" id="edit">Ändern</button></section>';
   h+='<section class="panel"><h3>Sicherung</h3><p class="soft small">Dein Fortschritt liegt nur auf diesem Gerät. Kopiere die Sicherung ab und zu in eine Notiz. Fotos sind darin nicht enthalten.</p><div class="row"><button class="btn line" id="exp">Kopieren</button><button class="btn line" id="imp">Einfügen</button></div></section>';
   var live=/github\.io$/.test(location.hostname);
   h+='<section class="panel"><h3>Als App aufs Handy</h3><p class="soft small">iPhone: Teilen, dann „Zum Home-Bildschirm“. Android: Menü, dann „App installieren“.</p></section>';
   h+='<section class="panel"><h3>App weiterempfehlen</h3><p class="soft small">'+(live?'Schick den Link an Freunde. Jeder bekommt seinen eigenen Plan, die Daten bleiben auf dem eigenen Handy.':'Das Weiterempfehlen klappt, sobald die App live online ist.')+'</p>'+(live?'<button class="btn line" id="shareapp">Link teilen</button>':'')+'</section>';
   h+='<section class="panel"><h3>Neustart</h3><p class="soft small">Löscht Plan, Zähler und Abgabe-Liste und beginnt wieder bei der Einrichtung. Wenn du nur andere Räume oder Methoden willst, nimm lieber „Ändern“ oben.</p><button class="btn line danger" id="reset">Neu starten</button></section></div>';
   $('app').innerHTML=h;
+  $('app').querySelectorAll('[data-fx]').forEach(function(b){b.onclick=function(){S[b.dataset.fx]=b.dataset.v==='1';save();var y=window.scrollY;renderMore();window.scrollTo(0,y);if(S[b.dataset.fx]){if(b.dataset.fx==='sound')FX.tick();if(b.dataset.fx==='buzz')buzz(30);if(b.dataset.fx==='confetti')confetti(12);}};});
+  $('app').querySelectorAll('[data-pc]').forEach(function(b){b.onclick=function(){if(setPace(S,b.dataset.pc)){save();var y=window.scrollY;renderMore();window.scrollTo(0,y);toast(PACES[S.pace].name+': '+PACES[S.pace].desc);}};});
   $('app').querySelectorAll('[data-th]').forEach(function(b){b.onclick=function(){S.theme=b.dataset.th;save();applyTheme();renderMore();};});
   $('cbq').onclick=function(){quiz();};
   if($('shareapp'))$('shareapp').onclick=function(){var url=location.origin+location.pathname,txt='Kruschtel-Kaizen: Ausmisten Raum für Raum, jeden Tag ein kleiner Schritt.';
