@@ -198,6 +198,11 @@ textarea{width:100%;min-height:120px;border-radius:14px;border:0;box-shadow:inse
 .mascot .spark{animation:spark 1.6s ease-in-out infinite}
 @keyframes spark{50%{opacity:.2}}
 .center{text-align:center}
+.tabs button{font-size:clamp(13px,3.7vw,14.5px);padding:10px clamp(8px,2.9vw,15px)}
+.furt.bk{background:var(--sheet);box-shadow:inset 0 0 0 1px var(--hair);color:var(--ink)}
+.furt.bk .row{margin-top:4px}
+.furt.bk .row .btn{flex:1;align-self:auto;background:var(--ink);color:var(--paper)}
+.furt.bk .row .btn.line{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
 .strip .pm .mbb{position:relative;display:grid;place-items:center}
 .strip .pm .mbb svg{width:21px;height:21px}
 .mbb i{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:9px;background:var(--saffron);color:#3a2a26;font:700 11px/18px var(--sans);font-style:normal;padding:0 4px;text-align:center}
@@ -463,7 +468,6 @@ html[data-theme=dark] .danger{color:#e89b8f;box-shadow:inset 0 0 0 1.5px #e89b8f
   <button data-tab="plan">Plan</button>
   <button data-tab="kalender">Kalender</button>
   <button data-tab="abgabe">Abgabe</button>
-  <button data-tab="feedback">Feedback</button>
   <button data-tab="mehr">Mehr</button>
 </div></nav>
 <div class="modal" id="dlg" hidden><div class="sheetd" id="dlgbox" role="dialog" aria-modal="true"></div></div>
@@ -1104,15 +1108,29 @@ function todayBox(){
   }
   var openG=S.give.filter(function(g){return !g.done;});
   if(furtToday(S)&&openG.length)h='<section class="furt"><h4>Heute ist Furt-Tag!</h4><p>'+openG.length+(openG.length===1?' Ding wartet':' Dinge warten')+' auf die Abgabe: '+openG.slice(0,3).map(function(g){return esc(g.t);}).join(', ')+(openG.length>3?' …':'')+'</p><button class="btn" id="gofurt">Zur Abgabe-Liste</button></section>'+h;
+  if(bkDue())h='<section class="furt bk"><h4>Zeit für eine Sicherung</h4><p>Dein Fortschritt liegt nur auf diesem Handy. Letzte Sicherung: '+bkDate()+'. Kopier sie in eine Notiz, dann geht bei einem Handywechsel nichts verloren.</p><div class="row"><button class="btn" id="bkgo">Jetzt sichern</button><button class="btn line" id="bklater">Später</button></div></section>'+h;
   if(mbDue())h='<section class="furt mbx"><h4>Die Vielleicht-Kiste ist '+mbAge()+' Tage zu</h4><p>'+mb().items.length+(mb().items.length===1?' Ding wartet':' Dinge warten')+' auf deine Entscheidung. Hast du etwas davon vermisst?</p><button class="btn" id="gomb">Kiste aufmachen</button></section>'+h;
   box.innerHTML=h;
   if($('gomb'))$('gomb').onclick=function(){mbResolve();};
+  if($('bkgo'))$('bkgo').onclick=function(){doBackup(mbBack);};
+  if($('bklater'))$('bklater').onclick=function(){S.bkSnooze=new Date(kNow().getTime()+7*DAY).toISOString();save();mbBack();toast('Ich erinnere dich in einer Woche.');};
   if($('gofurt'))$('gofurt').onclick=function(){tab='abgabe';window.scrollTo(0,0);render();};
   $('deerbtn').onclick=function(){say(buddyLine(w),buddyMood(w));};
   if($('tdone'))$('tdone').onclick=function(){WK.toggle(t.task);};
   if($('tmore'))$('tmore').onclick=function(){WK.toggle(t.next);};
   if($('fin'))$('fin').onclick=finishWeek;
   if($('mini5'))$('mini5').onclick=function(){fiveMin();};
+}
+/* ===== Sicherungs-Erinnerung: alle 30 Tage, sobald es Fortschritt gibt ===== */
+function bkDays(){return S&&S.bkDays||14;}
+function bkDue(){if(!S)return false;var now=kNow().getTime(),last=new Date(S.lastBackup||S.started).getTime();
+  if(S.bkSnooze&&now<new Date(S.bkSnooze).getTime())return false;
+  var progress=totalOut(S)>0||S.week>0||(S.stamps||[]).length>0;return !!progress&&now-last>=bkDays()*DAY;}
+function bkDate(){if(!S.lastBackup)return 'noch nie';var d=new Date(S.lastBackup);return d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear();}
+function doBackup(after){
+  var done=function(){S.lastBackup=new Date(kNow()).toISOString();S.bkSnooze=null;save();};
+  done();var j=JSON.stringify(S),p=navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(j):Promise.reject();
+  p.then(function(){toast('Sicherung kopiert. Jetzt in eine Notiz einfügen.');if(after)after();},function(){dialog('<h3>Sicherung</h3><p class="soft small">Alles markieren, kopieren und in eine Notiz oder eine Mail an dich selbst einfügen.</p><textarea readonly>'+esc(j)+'</textarea><button class="btn" data-close>Fertig</button>',null,after);});
 }
 /* ===== Vielleicht-Kiste: unsichere Dinge 30 Tage wegpacken ===== */
 var MB_DAYS=30;
@@ -1539,7 +1557,7 @@ function renderCal(){
 }
 
 /* ===== Feedback ===== */
-var APP_VERSION='kk-v9';
+var APP_VERSION='kk-v10';
 var FB_TO=['steffen','kiefer'].join('.')+String.fromCharCode(64)+['gmail','com'].join('.');
 var fb={kind:'idee',stars:0,text:'',info:true};
 function fbBody(){
@@ -1550,7 +1568,7 @@ function fbBody(){
 }
 function renderFeedback(){
   var kinds=[['idee','Idee'],['fehler','Fehler'],['lob','Lob'],['frage','Frage']];
-  var h='<h2>Feedback</h2>'+buddyHTML('Was soll besser werden? Ich lese alles, versprochen. Auch Kritik, die macht die App besser.','happy');
+  var h='<button class="btn text" id="fbback" style="width:auto;min-height:36px;padding:4px 0;margin-bottom:6px">‹ Zurück zu Mehr</button><h2>Feedback</h2>'+buddyHTML('Was soll besser werden? Ich lese alles, versprochen. Auch Kritik, die macht die App besser.','happy');
   h+='<div class="stack" style="margin-top:14px"><section class="panel"><div class="seg" role="group" aria-label="Art">'+kinds.map(function(k){return '<button data-fk="'+k[0]+'" aria-pressed="'+(fb.kind===k[0])+'">'+k[1]+'</button>';}).join('')+'</div>';
   h+='<div><p class="soft small" style="margin:0 0 6px">Wie gefällt dir die App? (optional)</p><div class="nuts" role="group" aria-label="Bewertung">'+[1,2,3,4,5].map(function(n){return '<button data-st="'+n+'" aria-label="'+n+' von 5" aria-pressed="'+(fb.stars>=n)+'">'+ACORN+'</button>';}).join('')+'</div></div>';
   h+='<textarea id="fbt" class="fbt" maxlength="2000" placeholder="'+({idee:'Was fehlt dir? Was würdest du dir wünschen?',fehler:'Was ist passiert? Was hast du davor gemacht?',lob:'Was gefällt dir besonders?',frage:'Was möchtest du wissen?'})[fb.kind]+'">'+esc(fb.text)+'</textarea>';
@@ -1559,6 +1577,7 @@ function renderFeedback(){
   h+='<p class="soft small">Das Feedback geht per E-Mail direkt an den Entwickler der App. Du siehst die Mail vor dem Absenden in deiner Mail-App.</p></div>';
   $('app').innerHTML=h;
   $('deerbtn').onclick=function(){say(pick(['Jede Idee zählt. Auch die verrückten.','Fehler gefunden? Her damit, ich jag ihn raus.','Lob nehm ich auch gern. Und Nüsse.']));};
+  $('fbback').onclick=function(){tab='mehr';window.scrollTo(0,0);render();};
   $('fbt').oninput=function(){fb.text=this.value;};
   $('fbi').onchange=function(){fb.info=this.checked;};
   $('app').querySelectorAll('[data-fk]').forEach(function(b){b.onclick=function(){fb.kind=b.dataset.fk;fb.text=$('fbt').value;renderFeedback();};});
@@ -1588,8 +1607,9 @@ function renderMore(){
   h+='<section class="panel"><h3>Klang und Effekte</h3><p class="soft small">Ein Plopp beim Abhaken, Nuss-Konfetti beim Abschließen eines Raums.</p><div class="fxrows">'+[['sound','Ton'],['buzz','Vibration'],['confetti','Konfetti']].map(function(x){var on=fxOn(x[0]);return '<div class="fxr"><span>'+x[1]+'</span><div class="seg" role="group" aria-label="'+x[1]+'"><button data-fx="'+x[0]+'" data-v="1" aria-pressed="'+on+'">An</button><button data-fx="'+x[0]+'" data-v="0" aria-pressed="'+(!on)+'">Aus</button></div></div>';}).join('')+'</div></section>';
   h+='<section class="panel"><h3>Tempo</h3><p class="soft small">Wie lange bleibt ein Raum dran? Gilt sofort, dein Plan und deine Haken bleiben.</p><div class="seg" role="group" aria-label="Tempo">'+PACE_ORDER.map(function(k){var pc=PACES[k];return '<button data-pc="'+k+'" aria-pressed="'+(S.pace===k)+'">'+(pc.days===1?'1 Tag':pc.days===7?'1 Woche':pc.days+' Tage')+'</button>';}).join('')+'</div><p class="soft small" style="margin-bottom:0">'+U().name+': '+U().desc+'.</p></section>';
   h+='<section class="panel"><h3>Räume und Methoden</h3><p class="soft small">Eine Änderung erstellt einen neuen Plan. Dein Zähler und die Abgabe-Liste bleiben.</p><button class="btn line" id="edit">Ändern</button></section>';
-  h+='<section class="panel"><h3>Sicherung</h3><p class="soft small">Dein Fortschritt liegt nur auf diesem Gerät. Kopiere die Sicherung ab und zu in eine Notiz. Fotos sind darin nicht enthalten.</p><div class="row"><button class="btn line" id="exp">Kopieren</button><button class="btn line" id="imp">Einfügen</button></div></section>';
+  h+='<section class="panel"><h3>Sicherung</h3><p class="soft small">Dein Fortschritt liegt nur auf diesem Gerät. Kopiere die Sicherung ab und zu in eine Notiz. Fotos sind darin nicht enthalten. Letzte Sicherung: '+bkDate()+'. Kurumi erinnert dich alle '+bkDays()+' Tage.</p><div class="seg" role="group" aria-label="Erinnerung">'+[7,14].map(function(n){return '<button data-bkd="'+n+'" aria-pressed="'+(bkDays()===n)+'">Alle '+n+' Tage</button>';}).join('')+'</div><div class="row"><button class="btn line" id="exp">Kopieren</button><button class="btn line" id="imp">Einfügen</button></div></section>';
   var live=/github\.io$/.test(location.hostname);
+  h+='<section class="panel"><h3>Feedback</h3><p class="soft small">Idee, Fehler oder Lob? Schreib direkt an den Entwickler der App.</p><button class="btn line" id="tofb">Feedback geben</button></section>';
   h+='<section class="panel"><h3>Als App aufs Handy</h3><p class="soft small">iPhone: Teilen, dann „Zum Home-Bildschirm“. Android: Menü, dann „App installieren“.</p></section>';
   h+='<section class="panel"><h3>App weiterempfehlen</h3><p class="soft small">'+(live?'Schick den Link an Freunde. Jeder bekommt seinen eigenen Plan, die Daten bleiben auf dem eigenen Handy.':'Das Weiterempfehlen klappt, sobald die App live online ist.')+'</p>'+(live?'<button class="btn line" id="shareapp">Link teilen</button>':'')+'</section>';
   h+='<section class="panel"><h3>Neustart</h3><p class="soft small">Löscht Plan, Zähler und Abgabe-Liste und beginnt wieder bei der Einrichtung. Wenn du nur andere Räume oder Methoden willst, nimm lieber „Ändern“ oben.</p><button class="btn line danger" id="reset">Neu starten</button></section></div>';
@@ -1598,6 +1618,8 @@ function renderMore(){
   $('app').querySelectorAll('[data-pc]').forEach(function(b){b.onclick=function(){if(setPace(S,b.dataset.pc)){save();var y=window.scrollY;renderMore();window.scrollTo(0,y);toast(PACES[S.pace].name+': '+PACES[S.pace].desc);}};});
   $('app').querySelectorAll('[data-th]').forEach(function(b){b.onclick=function(){S.theme=b.dataset.th;save();applyTheme();renderMore();};});
   $('cbq').onclick=function(){quiz();};
+  $('tofb').onclick=function(){tab='feedback';window.scrollTo(0,0);render();};
+  $('app').querySelectorAll('[data-bkd]').forEach(function(b){b.onclick=function(){S.bkDays=+b.dataset.bkd;save();var y=window.scrollY;renderMore();window.scrollTo(0,y);toast('Erinnerung alle '+S.bkDays+' Tage');};});
   $('mqb').onclick=function(){methodQuiz('more');};
   if($('shareapp'))$('shareapp').onclick=function(){var url=location.origin+location.pathname,txt='Kruschtel-Kaizen: Ausmisten Raum für Raum, jeden Tag ein kleiner Schritt.';
     if(navigator.share)navigator.share({title:'Kruschtel-Kaizen',text:txt,url:url}).catch(function(){});
@@ -1606,8 +1628,7 @@ function renderMore(){
   $('reset').onclick=function(){dialog('<div class="center" style="width:96px;margin:0 auto">'+happs(tines(),'sleepy')+'</div><h3>Wirklich neu starten?</h3><p class="soft">Plan, Zähler ('+num(totalOut(S))+' Dinge), Abgabe-Liste und Fotos werden gelöscht. Das lässt sich nicht rückgängig machen. Kopiere vorher die Sicherung, wenn du sie behalten willst.</p><div class="row"><button class="btn line" data-close>Abbrechen</button><button class="btn" id="resetok">Neu starten</button></div>',function(){
     $('resetok').onclick=function(){try{localStorage.removeItem(KEY);}catch(e){}pclear();S=null;draft=null;tab='woche';closeDlg();render();window.scrollTo(0,0);toast('Alles auf Anfang');};});};
   $('edit').onclick=function(){startSetup(S);};
-  $('exp').onclick=function(){var j=JSON.stringify(S),p=navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(j):Promise.reject();
-    p.then(function(){toast('Sicherung kopiert');},function(){dialog('<h3>Sicherung</h3><p class="soft small">Alles markieren und kopieren.</p><textarea readonly>'+esc(j)+'</textarea><button class="btn" data-close>Fertig</button>');});};
+  $('exp').onclick=function(){doBackup(function(){if(tab==='mehr'){var y=window.scrollY;renderMore();window.scrollTo(0,y);}});};
   $('imp').onclick=function(){dialog('<h3>Sicherung einfügen</h3><p class="soft small">Der aktuelle Stand wird ersetzt.</p><textarea id="it"></textarea><div class="row"><button class="btn line" data-close>Abbrechen</button><button class="btn" id="ok">Laden</button></div>',function(){
     $('ok').onclick=function(){try{var o=JSON.parse($('it').value);if(!o.plan||!o.rooms||!o.methods)throw 0;S=migrate(o);save();applyTheme();closeDlg();tab='woche';render();toast('Sicherung geladen');}catch(e){toast('Das ist keine Kruschtel-Kaizen-Sicherung.');}};});};
 }
@@ -1623,7 +1644,7 @@ function render(){
   if(!S&&!draft){startSetup();return;}
   $('tabs').hidden=!!draft;
   if(draft)return renderSetup();
-  document.querySelectorAll('.tabs button').forEach(function(b){b.classList.toggle('on',b.dataset.tab===tab);});
+  document.querySelectorAll('.tabs button').forEach(function(b){b.classList.toggle('on',b.dataset.tab===(tab==='feedback'?'mehr':tab));});
   if(tab==='plan')renderPlan();else if(tab==='kalender')renderCal();else if(tab==='abgabe')renderGive();else if(tab==='mehr')renderMore();else if(tab==='feedback')renderFeedback();else renderWeek();
 }
 S=load();render();
