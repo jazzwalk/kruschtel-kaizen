@@ -198,6 +198,7 @@ textarea{width:100%;min-height:120px;border-radius:14px;border:0;box-shadow:inse
 .mascot .spark{animation:spark 1.6s ease-in-out infinite}
 @keyframes spark{50%{opacity:.2}}
 .center{text-align:center}
+.fit{display:inline-block;margin-left:8px;font-family:var(--sans);font-style:normal;font-size:12px;font-weight:600;color:#3a2a26;background:var(--saffron);border-radius:999px;padding:1px 9px;vertical-align:3px;line-height:1.6}
 .nuts{display:flex;gap:6px}
 .nuts button{width:44px;height:44px;border-radius:50%;border:0;background:var(--paper);box-shadow:inset 0 0 0 1px var(--hair);display:grid;place-items:center;cursor:pointer;padding:0}
 .nuts button svg{width:24px;height:24px;filter:grayscale(1) opacity(.35);transition:filter .2s}
@@ -551,6 +552,22 @@ function planWeeks(rooms,methods,weeks,seed,pace){
     return {ids:u.ids,room:u.name,method:mt,out:0,tasks:methodTasks(mt,extra,pace)};
   });
 }
+/* Methoden mitten im Plan wechseln: Erledigtes bleibt, kommende Räume bekommen die neuen Methoden.
+   Der aktuelle Raum wechselt nur, solange dort noch nichts abgehakt ist. Eigene Aufgaben bleiben. */
+function remethod(s,methods,rnd){
+  rnd=rnd||Math.random;s.methods=methods.slice();
+  var cur=s.plan[s.week],from=s.finished?s.plan.length:(cur&&cur.tasks.some(function(t){return t.done;})?s.week+1:s.week);
+  var prev=from>0?s.plan[from-1].method:null,cnt={},seen={},changed=0;methods.forEach(function(m){cnt[m]=0;});
+  s.plan.forEach(function(w,i){
+    var key=w.ids.join(),pass=seen[key]||0;seen[key]=pass+1;if(i<from)return;
+    var c=methods.filter(function(m){return m!==prev;});if(!c.length)c=methods.slice();
+    var min=Math.min.apply(null,c.map(function(m){return cnt[m];}));c=c.filter(function(m){return cnt[m]===min;});
+    var mt=c[Math.floor(rnd()*c.length)];cnt[mt]++;prev=mt;if(w.method!==mt)changed++;
+    var rt=ROOMTASKS[w.ids[0]]||GENERIC_ROOM,own=w.tasks.filter(function(t){return t.own;});
+    w.method=mt;w.tasks=methodTasks(mt,rt[pass%2],s.pace).concat(own);
+  });
+  return {from:from,changed:changed};
+}
 function newSeed(){return Math.floor(Math.random()*1e9);}
 function newState(rooms,methods,seed,pace){seed=seed==null?newSeed():seed;pace=pace||'woche';return {v:2,app:'leerraum',seed:seed,pace:pace,rooms:rooms,methods:methods,plan:planWeeks(rooms,methods,12,seed,pace),week:0,round:1,stamps:[],outPrev:0,give:[],paused:null,cal:{day:0,time:'10:00',freq:'daily'},theme:'auto',started:new Date().toISOString()};}
 function migrate(s){
@@ -871,8 +888,9 @@ function renderSetup(){
     h+='</div><div class="add"><input type="text" id="nr" placeholder="Eigener Raum" maxlength="28" aria-label="Eigener Raum"><label><input type="checkbox" id="nb"> groß</label><button class="btn" id="ad">Hinzufügen</button></div>';
     h+='<button class="btn" id="next"'+(n?'':' disabled')+'>Weiter mit '+n+' '+(n===1?'Raum':'Räumen')+'</button>'+(S?'<button class="btn text" id="cancel">Abbrechen</button>':'')+'</div>';
   }else if(d.step===2){
-    h+=steps(2)+'<div class="stack" style="margin-top:26px"><h2>Nach welchen Methoden?</h2><p class="soft small">Die Methoden werden auf die Räume verteilt. Eine reicht auch.</p><div class="mlist">';
-    METHOD_ORDER.forEach(function(k){var m=METHODS[k],on=d.methods.indexOf(k)>=0;h+='<button class="mopt" data-m="'+k+'" aria-pressed="'+on+'"><div><b>'+m.name+'</b><span>'+m.short+'</span></div><span class="ck">'+TICK+'</span></button>';});
+    h+=steps(2)+'<div class="stack" style="margin-top:26px"><h2>Nach welchen Methoden?</h2><p class="soft small">Die Methoden werden auf die Räume verteilt. Eine reicht auch.</p><button class="btn line" id="mtest">'+((d.mq||(S&&S.mq))?'Methoden-Test wiederholen':'Welche Methode passt zu mir?')+'</button><div class="mlist">';
+    var rec=d.mq||(S&&S.mq)||[];
+    METHOD_ORDER.forEach(function(k){var m=METHODS[k],on=d.methods.indexOf(k)>=0,ri=rec.indexOf(k);h+='<button class="mopt" data-m="'+k+'" aria-pressed="'+on+'"><div><b>'+m.name+(ri>=0?'<em class="fit">'+(ri===0?'passt am besten':'passt zu dir')+'</em>':'')+'</b><span>'+m.short+'</span></div><span class="ck">'+TICK+'</span></button>';});
     h+='</div><h2 style="margin-top:34px">Wie schnell?</h2><p class="soft small">Egal welches Tempo: Jeden Tag steht eine kleine Aufgabe für heute bereit.</p><div class="mlist">';
     PACE_ORDER.slice().reverse().forEach(function(k){var pc=PACES[k];h+='<button class="mopt" data-pace="'+k+'" aria-pressed="'+(d.pace===k)+'"><div><b>'+pc.name+'</b><span>'+pc.desc+', 12 Räume in '+(pc.days*12<14?pc.days*12+' Tagen':'etwa '+Math.round(pc.days*12/7)+' Wochen')+'</span></div><span class="ck">'+TICK+'</span></button>';});
     h+='</div><button class="btn" id="next"'+(d.methods.length?'':' disabled')+'>Plan ansehen</button><button class="btn text" id="back">Zurück</button></div>';
@@ -893,6 +911,7 @@ function renderSetup(){
   q('[data-m]').forEach(function(b){b.onclick=function(){var k=b.dataset.m,i=d.methods.indexOf(k);if(i>=0)d.methods.splice(i,1);else d.methods.push(k);d.methods.sort(function(a,c){return METHOD_ORDER.indexOf(a)-METHOD_ORDER.indexOf(c);});renderSetup();};});
   if($('ad')){var add=function(){var v=$('nr').value.trim();if(!v)return;d.rooms.push({id:'c'+Date.now(),name:v,big:$('nb').checked,on:true,custom:true});renderSetup();};$('ad').onclick=add;$('nr').onkeydown=function(e){if(e.key==='Enter')add();};}
   if($('next'))$('next').onclick=function(){d.step++;renderSetup();};
+  if($('mtest'))$('mtest').onclick=function(){methodQuiz('setup');};
   if($('deerbtn'))$('deerbtn').onclick=function(){hop();};
   if($('roll'))$('roll').onclick=function(){var dc=$('dice');dc.classList.add('roll');setTimeout(function(){d.seed=newSeed();d.rolls++;var y=window.scrollY;renderSetup();window.scrollTo(0,y);hop();},450);};
   if($('back'))$('back').onclick=function(){d.step--;renderSetup();};
@@ -901,7 +920,7 @@ function renderSetup(){
     var rooms=d.rooms.filter(function(r){return r.on;}).map(function(r){return {id:r.id,name:r.name,big:r.big,custom:!!r.custom};});
     var old=S;S=newState(rooms,d.methods.slice(),d.seed,d.pace);
     if(old){S.cal=old.cal;S.theme=old.theme;S.give=old.give;S.round=old.round;S.outPrev=totalOut(old);}
-    draft=null;save();tab='woche';render();
+    if(d.mq)S.mq=d.mq;else if(old&&old.mq)S.mq=old.mq;draft=null;save();tab='woche';render();
   };
 }
 
@@ -982,10 +1001,11 @@ var photoWeek=null,WK=null,tipN=0,openSpots=false,openTip=false,openAll=false,mi
 var ACORN='<svg viewBox="0 0 30 30" aria-hidden="true"><ellipse cx="15" cy="18" rx="8" ry="9" fill="#e0a43a"/><path d="M6 13q9-8 18 0v-2.5q-9-7-18 0z" fill="#9a6a4e"/><path d="M15 4v3.5" stroke="#9a6a4e" stroke-width="2" stroke-linecap="round"/></svg>';
 function tipBox(step){
   tipN+=step;var t=tipFor(S,tipN),b=$('tipbox');if(!b)return;var cb=S.cb&&CB[S.cb];
-  b.innerHTML='<details class="acc tipacc" id="tipacc"'+(openTip?' open':'')+'><summary>'+ACORN+'<span class="tprev">'+esc(t.text)+'</span></summary><div class="accb"><p class="soft small">Kurumis Tipp'+(t.own?' für '+cb.name:t.season?' für den '+t.season:'')+'</p><p>'+esc(t.text)+'</p><div class="acts"><button id="tipnext">Noch ein Tipp</button>'+(cb?'':'<button id="tipquiz">Welcher Aufräumtyp bin ich?</button>')+'</div></div></details>';
+  b.innerHTML='<details class="acc tipacc" id="tipacc"'+(openTip?' open':'')+'><summary>'+ACORN+'<span class="tprev">'+esc(t.text)+'</span></summary><div class="accb"><p class="soft small">Kurumis Tipp'+(t.own?' für '+cb.name:t.season?' für den '+t.season:'')+'</p><p>'+esc(t.text)+'</p><div class="acts"><button id="tipnext">Noch ein Tipp</button>'+(cb?'':'<button id="tipquiz">Welcher Aufräumtyp bin ich?</button>')+(S.mq?'':'<button id="tipmq">Welche Methode passt zu mir?</button>')+'</div></div></details>';
   $('tipacc').ontoggle=function(){openTip=$('tipacc').open;};
   $('tipnext').onclick=function(){openTip=true;tipBox(1);};
   if($('tipquiz'))$('tipquiz').onclick=function(){quiz();};
+  if($('tipmq'))$('tipmq').onclick=function(){methodQuiz('more');};
 }
 /* Kurztest nach Clutterbug: zwei Fragen */
 function quiz(){
@@ -997,6 +1017,52 @@ function quiz(){
   var res=function(){var k=cbType(a.store,a.sys),c=CB[k];S.cb=k;save();
     dialog('<div class="center" style="width:110px;margin:0 auto">'+happs(tines(),'proud')+'</div><p class="soft small center">Du bist ein</p><p class="cbres center">'+c.name+' <span class="soft" style="font-size:18px">('+c.en+')</span></p><p class="soft small center">'+c.store.charAt(0).toUpperCase()+c.store.slice(1)+' und '+c.sys+'</p><p>'+c.desc+'</p><p><b>Kurumis Tipp:</b> '+c.tips[0]+'</p><p class="soft small">Ab jetzt passen meine Tipps zu deinem Stil. Ändern kannst du ihn unter Mehr.</p><button class="btn" data-close>Alles klar</button>',function(){hop2();},function(){if(tab==='woche')tipBox(0);if(tab==='mehr')renderMore();});};
   q1();
+}
+/* Methoden-Test: fünf Fragen, Punkte je Methode, die drei passendsten als Vorschlag */
+var MQ=[
+ {q:'Wie viel Zeit hast du meistens am Stück?',o:[['Eine Viertelstunde','Zwischendurch, mehr ist selten drin.',{fl:3,mg:2,tt:1}],['Etwa eine Stunde','Am Abend oder am Wochenende.',{vk:2,tt:2,zz:1}],['Einen ganzen Nachmittag','Wenn schon, dann richtig.',{km:3,ds:2,vk:1}]]},
+ {q:'Was fällt dir beim Ausmisten am schwersten?',o:[['Anfangen','Der Berg wirkt einfach zu groß.',{fl:3,mg:2}],['Entscheiden','Ich halte Dinge lange in der Hand.',{vk:2,zz:3}],['Dranbleiben','Nach dem ersten Schwung ist die Luft raus.',{mg:3,fl:1,tt:1}],['Loslassen','An vielen Dingen hängen Erinnerungen.',{km:3,ds:2}]]},
+ {q:'Was motiviert dich am meisten?',o:[['Zahlen und Ziele','Ich will sehen, wie viel schon weg ist.',{tt:3,mg:2}],['Ein gutes Gefühl','Am Ende soll es sich leicht anfühlen.',{km:3,fl:1}],['Eine Challenge','Ich mag Spiele und kleine Wettkämpfe.',{mg:3,tt:1}],['Anderen helfen','Meine Sachen sollen jemand anderem nützen.',{ds:3,vk:1}]]},
+ {q:'Was sammelt sich bei dir am meisten an?',o:[['„Vielleicht brauch ich das noch“','Ersatzteile, Kabel, Gläser für alle Fälle.',{zz:3,vk:1}],['Kleinkram auf Flächen','Tisch, Kommode und Fensterbank sind schnell voll.',{fl:3,tt:1}],['Kleidung, Bücher, Sammlungen','Von einer Sorte ganz viel.',{km:3,mg:1}],['Kisten von früher','Erbstücke, Umzugskartons, Erinnerungen.',{ds:3,vk:1}]]},
+ {q:'Wie entscheidest du am liebsten?',o:[['Schnell aus dem Bauch','Kurz anschauen, fertig.',{vk:3,fl:1}],['Nach einer klaren Regel','Gibt es eine Regel, halte ich mich dran.',{zz:3,tt:2}],['In Ruhe, Teil für Teil','Ich nehme mir für jedes Ding Zeit.',{km:3,ds:2}]]}
+];
+var MQ_WHY={
+ km:'Du entscheidest mit Gefühl. Am Ende soll nur bleiben, was dir wirklich etwas bedeutet.',
+ vk:'Du entscheidest gern schnell. Vier Kisten nehmen dir das Grübeln ab.',
+ mg:'Du magst eine Challenge, und jeden Tag ein Teil mehr hält dich dran.',
+ tt:'Feste Zahlen geben dir ein klares Ziel, ohne langes Abwägen.',
+ ds:'Du denkst an andere und an später. Döstädning macht daraus einen ruhigen Plan.',
+ zz:'„Vielleicht brauch ich das noch“ hält dich auf. Die 20/20-Regel beantwortet die Frage für dich.',
+ fl:'Kurze Einsätze mit Timer passen in deinen Alltag und bringen dich ins Tun.'
+};
+function mqTop(sc){var top=METHOD_ORDER.slice().sort(function(a,b){return sc[b]-sc[a]||METHOD_ORDER.indexOf(a)-METHOD_ORDER.indexOf(b);});return top.slice(0,3);}
+function methodQuiz(ctx){
+  var sc={},i=0;METHOD_ORDER.forEach(function(k){sc[k]=0;});
+  var ask=function(){var Q=MQ[i];
+    dialog('<h3>Welche Methode passt zu dir?</h3><p class="soft small">Frage '+(i+1)+' von '+MQ.length+'</p><div class="steps" style="margin:0" aria-hidden="true">'+MQ.map(function(_,k){return '<i class="'+(k<=i?'on':'')+'"></i>';}).join('')+'</div><p><b>'+Q.q+'</b></p><div class="quiz">'+Q.o.map(function(o,k){return '<button class="qopt" data-o="'+k+'"><b>'+o[0]+'</b><span>'+o[1]+'</span></button>';}).join('')+'</div>'+(i?'<button class="btn text" id="mqback">Zurück</button>':'<button class="btn text" data-close>Später</button>'),function(){
+      $('dlgbox').querySelectorAll('[data-o]').forEach(function(b){b.onclick=function(){var p=Q.o[+b.dataset.o][2];Q.pick=p;Object.keys(p).forEach(function(k){sc[k]+=p[k];});i++;if(i<MQ.length)ask();else res();};});
+      if($('mqback'))$('mqback').onclick=function(){i--;var p=MQ[i].pick||{};Object.keys(p).forEach(function(k){sc[k]-=p[k];});ask();};
+    },ctx==='setup'?function(){if(draft)renderSetup();}:null);};
+  var res=function(){
+    var top=mqTop(sc),max=sc[top[0]]||1,m0=METHODS[top[0]];
+    if(S){S.mq=top;save();}if(draft)draft.mq=top;
+    var h='<div class="center" style="width:110px;margin:0 auto">'+happs(tines(),'proud')+'</div><p class="soft small center">Am besten passt zu dir</p><p class="cbres center">'+m0.name+'</p><p class="center"><span class="meth m-'+top[0]+'" style="margin-top:2px">'+m0.short+'</span></p><p>'+MQ_WHY[top[0]]+'</p><p class="rule">'+m0.rule+'</p>';
+    h+='<p><b>Passt auch gut zu dir</b></p><div class="mlist">'+top.slice(1).map(function(k){var m=METHODS[k];return '<div class="mopt" style="cursor:default;grid-template-columns:1fr auto"><div><b>'+m.name+'</b><span>'+MQ_WHY[k]+'</span></div><span class="soft small" style="margin-top:4px">'+Math.round(sc[k]/max*100)+' %</span></div>';}).join('')+'</div>';
+    h+='<p class="soft small">Mehrere Methoden halten es abwechslungsreich. Kurumi würfelt sie auf deine Räume.</p>';
+    var mid=ctx!=='setup'&&S&&!S.finished,curDone=mid&&S.plan[S.week].tasks.some(function(t){return t.done;});
+    if(ctx==='setup')h+='<button class="btn" id="mqok">Diese drei übernehmen</button><button class="btn text" data-close>Selbst auswählen</button>';
+    else if(mid)h+='<button class="btn" id="mqnow">Ab '+(curDone?'dem nächsten Raum':'jetzt')+' im Plan verwenden</button><p class="soft small center" style="margin-top:-6px">'+(curDone?'Erledigte Räume und '+esc(S.plan[S.week].room)+' bleiben, wie sie sind.':'Erledigte Räume bleiben, wie sie sind.')+' Reihenfolge, Zähler und eigene Aufgaben auch.</p><button class="btn line" id="mqok">Ganzen Plan neu würfeln</button><button class="btn text" data-close>Nur merken</button>';
+    else h+='<button class="btn" id="mqnext">Für die nächste Runde übernehmen</button><button class="btn text" data-close>Nur merken</button>';
+    var ms=top.slice().sort(function(a,b){return METHOD_ORDER.indexOf(a)-METHOD_ORDER.indexOf(b);});
+    dialog(h,function(){hop2();FX.small();
+      if($('mqnow'))$('mqnow').onclick=function(){var r=remethod(S,ms);save();onClose=null;closeDlg();render();toast(r.changed?'Plan angepasst: '+r.changed+(r.changed===1?' Raum':' Räume')+' mit neuer Methode':'Passt schon, der Plan bleibt so');};
+      if($('mqnext'))$('mqnext').onclick=function(){S.methods=ms;save();onClose=null;closeDlg();render();toast('Gilt ab der nächsten Runde');};
+      if($('mqok'))$('mqok').onclick=function(){onClose=null;closeDlg();
+        if(ctx==='setup'){draft.methods=ms;renderSetup();toast('Methoden übernommen');}
+        else{startSetup(S);draft.methods=ms;draft.mq=top;draft.step=2;renderSetup();toast('Methoden übernommen');}};
+    },function(){if(ctx==='setup'){if(draft)renderSetup();}else if(tab==='mehr')renderMore();else if(tab==='woche')tipBox(0);});
+  };
+  ask();
 }
 function bindHow(m){$('mhow').onclick=function(){dialog('<h3>So geht '+m.name+'</h3><p>'+m.text+'</p><p class="rule">'+m.rule+'</p><button class="btn" data-close>Alles klar</button>');};}
 function dots(t){var s='<span class="dots" aria-label="Tag '+Math.min(t.day+1,t.days)+' von '+t.days+'">';for(var d=0;d<t.days;d++)s+='<i class="'+(d<t.day?'past':d===t.day?'cur':'')+'"></i>';if(t.late)s+='<em>+'+(t.day-t.days+1)+'</em>';return s+'</span>';}
@@ -1409,7 +1475,7 @@ function renderCal(){
 }
 
 /* ===== Feedback ===== */
-var APP_VERSION='kk-v7';
+var APP_VERSION='kk-v8';
 var FB_TO=['steffen','kiefer'].join('.')+String.fromCharCode(64)+['gmail','com'].join('.');
 var fb={kind:'idee',stars:0,text:'',info:true};
 function fbBody(){
@@ -1452,6 +1518,8 @@ function renderMore(){
   var h='<h2>Mehr</h2><div class="stack" style="margin-top:22px">';
   var cb=S.cb&&CB[S.cb];
   h+='<section class="panel"><h3>Dein Aufräumstil</h3><p class="soft small">'+(cb?'<b style="color:var(--ink)">'+cb.name+' ('+cb.en+')</b>: '+cb.store+' und '+cb.sys+'. '+cb.desc:'Noch nicht bestimmt. Zwei Fragen, dann passen Kurumis Tipps zu dir.')+'</p><p class="soft small">Nach den Clutterbug-Stilen von Cas Aarssen.</p><button class="btn line" id="cbq">'+(cb?'Test wiederholen':'Aufräumtyp finden')+'</button></section>';
+  var mq=S.mq||[];
+  h+='<section class="panel"><h3>Deine Aufräummethode</h3><p class="soft small">'+(mq.length?'Passt am besten: <b style="color:var(--ink)">'+METHODS[mq[0]].name+'</b>, danach '+mq.slice(1).map(function(k){return METHODS[k].name;}).join(' und ')+'. ':'Fünf kurze Fragen, dann schlägt Kurumi dir die drei passendsten Methoden vor. ')+'Geht auch mitten im Plan: Erledigtes bleibt, wie es ist.</p><p class="soft small">Gerade im Plan: '+S.methods.map(function(k){return METHODS[k].name;}).join(', ')+'.</p><button class="btn line" id="mqb">'+(mq.length?'Test wiederholen':'Methoden-Test machen')+'</button></section>';
   h+='<section class="panel"><h3>Erscheinungsbild</h3><div class="seg" role="group" aria-label="Erscheinungsbild">'+[['auto','Wie das Handy'],['light','Hell'],['dark','Dunkel']].map(function(t){return '<button data-th="'+t[0]+'" aria-pressed="'+(S.theme===t[0])+'">'+t[1]+'</button>';}).join('')+'</div></section>';
   h+='<section class="panel"><h3>Klang und Effekte</h3><p class="soft small">Ein Plopp beim Abhaken, Nuss-Konfetti beim Abschließen eines Raums.</p><div class="fxrows">'+[['sound','Ton'],['buzz','Vibration'],['confetti','Konfetti']].map(function(x){var on=fxOn(x[0]);return '<div class="fxr"><span>'+x[1]+'</span><div class="seg" role="group" aria-label="'+x[1]+'"><button data-fx="'+x[0]+'" data-v="1" aria-pressed="'+on+'">An</button><button data-fx="'+x[0]+'" data-v="0" aria-pressed="'+(!on)+'">Aus</button></div></div>';}).join('')+'</div></section>';
   h+='<section class="panel"><h3>Tempo</h3><p class="soft small">Wie lange bleibt ein Raum dran? Gilt sofort, dein Plan und deine Haken bleiben.</p><div class="seg" role="group" aria-label="Tempo">'+PACE_ORDER.map(function(k){var pc=PACES[k];return '<button data-pc="'+k+'" aria-pressed="'+(S.pace===k)+'">'+(pc.days===1?'1 Tag':pc.days===7?'1 Woche':pc.days+' Tage')+'</button>';}).join('')+'</div><p class="soft small" style="margin-bottom:0">'+U().name+': '+U().desc+'.</p></section>';
@@ -1466,6 +1534,7 @@ function renderMore(){
   $('app').querySelectorAll('[data-pc]').forEach(function(b){b.onclick=function(){if(setPace(S,b.dataset.pc)){save();var y=window.scrollY;renderMore();window.scrollTo(0,y);toast(PACES[S.pace].name+': '+PACES[S.pace].desc);}};});
   $('app').querySelectorAll('[data-th]').forEach(function(b){b.onclick=function(){S.theme=b.dataset.th;save();applyTheme();renderMore();};});
   $('cbq').onclick=function(){quiz();};
+  $('mqb').onclick=function(){methodQuiz('more');};
   if($('shareapp'))$('shareapp').onclick=function(){var url=location.origin+location.pathname,txt='Kruschtel-Kaizen: Ausmisten Raum für Raum, jeden Tag ein kleiner Schritt.';
     if(navigator.share)navigator.share({title:'Kruschtel-Kaizen',text:txt,url:url}).catch(function(){});
     else if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(function(){toast('Link kopiert');},function(){toast(url);});
