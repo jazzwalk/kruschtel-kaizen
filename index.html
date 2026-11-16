@@ -198,6 +198,22 @@ textarea{width:100%;min-height:120px;border-radius:14px;border:0;box-shadow:inse
 .mascot .spark{animation:spark 1.6s ease-in-out infinite}
 @keyframes spark{50%{opacity:.2}}
 .center{text-align:center}
+.advent{margin-bottom:12px;border-radius:22px;padding:14px 16px;background:#2f4a3a;color:#faf3ea;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+.advent:before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,#faf3ea 1px,transparent 1.6px);background-size:22px 22px;opacity:.13;pointer-events:none}
+.advh{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:center;position:relative}
+.advn{display:grid;place-items:center;width:52px;height:52px;border-radius:12px;background:#b8392c;color:#faf3ea;font-family:var(--serif);font-size:26px;box-shadow:inset 0 0 0 2px rgba(250,243,234,.35)}
+.advn.ok{background:#faf3ea;color:#2f4a3a;font-size:24px}
+.advent h4{margin:0;font-family:var(--serif);font-weight:400;font-size:18px;line-height:1.2}
+.advent p{margin:3px 0 0;font-size:14px;opacity:.85;line-height:1.35}
+.advent .btn{position:relative;background:#faf3ea;color:#2f4a3a;width:auto;align-self:flex-start;padding:9px 18px;min-height:42px}
+.doors{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:12px 0 10px}
+.door{aspect-ratio:1;border:0;border-radius:10px;font-family:var(--serif);font-size:17px;cursor:pointer;background:var(--paper);color:var(--ink);box-shadow:inset 0 0 0 1px var(--hair);padding:0}
+.door.done{background:#2f4a3a;color:#faf3ea;box-shadow:none}
+.door.now{background:#b8392c;color:#faf3ea;box-shadow:none}
+.door.miss{outline:1.5px dashed var(--soft);outline-offset:-6px}
+.door.lock{opacity:.4;cursor:default}
+.doorbig{width:84px;height:84px;margin:0 auto;border-radius:16px;display:grid;place-items:center;background:#b8392c;color:#faf3ea;font-family:var(--serif);font-size:38px;animation:dooropen .7s cubic-bezier(.2,1.4,.4,1)}
+@keyframes dooropen{from{transform:perspective(300px) rotateY(-85deg);opacity:.2}}
 .tabs button{font-size:clamp(13px,3.7vw,14.5px);padding:10px clamp(8px,2.9vw,15px)}
 .furt.bk{background:var(--sheet);box-shadow:inset 0 0 0 1px var(--hair);color:var(--ink)}
 .furt.bk .row{margin-top:4px}
@@ -965,8 +981,8 @@ function renderWeek(){
   var h='<div class="head2"><div><span class="wk">'+U().one+' '+(i+1)+' von '+S.plan.length+(S.round>1?', Runde '+S.round:'')+'</span><h1 class="room">'+esc(w.room)+'</h1></div><button class="meth m-'+w.method+' mbtn" id="mhow" aria-label="So geht '+m.name+'">'+m.name+' <span aria-hidden="true">ⓘ</span></button></div>';
   h+='<div class="scene" id="scene">'+scene(i,f)+visitorsHTML()+'</div>';
   if(S.paused){
-    h+='<section class="today light" style="margin-top:14px">'+buddyHTML(pick(LINES.pause),'sleepy')+'<p class="tt2">Pausiert seit '+fmtDate(S.paused)+'</p><p class="soft small">Der Plan wartet, deine Haken bleiben.</p><button class="btn" id="resume">Weitermachen</button></section>';
-    $('app').innerHTML=h;bindHow(m);$('resume').onclick=function(){S.paused=null;save();renderWeek();};$('deerbtn').onclick=function(){say(pick(LINES.pause));};return;
+    h+='<div style="margin-top:14px">'+adventHTML()+'</div><section class="today light" style="margin-top:14px">'+buddyHTML(pick(LINES.pause),'sleepy')+'<p class="tt2">Pausiert seit '+fmtDate(S.paused)+'</p><p class="soft small">Der Plan wartet, deine Haken bleiben.</p><button class="btn" id="resume">Weitermachen</button></section>';
+    $('app').innerHTML=h;bindHow(m);$('resume').onclick=function(){S.paused=null;save();renderWeek();};bindAdvent();$('deerbtn').onclick=function(){say(pick(LINES.pause));};return;
   }
   h+='<div id="todaybox" style="margin-top:14px"></div>';
   h+='<section class="strip" aria-label="Zähler"><div class="sn"><b id="tw">'+(w.out||0)+'</b><span>weg '+U().inthis+'<br>insgesamt <span id="tt">'+num(totalOut(S))+'</span></span></div><div class="pm"><button id="mbox" class="lst mbb" aria-label="Vielleicht-Kiste'+(mb().items.length?', '+mb().items.length+' drin':'')+'">'+MBOX+(mb().items.length?'<i>'+mb().items.length+'</i>':'')+'</button><button id="togive" class="lst" aria-label="Auf die Abgabe-Liste"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11M4 12h11M4 17h7M18 14v6M15 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button><button id="minus" aria-label="Eins weniger">−</button><button class="plus" id="plus" aria-label="Eins mehr">+1</button></div></section>';
@@ -1108,10 +1124,12 @@ function todayBox(){
   }
   var openG=S.give.filter(function(g){return !g.done;});
   if(furtToday(S)&&openG.length)h='<section class="furt"><h4>Heute ist Furt-Tag!</h4><p>'+openG.length+(openG.length===1?' Ding wartet':' Dinge warten')+' auf die Abgabe: '+openG.slice(0,3).map(function(g){return esc(g.t);}).join(', ')+(openG.length>3?' …':'')+'</p><button class="btn" id="gofurt">Zur Abgabe-Liste</button></section>'+h;
+  h=adventHTML()+h;
   if(bkDue())h='<section class="furt bk"><h4>Zeit für eine Sicherung</h4><p>Dein Fortschritt liegt nur auf diesem Handy. Letzte Sicherung: '+bkDate()+'. Kopier sie in eine Notiz, dann geht bei einem Handywechsel nichts verloren.</p><div class="row"><button class="btn" id="bkgo">Jetzt sichern</button><button class="btn line" id="bklater">Später</button></div></section>'+h;
   if(mbDue())h='<section class="furt mbx"><h4>Die Vielleicht-Kiste ist '+mbAge()+' Tage zu</h4><p>'+mb().items.length+(mb().items.length===1?' Ding wartet':' Dinge warten')+' auf deine Entscheidung. Hast du etwas davon vermisst?</p><button class="btn" id="gomb">Kiste aufmachen</button></section>'+h;
   box.innerHTML=h;
   if($('gomb'))$('gomb').onclick=function(){mbResolve();};
+  bindAdvent();
   if($('bkgo'))$('bkgo').onclick=function(){doBackup(mbBack);};
   if($('bklater'))$('bklater').onclick=function(){S.bkSnooze=new Date(kNow().getTime()+7*DAY).toISOString();save();mbBack();toast('Ich erinnere dich in einer Woche.');};
   if($('gofurt'))$('gofurt').onclick=function(){tab='abgabe';window.scrollTo(0,0);render();};
@@ -1121,6 +1139,28 @@ function todayBox(){
   if($('fin'))$('fin').onclick=finishWeek;
   if($('mini5'))$('mini5').onclick=function(){fiveMin();};
 }
+/* ===== Kruschtel-Adventskalender: 1. bis 24. Dezember, unabhängig vom Plan ===== */
+var ADV=['Weihnachtsdeko-Kisten öffnen: Was ist kaputt oder hing letztes Jahr gar nicht?','Geschenkpapier, Bänder, Tüten: nur so viel behalten, wie in eine Kiste passt.','Alte Kerzenstummel und abgebrannte Teelichter weg.','Plätzchenformen und Backzubehör: Doppeltes aussortieren.','Vor dem Nikolaus: Schuhe durchsehen. Welche passen nicht mehr oder drücken?','Nikolaustag: Verschenk ein Teil, das jemand anderem Freude macht.','Lichterketten testen: Was nicht mehr leuchtet, darf zum Wertstoffhof.','Mützen, Schals, Handschuhe: Einzelstücke und Verwaistes klären.','Weihnachtskarten vom letzten Jahr: ein Foto machen, dann ins Altpapier.','Bevor neue Geschenke kommen: drei Spielsachen aussortieren.','Kühlschrank: Platz fürs Festessen schaffen, Abgelaufenes raus.','Dosen und Schüsseln ohne Deckel aussortieren.','Luciatag: eine dunkle Ecke freiräumen und Licht reinlassen.','Bücherregal: drei Bücher für den öffentlichen Bücherschrank.','Gästeecke oder Sofa: alles weg, was dem Besuch im Weg ist.','Geschenktüten und Schleifen: eine Tüte voll reicht.','Handtücher und Gästebettwäsche: Was ist dünn, fleckig, zu viel?','Ungenutzte Geschenksets vom letzten Jahr: weiterschenken.','Flur: Platz für die Jacken der Gäste schaffen.','Backvorräte: altes Backpulver, harte Streusel, Abgelaufenes weg.','Wintersonnenwende: eine Schublade ausmisten. Ab heute werden die Tage länger.','Batterien sammeln und zur Sammelbox bringen.','Couchtisch und Sofa ganz freiräumen für die Feiertage.','Heiligabend: nur noch eins. Ein Ding verabschieden, mit Danke.'];
+var ADV_ORDER=[7,19,3,22,12,1,16,9,24,5,14,20,2,11,18,8,23,4,15,10,21,6,17,13];
+function advToday(){var d=kNow();return d.getMonth()===11&&d.getDate()<=24?d.getDate():0;}
+function adv(){var y=kNow().getFullYear();if(!S.adv||S.adv.y!==y)S.adv={y:y,done:{},stamped:false};return S.adv;}
+function advCount(){return Object.keys(adv().done).length;}
+function advBack(){var y=window.scrollY;render();window.scrollTo(0,y);}
+function advStamp(){var a=adv(),d=kNow();if(a.stamped||advCount()<12||d.getMonth()!==11||d.getDate()<24)return false;a.stamped=true;S.stamps=S.stamps||[];
+  S.stamps.push({advent:true,room:'Advent '+a.y,method:'advent',round:S.round,at:d.toISOString(),out:Object.keys(a.done).reduce(function(x,k){return x+(a.done[k]||0);},0)});save();return true;}
+function adventHTML(){var t=advToday();if(!t)return '';var a=adv(),ok=a.done[t]!=null,n=advCount();
+  return '<section class="advent"><div class="advh"><span class="advn'+(ok?' ok':'')+'">'+(ok?'✓':t)+'</span><div><h4>Türchen '+t+(ok?' geschafft':' wartet')+'</h4><p>'+(ok?(t<24?'Morgen geht Türchen '+(t+1)+' auf.':'Frohe Weihnachten!'):'Fünf Minuten Advents-Ausmisten.')+' '+n+' von 24 geschafft.</p></div></div>'+(ok?'':'<button class="btn" id="advgo">Türchen öffnen</button>')+'</section>';}
+function bindAdvent(){if($('advgo'))$('advgo').onclick=function(){FX.plus();doorDialog(advToday(),advBack);};if(S&&advStamp())setTimeout(function(){toast('Neuer Stempel: 冬 heißt Winter');},400);}
+function doorDialog(d,back){var a=adv(),ok=a.done[d]!=null;
+  dialog('<div class="doorbig">'+d+'</div><p class="soft small center" style="margin-top:10px">Türchen '+d+(d===advToday()?', heute':'')+'</p><p class="mtask">'+esc(ADV[d-1])+'</p>'+(ok?'<p class="center soft">Geschafft'+(a.done[d]?', '+a.done[d]+(a.done[d]===1?' Ding':' Dinge')+' furt':'')+'.</p><button class="btn" data-close>Fertig</button>':'<button class="btn" id="dok">Erledigt</button><button class="btn text" data-close>Später</button>'),function(){
+    if($('dok'))$('dok').onclick=function(){
+      dialog('<div class="center" style="width:96px;margin:0 auto">'+happs(tines(),'proud')+'</div><h3 class="center">Türchen '+d+' geschafft!</h3><p class="soft center">Wie viele Dinge sind dabei rausgeflogen?</p><div class="qty"><button data-q="0">Keins</button><button data-q="1">+1</button><button data-q="3">+3</button><button data-q="5">+5</button></div>',function(){hop2();
+        $('dlgbox').querySelectorAll('[data-q]').forEach(function(b){b.onclick=function(){var q=+b.dataset.q;a.done[d]=q;if(q)addOut(S,q);FX.small();save();var st=advStamp();onClose=null;closeDlg();if(back)back();toast(st?'Neuer Stempel: 冬 heißt Winter':q?'Furt demit! +'+q:'Türchen '+d+' geschafft');};});},back);};
+  },back);}
+function adventBookHTML(){var d=kNow();if(d.getMonth()!==11)return '';var a=adv(),t=d.getDate();
+  var h='<section class="hbook"><div class="hhead"><h3>Adventskalender</h3><span class="soft small">'+advCount()+' von 24</span></div><div class="doors">';
+  ADV_ORDER.forEach(function(i){var st=a.done[i]!=null?'done':i===t?'now':i<t?'miss':'lock';h+='<button class="door '+st+'" data-door="'+i+'"'+(st==='lock'?' disabled':'')+' aria-label="Türchen '+i+(st==='done'?', geschafft':st==='lock'?', noch zu':'')+'">'+(st==='done'?'✓':i)+'</button>';});
+  return h+'</div><p class="soft small">Ab 12 Türchen gibt es an Heiligabend den Sonder-Stempel 冬.'+(t<24?' Verpasste Türchen kannst du nachholen.':'')+'</p></section>';}
 /* ===== Sicherungs-Erinnerung: alle 30 Tage, sobald es Fortschritt gibt ===== */
 function bkDays(){return S&&S.bkDays||14;}
 function bkDue(){if(!S)return false;var now=kNow().getTime(),last=new Date(S.lastBackup||S.started).getTime();
@@ -1316,7 +1356,7 @@ function checkFriends(){
   if(!f)return;S.friends.push(f.id);save();setTimeout(function(){friendDialog(f,true);},350);
 }
 /* ===== Hanko-Stempelheft ===== */
-var HANKO={km:['喜','Freude','Bei KonMari bleibt nur, was Freude macht.'],vk:['四','Vier','Vier Kisten: behalten, spenden, Müll, woanders hin.'],mg:['減','Weniger','Jeden Tag ein Teil mehr: Es wird weniger.'],tt:['十二','Zwölf','Zwölf zum Wegwerfen, zwölf zum Spenden, zwölf zurück an ihren Platz.'],ds:['終','Abschluss','Döstädning heißt auf Japanisch Shūkatsu: in Ruhe abschließen.'],zz:['二十','Zwanzig','In 20 Minuten für unter 20 Euro ersetzbar? Dann darf es gehen.'],fl:['舞','Tanz','FlyLadys 27-Fling-Boogie: Ausmisten als kleiner Tanz.'],kaizen:['改善','Kaizen','Stetige kleine Verbesserung. Eine ganze Runde geschafft.']};
+var HANKO={km:['喜','Freude','Bei KonMari bleibt nur, was Freude macht.'],vk:['四','Vier','Vier Kisten: behalten, spenden, Müll, woanders hin.'],mg:['減','Weniger','Jeden Tag ein Teil mehr: Es wird weniger.'],tt:['十二','Zwölf','Zwölf zum Wegwerfen, zwölf zum Spenden, zwölf zurück an ihren Platz.'],ds:['終','Abschluss','Döstädning heißt auf Japanisch Shūkatsu: in Ruhe abschließen.'],zz:['二十','Zwanzig','In 20 Minuten für unter 20 Euro ersetzbar? Dann darf es gehen.'],fl:['舞','Tanz','FlyLadys 27-Fling-Boogie: Ausmisten als kleiner Tanz.'],kaizen:['改善','Kaizen','Stetige kleine Verbesserung. Eine ganze Runde geschafft.'],advent:['冬','Winter','Zwölf Adventstürchen geschafft. Im Winter wird es still, und Stille braucht Platz.']};
 var HSQ={vk:1,tt:1,zz:1,kaizen:1};
 function hankoSVG(st,uid){
   var k=st.kaizen?'kaizen':st.method,g=HANKO[k]||HANKO.vk,ch=g[0],n=hash(String(st.room||'')+st.at)%997,rot=(n%15)-7,sq=HSQ[k];
@@ -1329,10 +1369,10 @@ function hankoSVG(st,uid){
   return s+'</g></svg>';
 }
 function stampBookHTML(){
-  var cur=stampsOf(S,S.round),left=Math.max(0,S.plan.length-cur.filter(function(x){return !x.kaizen;}).length);
+  var cur=stampsOf(S,S.round),left=Math.max(0,S.plan.length-cur.filter(function(x){return !x.kaizen&&!x.advent;}).length);
   if(S.finished)left=0;
   var cell=function(st,idx){return '<button class="hslot" data-hk="'+idx+'" aria-label="Stempel '+esc(st.kaizen?'Kaizen, Runde '+st.round:st.room)+'">'+hankoSVG(st,'b'+idx)+'<span>'+esc(st.kaizen?'Runde '+st.round:st.room)+'</span></button>';};
-  var all=S.stamps||[],h='<section class="hbook"><div class="hhead"><h3>Stempelheft</h3><span class="soft small">'+cur.filter(function(x){return !x.kaizen;}).length+' von '+S.plan.length+(S.round>1?', Runde '+S.round:'')+'</span></div><div class="hgrid">';
+  var all=S.stamps||[],h='<section class="hbook"><div class="hhead"><h3>Stempelheft</h3><span class="soft small">'+cur.filter(function(x){return !x.kaizen&&!x.advent;}).length+' von '+S.plan.length+(S.round>1?', Runde '+S.round:'')+'</span></div><div class="hgrid">';
   all.forEach(function(st,i){if(st.round===S.round)h+=cell(st,i);});
   for(var k=0;k<left;k++)h+='<div class="hslot empty" aria-hidden="true"><i>'+(S.plan.length-left+k+1)+'</i><span>'+(k===0&&!S.finished?esc(S.plan[S.week].room):'&nbsp;')+'</span></div>';
   h+='</div>';
@@ -1341,7 +1381,7 @@ function stampBookHTML(){
 }
 function stampDialog(i,back){
   var st=(S.stamps||[])[i];if(!st)return;var k=st.kaizen?'kaizen':st.method,g=HANKO[k],d=new Date(st.at);
-  dialog('<div class="hbig">'+hankoSVG(st,'d'+i)+'</div><h3 class="center">'+g[0]+' heißt '+g[1]+'</h3><p class="soft center small" style="margin-top:6px">'+esc(g[2])+'</p><p class="center" style="margin:14px 0 18px">'+(st.kaizen?'Runde '+st.round+' komplett':esc(st.room)+', '+METHODS[st.method].name)+'<br><span class="soft small">'+d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear()+(st.out?', '+st.out+(st.out===1?' Ding':' Dinge')+' furt':'')+'</span></p><button class="btn" data-close>Fertig</button>',null,back);
+  dialog('<div class="hbig">'+hankoSVG(st,'d'+i)+'</div><h3 class="center">'+g[0]+' heißt '+g[1]+'</h3><p class="soft center small" style="margin-top:6px">'+esc(g[2])+'</p><p class="center" style="margin:14px 0 18px">'+(st.kaizen?'Runde '+st.round+' komplett':esc(st.room)+', '+(METHODS[st.method]?METHODS[st.method].name:'Adventskalender'))+'<br><span class="soft small">'+d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear()+(st.out?', '+st.out+(st.out===1?' Ding':' Dinge')+' furt':'')+'</span></p><button class="btn" data-close>Fertig</button>',null,back);
 }
 /* ===== Klang, Vibration, Nuss-Konfetti ===== */
 var ACX=null;
@@ -1405,9 +1445,11 @@ function hop2(){var d=$('dlgbox').querySelector('.mascot');if(d)d.classList.add(
 function renderFinished(){
   var h='<span class="wk">Runde '+S.round+' abgeschlossen</span><div class="scene">'+stillLife('fin|'+S.round,1,{label:'Leerer Raum',room:'wz',uid:'f'}).svg+'</div>';
   var kz=stampsOf(S,S.round).filter(function(x){return x.kaizen;})[0];h+='<h1 class="room">Alles hat wieder Luft.</h1>'+(kz?'<div class="hnew" style="width:110px;margin:16px auto 0">'+hankoSVG(kz,'kz')+'</div><p class="soft small center">'+HANKO.kaizen[0]+' heißt Kaizen: stetige kleine Verbesserung.</p>':'')+buddyHTML('Zwölf '+U().many+'! Alles kruschtelfrei, Kaizen wie im Buche. Sogar mein Vorrat ist aufgeräumt.','proud')+'<div class="stack" style="margin-top:20px"><p class="soft">'+num(totalOut(S))+' Dinge haben dein Zuhause verlassen. Mit der Zeit kommt wieder etwas dazu, darum geht die nächste Runde schneller.</p>';
+  h+=adventHTML();
   h+='<button class="btn" id="again">Runde '+(S.round+1)+' beginnen</button><button class="btn line" id="chg">Räume oder Methoden ändern</button></div>';
   $('app').innerHTML=h;
   $('again').onclick=function(){nextRound(S);save();render();};
+  bindAdvent();
   $('deerbtn').onclick=function(){hop();};
   $('chg').onclick=function(){S.round++;startSetup(S);};
 }
@@ -1429,9 +1471,10 @@ function renderPlan(){
       var pa=w.fid?albumOf(S,w.fid):null;
       h+='<div class="cell '+st+'"'+(st==='done'&&pa?' data-alb="'+w.fid+'" role="button" tabindex="0" aria-label="'+esc(w.room)+': Vorher/Nachher ansehen"':st==='done'?' data-share="'+i+'" role="button" tabindex="0" aria-label="'+esc(w.room)+' als Bild teilen"':' data-spots="'+i+'" role="button" tabindex="0" aria-label="Kruschtel-Ecken für '+esc(w.room)+'"')+'>'+stillLife(seed(i),f,{label:w.room,room:rid(w),dim:st==='lock',uid:'g'+i}).svg+'<b>'+esc(w.room)+'</b><span>'+(pa?'<span class="cam">'+CAM+'</span>':'')+(st==='done'?(pa?'':'<span class="shr">Teilen</span> ')+'Erledigt'+(w.out?', '+w.out+' Dinge weg':''):st==='now'?(S.paused?'Pausiert':U().dies):U().one+' '+(i+1))+', '+METHODS[w.method].name+'</span></div>';
     });
-    h+='</div>'+stampBookHTML()+albumHTML();
+    h+='</div>'+adventBookHTML()+stampBookHTML()+albumHTML();
   }
   $('app').innerHTML=h;fillPhotos($('app'));
+  $('app').querySelectorAll('[data-door]').forEach(function(c){c.onclick=function(){doorDialog(+c.dataset.door,function(){if(tab==='plan'){var y=window.scrollY;renderPlan();window.scrollTo(0,y);}});};});
   $('app').querySelectorAll('[data-hk]').forEach(function(c){c.onclick=function(){stampDialog(+c.dataset.hk,function(){if(tab==='plan')renderPlan();});};});
   $('app').querySelectorAll('[data-alb]').forEach(function(c){c.style.cursor='pointer';var go=function(){compareDialog(c.dataset.alb,function(){if(tab==='plan')renderPlan();});};c.onclick=go;c.onkeydown=function(e){if(e.key==='Enter')go();};});
   if($('om'))$('om').onclick=function(){orderMode=!orderMode;renderPlan();};
@@ -1557,7 +1600,7 @@ function renderCal(){
 }
 
 /* ===== Feedback ===== */
-var APP_VERSION='kk-v10';
+var APP_VERSION='kk-v11';
 var FB_TO=['steffen','kiefer'].join('.')+String.fromCharCode(64)+['gmail','com'].join('.');
 var fb={kind:'idee',stars:0,text:'',info:true};
 function fbBody(){
