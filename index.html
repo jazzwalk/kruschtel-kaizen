@@ -198,6 +198,21 @@ textarea{width:100%;min-height:120px;border-radius:14px;border:0;box-shadow:inse
 .mascot .spark{animation:spark 1.6s ease-in-out infinite}
 @keyframes spark{50%{opacity:.2}}
 .center{text-align:center}
+.strip .pm .mbb{position:relative;display:grid;place-items:center}
+.strip .pm .mbb svg{width:21px;height:21px}
+.mbb i{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:9px;background:var(--saffron);color:#3a2a26;font:700 11px/18px var(--sans);font-style:normal;padding:0 4px;text-align:center}
+.furt.mbx{background:var(--teal);color:#faf3ea}
+.furt.mbx .btn{background:#faf3ea;color:#2f6f6a}
+.mbk{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.mbl li{grid-template-columns:8px 1fr auto}
+.runner{position:absolute;bottom:3%;left:-70px;width:clamp(56px,17vw,72px);pointer-events:none;z-index:3;animation:run 1.25s cubic-bezier(.4,.1,.6,.9) forwards}
+.runner.back{transform:scaleX(-1);animation-name:runback}
+.runner .rb{position:relative;animation:rbob .2s ease-in-out infinite alternate}
+.runner svg{display:block;width:100%!important;height:auto!important;overflow:visible}
+.runner .rbox{position:absolute;left:28%;top:-12%;width:44%}
+@keyframes run{from{left:-70px}to{left:calc(100% + 10px)}}
+@keyframes runback{from{left:calc(100% + 10px)}to{left:-70px}}
+@keyframes rbob{to{transform:translateY(-5px) rotate(-4deg)}}
 .fit{display:inline-block;margin-left:8px;font-family:var(--sans);font-style:normal;font-size:12px;font-weight:600;color:#3a2a26;background:var(--saffron);border-radius:999px;padding:1px 9px;vertical-align:3px;line-height:1.6}
 .nuts{display:flex;gap:6px}
 .nuts button{width:44px;height:44px;border-radius:50%;border:0;background:var(--paper);box-shadow:inset 0 0 0 1px var(--hair);display:grid;place-items:center;cursor:pointer;padding:0}
@@ -862,6 +877,15 @@ function buddyLine(w){var d=w.tasks.filter(function(t){return t.done;}).length,n
 function buddyMood(w){var d=w.tasks.filter(function(t){return t.done;}).length;return d===w.tasks.length?'proud':d>0?'happy':'';}
 function buddyHTML(line,mood,big){return '<div class="buddy'+(big?' big':'')+'"><button id="deerbtn" aria-label="Kurumi antippen">'+happs(tines(),mood)+'</button><p class="bubble" id="say" aria-live="polite">'+line+'</p></div>';}
 function hop(){var d=document.querySelector('#deerbtn .mascot');if(!d)return;d.classList.remove('hop');void d.getBoundingClientRect();d.classList.add('hop');}
+/* +1: Kurumi trägt eine Kiste aus dem Bild, bei −1 bringt sie sie zurück */
+var BOXSVG='<svg viewBox="0 0 24 20"><rect x="1" y="3" width="22" height="16" rx="2" fill="#c49a64"/><path d="M12 3v6" stroke="#3a2a26" stroke-opacity=".3" stroke-width="2.5"/><path d="M2 7h20" stroke="#3a2a26" stroke-opacity=".15"/></svg>';
+function carry(dir){
+  var sc=$('scene');if(!sc||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;
+  if(sc.querySelectorAll('.runner').length>=3)return;
+  var r=document.createElement('div');r.className='runner'+(dir<0?' back':'');r.setAttribute('aria-hidden','true');
+  r.innerHTML='<div class="rb">'+happs(5,'happy').replace(/<g class="spark">[\s\S]*?<\/g>/,'')+'<div class="rbox">'+BOXSVG+'</div></div>';
+  sc.appendChild(r);setTimeout(function(){r.remove();},1400);
+}
 function say(line,mood){var s=$('say');if(s)s.textContent=line;var b=$('deerbtn');if(b&&mood!==undefined){b.innerHTML=happs(tines(),mood);}hop();}
 
 /* Dunkelmodus */
@@ -941,7 +965,7 @@ function renderWeek(){
     $('app').innerHTML=h;bindHow(m);$('resume').onclick=function(){S.paused=null;save();renderWeek();};$('deerbtn').onclick=function(){say(pick(LINES.pause));};return;
   }
   h+='<div id="todaybox" style="margin-top:14px"></div>';
-  h+='<section class="strip" aria-label="Zähler"><div class="sn"><b id="tw">'+(w.out||0)+'</b><span>weg '+U().inthis+'<br>insgesamt <span id="tt">'+num(totalOut(S))+'</span></span></div><div class="pm"><button id="togive" class="lst" aria-label="Auf die Abgabe-Liste"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11M4 12h11M4 17h7M18 14v6M15 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button><button id="minus" aria-label="Eins weniger">−</button><button class="plus" id="plus" aria-label="Eins mehr">+1</button></div></section>';
+  h+='<section class="strip" aria-label="Zähler"><div class="sn"><b id="tw">'+(w.out||0)+'</b><span>weg '+U().inthis+'<br>insgesamt <span id="tt">'+num(totalOut(S))+'</span></span></div><div class="pm"><button id="mbox" class="lst mbb" aria-label="Vielleicht-Kiste'+(mb().items.length?', '+mb().items.length+' drin':'')+'">'+MBOX+(mb().items.length?'<i>'+mb().items.length+'</i>':'')+'</button><button id="togive" class="lst" aria-label="Auf die Abgabe-Liste"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11M4 12h11M4 17h7M18 14v6M15 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button><button id="minus" aria-label="Eins weniger">−</button><button class="plus" id="plus" aria-label="Eins mehr">+1</button></div></section>';
   h+='<div class="accs"><div id="spotbox"></div><div id="photobox"></div><div id="tipbox"></div>';
   h+='<details class="acc" id="all"><summary>Alle Aufgaben <span class="soft" id="cnt"></span></summary><div class="accb"><ul class="tasks">';
   w.tasks.forEach(function(t,k){h+='<li'+(t.own?' class="own"':'')+'><button class="task" data-t="'+k+'" aria-pressed="'+t.done+'"><span class="c">'+TICK+'</span><span class="t">'+esc(t.t)+(t.own?'<span class="ownb">eigene</span>':'')+'</span>'+(t.n?'<span class="n">+'+t.n+'</span>':'<span></span>')+'</button>'+(t.own?'<button class="tdel" data-del="'+k+'" aria-label="Eigene Aufgabe löschen">✕</button>':'')+'</li>';});
@@ -962,14 +986,15 @@ function renderWeek(){
   var toggle=function(k){var t=toggleTask(S,k);save();if(t.done)FX.tick();else FX.untick();refresh(!!t.n);if(t.n)checkFriends();if(t.done)say(buddyLine(w),buddyMood(w));};
   WK={toggle:toggle};
   $('app').querySelectorAll('[data-t]').forEach(function(b){b.onclick=function(){toggle(+b.dataset.t);};});
-  $('plus').onclick=function(){FX.plus();addOut(S,1);save();refresh(true);say(pick(LINES.plus),'happy');checkFriends();};
+  $('plus').onclick=function(){FX.plus();addOut(S,1);save();refresh(true);carry(1);say(pick(LINES.plus),'happy');checkFriends();};
   if(openAll)$('all').open=true;
   $('all').ontoggle=function(){openAll=$('all').open;};
   var addOwn=function(){var v=$('nt').value;if(addTask(S,v,$('ntrem').checked)){save();openAll=true;var y=window.scrollY;renderWeek();window.scrollTo(0,y);toast('Aufgabe hinzugefügt');var f=$('nt');if(f)f.focus();}else if(v.trim())toast('Diese Aufgabe gibt es schon.');};
   $('ntadd').onclick=addOwn;$('nt').onkeydown=function(e){if(e.key==='Enter')addOwn();};
   $('app').querySelectorAll('[data-del]').forEach(function(b){b.onclick=function(){if(removeTask(S,+b.dataset.del)){save();var y=window.scrollY;renderWeek();window.scrollTo(0,y);toast('Aufgabe gelöscht');}};});
-  $('minus').onclick=function(){addOut(S,-1);save();refresh(false);};
+  $('minus').onclick=function(){var b=w.out||0;addOut(S,-1);save();refresh(false);if(w.out<b)carry(-1);};
   $('togive').onclick=function(){addGiveDialog();};
+  $('mbox').onclick=function(){maybeDialog();};
   $('pause').onclick=function(){S.paused=new Date().toISOString();save();window.scrollTo(0,0);renderWeek();};
   refresh(false);tipBox(0);spotBox();photoBox();
   $('app').querySelectorAll('[data-vis]').forEach(function(b){b.onclick=function(){friendDialog(FRIENDS.filter(function(x){return x.id===b.dataset.vis;})[0],false);};});
@@ -1079,13 +1104,52 @@ function todayBox(){
   }
   var openG=S.give.filter(function(g){return !g.done;});
   if(furtToday(S)&&openG.length)h='<section class="furt"><h4>Heute ist Furt-Tag!</h4><p>'+openG.length+(openG.length===1?' Ding wartet':' Dinge warten')+' auf die Abgabe: '+openG.slice(0,3).map(function(g){return esc(g.t);}).join(', ')+(openG.length>3?' …':'')+'</p><button class="btn" id="gofurt">Zur Abgabe-Liste</button></section>'+h;
+  if(mbDue())h='<section class="furt mbx"><h4>Die Vielleicht-Kiste ist '+mbAge()+' Tage zu</h4><p>'+mb().items.length+(mb().items.length===1?' Ding wartet':' Dinge warten')+' auf deine Entscheidung. Hast du etwas davon vermisst?</p><button class="btn" id="gomb">Kiste aufmachen</button></section>'+h;
   box.innerHTML=h;
+  if($('gomb'))$('gomb').onclick=function(){mbResolve();};
   if($('gofurt'))$('gofurt').onclick=function(){tab='abgabe';window.scrollTo(0,0);render();};
   $('deerbtn').onclick=function(){say(buddyLine(w),buddyMood(w));};
   if($('tdone'))$('tdone').onclick=function(){WK.toggle(t.task);};
   if($('tmore'))$('tmore').onclick=function(){WK.toggle(t.next);};
   if($('fin'))$('fin').onclick=finishWeek;
   if($('mini5'))$('mini5').onclick=function(){fiveMin();};
+}
+/* ===== Vielleicht-Kiste: unsichere Dinge 30 Tage wegpacken ===== */
+var MB_DAYS=30;
+var MBOX='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 9h17v11h-17z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M3.5 9l2-4h13l2 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10.2 13.2a1.9 1.9 0 1 1 2.6 1.8c-.6.3-.8.6-.8 1.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="18.2" r="1" fill="currentColor"/></svg>';
+function mb(){S.mb=S.mb||{since:null,items:[]};return S.mb;}
+function mbAge(){var m=mb();return m.since?Math.max(0,Math.floor((d0(kNow())-d0(m.since))/DAY)):0;}
+function mbDue(){return mb().items.length>0&&mbAge()>=MB_DAYS;}
+function mbDate(){var d=new Date(d0(mb().since).getTime()+MB_DAYS*DAY);return d.getDate()+'.'+(d.getMonth()+1)+'.';}
+function mbBack(){if(tab==='woche'&&S&&!S.finished){var y=window.scrollY;renderWeek();window.scrollTo(0,y);}}
+function maybeDialog(){
+  var m=mb();
+  var draw=function(){
+    var h='<div class="center" style="width:84px;margin:0 auto">'+happs(tines(),'happy')+'</div><h3>Vielleicht-Kiste</h3><p class="soft small">Unsicher, ob es gehen darf? Pack es in eine Kiste und stell sie weg. Nach '+MB_DAYS+' Tagen frage ich dich, ob du etwas davon vermisst hast. Was nicht, darf gehen.</p>';
+    h+='<div class="sadd"><input type="text" id="mbn" maxlength="60" placeholder="z. B. Fondue-Set" aria-label="Was kommt in die Kiste?"><button class="btn" id="mbadd">Rein damit</button></div>';
+    if(m.items.length){var age=mbAge();
+      h+='<p class="soft small" style="margin-top:4px">'+(age?'Seit '+age+(age===1?' Tag':' Tagen')+' zu. ':'Heute gepackt. ')+(mbDue()?'Zeit für die Entscheidung!':'Ich frage am '+mbDate()+' nach.')+'</p><ul class="give mbl">'+m.items.map(function(it,i){return '<li><span></span><span class="tt">'+esc(it.t)+'</span><button class="del" data-mbx="'+i+'" aria-label="'+esc(it.t)+' wieder rausnehmen">✕</button></li>';}).join('')+'</ul><button class="btn line" id="mbopen">'+(mbDue()?'Kiste aufmachen':'Schon jetzt entscheiden')+'</button>';}
+    else h+='<p class="soft small">Die Kiste ist leer.</p>';
+    h+='<button class="btn text" data-close>Fertig</button>';
+    dialog(h,function(){
+      var add=function(){var v=$('mbn').value.trim().slice(0,60);if(!v){$('mbn').focus();return;}if(!m.items.length)m.since=new Date(kNow()).toISOString();m.items.push({t:v,at:new Date().toISOString()});save();FX.plus();draw();setTimeout(function(){var f=$('mbn');if(f)f.focus();},30);};
+      $('mbadd').onclick=add;$('mbn').onkeydown=function(e){if(e.key==='Enter')add();};
+      $('dlgbox').querySelectorAll('[data-mbx]').forEach(function(b){b.onclick=function(){m.items.splice(+b.dataset.mbx,1);if(!m.items.length)m.since=null;save();draw();};});
+      if($('mbopen'))$('mbopen').onclick=function(){mbResolve();};
+    },mbBack);
+  };
+  draw();
+}
+function mbResolve(){
+  var m=mb(),keep={};
+  var draw=function(){
+    var n=m.items.length-Object.keys(keep).length;
+    dialog('<div class="center" style="width:84px;margin:0 auto">'+happs(tines(),'happy')+'</div><h3 class="center">Hast du etwas davon vermisst?</h3><p class="soft small center">Tipp an, was du behalten willst. Der Rest kommt auf die Abgabe-Liste.</p><div class="mbk">'+m.items.map(function(it,i){return '<button class="chip" data-mk="'+i+'" aria-pressed="'+!!keep[i]+'">'+esc(it.t)+(keep[i]?' · bleibt':'')+'</button>';}).join('')+'</div><button class="btn" id="mbgo">'+(n?n+(n===1?' Ding':' Dinge')+' auf die Abgabe-Liste':'Alles behalten')+'</button><button class="btn text" data-close>Noch nicht</button>',function(){
+      $('dlgbox').querySelectorAll('[data-mk]').forEach(function(b){b.onclick=function(){var i=+b.dataset.mk;if(keep[i])delete keep[i];else keep[i]=1;draw();};});
+      $('mbgo').onclick=function(){var room=S.plan[S.week]?S.plan[S.week].room:'';m.items.forEach(function(it,i){if(!keep[i])S.give.unshift({id:Date.now()+i,t:it.t,cat:'so',how:'spenden',done:false,room:room,to:''});});m.items=[];m.since=null;save();onClose=null;closeDlg();if(n)FX.small();render();toast(n?'Furt demit! '+n+' auf der Abgabe-Liste':'Alles bleibt. Auch das ist eine Entscheidung.');};
+    },mbBack);
+  };
+  draw();
 }
 function fiveMin(){
   var stop=function(){if(miniTimer){clearInterval(miniTimer);miniTimer=null;}};
@@ -1475,7 +1539,7 @@ function renderCal(){
 }
 
 /* ===== Feedback ===== */
-var APP_VERSION='kk-v8';
+var APP_VERSION='kk-v9';
 var FB_TO=['steffen','kiefer'].join('.')+String.fromCharCode(64)+['gmail','com'].join('.');
 var fb={kind:'idee',stars:0,text:'',info:true};
 function fbBody(){
