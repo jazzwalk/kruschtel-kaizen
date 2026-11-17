@@ -802,8 +802,10 @@ function seasonTip(d,n){d=d||new Date();var m=d.getMonth(),a=SEASON[m];return {t
 function tipFor(s,n,now){var d=now||new Date(),k=Math.floor(d.getTime()/86400000)+(n||0);
   /* jeder 6. Tipp passt zur Jahreszeit, jeder 4. der übrigen zum Aufräumtyp, sonst die große Sammlung */
   if(k%6===0)return seasonTip(d,Math.floor(k/6));
-  var j=k-Math.floor(k/6)-1,m=function(a,i){return a[((i%a.length)+a.length)%a.length];};
-  if(s&&s.cb&&CB[s.cb]){if(j%4===0)return {text:m(CB[s.cb].tips,j/4),own:true};return {text:m(TIPS,j-Math.floor(j/4)-1),own:false};}return {text:m(TIPS,j),own:false};}
+  /* gemischte Reihenfolge pro Person und Runde, gezählt ab dem Starttag: jeder Tipp kommt einmal, dann wird neu gemischt */
+  var J=function(x){return x-Math.floor(x/6)-1;},k0=Math.floor(new Date((s&&s.started)||0).getTime()/86400000),j=J(k)-J(k0),sd=hash('tips|'+((s&&s.started)||'kk'));
+  var m=function(a,i,o){var n=a.length,c=Math.floor(i/n),r=rng(sd+(o||0)+c*7919),b=a.slice();for(var x=n-1;x>0;x--){var y=Math.floor(r()*(x+1)),t=b[x];b[x]=b[y];b[y]=t;}return b[((i%n)+n)%n];};
+  if(s&&s.cb&&CB[s.cb]){if(((j%4)+4)%4===0)return {text:m(CB[s.cb].tips,Math.floor(j/4),1),own:true};return {text:m(TIPS,j-Math.floor(j/4)-1),own:false};}return {text:m(TIPS,j),own:false};}
 var GIVE_CATS=[['kl','Kleidung & Schuhe'],['bm','Bücher & Medien'],['sp','Spielzeug'],['hm','Haushalt & Möbel'],['el','Elektro'],['so','Sonstiges']];
 var GIVE_HOW=[['spenden','Spenden'],['verschenken','Verschenken'],['verkaufen','Verkaufen']];
 var PORTALS=[
@@ -1809,7 +1811,7 @@ function renderCal(){
 }
 
 /* ===== Feedback ===== */
-var APP_VERSION='kk-v17';
+var APP_VERSION='kk-v18';
 var FB_TO=['steffen','kiefer'].join('.')+String.fromCharCode(64)+['gmail','com'].join('.');
 var fb={kind:'idee',stars:0,text:'',info:true};
 function fbBody(){
