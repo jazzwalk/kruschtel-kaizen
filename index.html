@@ -198,6 +198,14 @@ textarea{width:100%;min-height:120px;border-radius:14px;border:0;box-shadow:inse
 .mascot .spark{animation:spark 1.6s ease-in-out infinite}
 @keyframes spark{50%{opacity:.2}}
 .center{text-align:center}
+.tipc.tipday{margin-top:12px;border-left:4px solid var(--saffron);box-shadow:inset 0 0 0 1px var(--hair)}
+.tipc.tipday p{font-size:15.5px}
+.tipc.tipday{position:relative;padding-right:52px}
+.tnext{position:absolute;top:10px;right:10px;width:38px;height:38px;border-radius:50%;border:0;background:var(--paper);box-shadow:inset 0 0 0 1px var(--hair);color:var(--ink);display:grid;place-items:center;cursor:pointer;padding:0}
+.tnext svg{width:18px;height:18px}
+.tnext:active svg{transform:translateX(3px)}
+.tipc.tipday .acts{column-gap:14px}
+.tipc.tipday .acts button{font-size:13px;padding:5px 0}
 html[data-theme=dark] .bulb{filter:drop-shadow(0 0 2.5px #ffcf7a)}
 .stm{animation:stm 2.6s ease-in-out infinite}
 @keyframes stm{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:.9;transform:translateY(-1.5px)}}
@@ -1101,9 +1109,9 @@ function renderWeek(){
     h+='<div style="margin-top:14px">'+adventHTML()+'</div><section class="today light" style="margin-top:14px">'+buddyHTML(pick(LINES.pause),'sleepy')+'<p class="tt2">Pausiert seit '+fmtDate(S.paused)+'</p><p class="soft small">Der Plan wartet, deine Haken bleiben.</p><button class="btn" id="resume">Weitermachen</button></section>';
     $('app').innerHTML=h;bindHow(m);$('resume').onclick=function(){S.paused=null;save();renderWeek();};bindAdvent();$('deerbtn').onclick=function(){say(pick(LINES.pause));};return;
   }
-  h+='<div id="todaybox" style="margin-top:14px"></div>';
+  h+='<div id="todaybox" style="margin-top:14px"></div><div id="tipbox"></div>';
   h+='<section class="strip" aria-label="Zähler"><div class="sn"><b id="tw">'+(w.out||0)+'</b><span>weg '+U().inthis+'<br>insgesamt <span id="tt">'+num(totalOut(S))+'</span></span></div><div class="pm"><button id="mbox" class="lst mbb" aria-label="Vielleicht-Kiste'+(mb().items.length?', '+mb().items.length+' drin':'')+'">'+MBOX+(mb().items.length?'<i>'+mb().items.length+'</i>':'')+'</button><button id="togive" class="lst" aria-label="Auf die Abgabe-Liste"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11M4 12h11M4 17h7M18 14v6M15 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button><button id="minus" aria-label="Eins weniger">−</button><button class="plus" id="plus" aria-label="Eins mehr">+1</button></div></section>';
-  h+='<div class="accs"><div id="spotbox"></div><div id="photobox"></div><div id="tipbox"></div><div id="wordbox"></div>';
+  h+='<div class="accs"><div id="spotbox"></div><div id="photobox"></div><div id="wordbox"></div>';
   h+='<details class="acc" id="all"><summary>Alle Aufgaben <span class="soft" id="cnt"></span></summary><div class="accb"><ul class="tasks">';
   w.tasks.forEach(function(t,k){h+='<li'+(t.own?' class="own"':'')+'><button class="task" data-t="'+k+'" aria-pressed="'+t.done+'"><span class="c">'+TICK+'</span><span class="t">'+esc(t.t)+(t.own?'<span class="ownb">eigene</span>':'')+'</span>'+(t.n?'<span class="n">+'+t.n+'</span>':'<span></span>')+'</button>'+(t.own?'<button class="tdel" data-del="'+k+'" aria-label="Eigene Aufgabe löschen">✕</button>':'')+'</li>';});
   h+='</ul><div class="addt"><div class="row2"><input type="text" id="nt" maxlength="120" placeholder="Eigene Aufgabe, z. B. Kartons von Opa durchsehen" aria-label="Eigene Aufgabe"><button class="btn" id="ntadd">Hinzufügen</button></div><label><input type="checkbox" id="ntrem" checked> Auch beim nächsten Mal in diesem Raum</label></div><p class="gate">Der nächste Raum öffnet sich, sobald alle Aufgaben abgehakt sind.</p><button class="btn text" id="pause">'+U().one+' pausieren</button></div></details></div>';
@@ -1163,8 +1171,7 @@ var photoWeek=null,WK=null,tipN=0,openSpots=false,openTip=false,openAll=false,mi
 var ACORN='<svg viewBox="0 0 30 30" aria-hidden="true"><ellipse cx="15" cy="18" rx="8" ry="9" fill="#e0a43a"/><path d="M6 13q9-8 18 0v-2.5q-9-7-18 0z" fill="#9a6a4e"/><path d="M15 4v3.5" stroke="#9a6a4e" stroke-width="2" stroke-linecap="round"/></svg>';
 function tipBox(step){
   tipN+=step;var t=tipFor(S,tipN),b=$('tipbox');if(!b)return;var cb=S.cb&&CB[S.cb];
-  b.innerHTML='<details class="acc tipacc" id="tipacc"'+(openTip?' open':'')+'><summary>'+ACORN+'<span class="tprev">'+esc(t.text)+'</span></summary><div class="accb"><p class="soft small">Kurumis Tipp'+(t.own?' für '+cb.name:t.season?' für den '+t.season:'')+'</p><p>'+esc(t.text)+'</p><div class="acts"><button id="tipnext">Noch ein Tipp</button>'+(cb?'':'<button id="tipquiz">Welcher Aufräumtyp bin ich?</button>')+(S.mq?'':'<button id="tipmq">Welche Methode passt zu mir?</button>')+'</div></div></details>';
-  $('tipacc').ontoggle=function(){openTip=$('tipacc').open;};
+  b.innerHTML='<section class="tipc tipday" aria-live="polite"><button class="tnext" id="tipnext" aria-label="Nächster Tipp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'+ACORN+'<div><h4>Kurumis Tipp<span>'+(t.own?'für '+cb.name:t.season?'für den '+t.season:'')+'</span></h4><p>'+esc(t.text)+'</p><div class="acts">'+(cb?'':'<button id="tipquiz">Welcher Aufräumtyp bin ich?</button>')+(S.mq?'':'<button id="tipmq">Welche Methode passt zu mir?</button>')+'</div></div></section>';
   $('tipnext').onclick=function(){openTip=true;tipBox(1);};
   if($('tipquiz'))$('tipquiz').onclick=function(){quiz();};
   if($('tipmq'))$('tipmq').onclick=function(){methodQuiz('more');};
@@ -1769,7 +1776,7 @@ function renderCal(){
 }
 
 /* ===== Feedback ===== */
-var APP_VERSION='kk-v15';
+var APP_VERSION='kk-v16';
 var FB_TO=['steffen','kiefer'].join('.')+String.fromCharCode(64)+['gmail','com'].join('.');
 var fb={kind:'idee',stars:0,text:'',info:true};
 function fbBody(){
