@@ -749,7 +749,39 @@ var TIPS=['Erst ausmisten, dann Aufbewahrung kaufen. Sonst sortierst du Kruschte
   'Stacey Solomon sagt: Was du für schlechte Zeiten aufhebst, zieht dich heute runter. Behalte fürs Jetzt.',
   'Gib jedem Raum zuerst ein Ziel: Wofür willst du ihn nutzen? Was nicht dazu passt, zieht um oder aus.',
   'Nimm dir genug Zeit, um einen Bereich ganz fertig zu machen. Ein halb ausgeräumter Schrank ist schlimmer als ein voller.',
-  'Vier Stapel wie im Sort-Your-Life-Out-Lagerhaus: Behalten, Spenden, Verkaufen, Recyceln. Dazwischen gibt es nichts.'];
+  'Vier Stapel wie im Sort-Your-Life-Out-Lagerhaus: Behalten, Spenden, Verkaufen, Recyceln. Dazwischen gibt es nichts.',
+  'Marie Kondo räumt nach Kategorien auf, nicht nach Räumen: erst Kleidung, dann Bücher, Papiere, Kleinkram und ganz zum Schluss Erinnerungsstücke.',
+  'Dana K. White sieht Regale und Schubladen als Behälter: Was nicht reinpasst, ist zu viel. Das Regal setzt die Grenze, nicht du.',
+  'Die Ein-Minuten-Regel von Gretchen Rubin: Was weniger als eine Minute dauert, machst du sofort. Jacke aufhängen, Brief wegwerfen, Tasse spülen.',
+  'Der Kleiderbügel-Trick: Häng alle Bügel verkehrt herum auf. Was du trägst, hängst du richtig zurück. Nach einem halben Jahr siehst du, was nie dran war.',
+  'Joshua Becker rät, mit dem leichtesten Bereich anzufangen, etwa dem Auto oder dem Bad. Der schnelle Erfolg gibt Schwung für den Rest.',
+  'Die Packing Party von The Minimalists: Pack alles in Kisten wie für einen Umzug und hol nur raus, was du wirklich brauchst. Nach drei Wochen weißt du, was zu viel ist.',
+  'Dana K. White fragt: Wo würde ich das zuerst suchen? Genau dort ist sein Platz. Nicht da, wo es am schönsten aussähe.',
+  'Project 333 von Courtney Carver: 33 Kleidungsstücke für drei Monate, Schuhe und Schmuck mitgezählt. Der Rest wird weggepackt. Probier es eine Saison lang aus.',
+  'Hideko Yamashita, die Erfinderin von Danshari, sagt: Frag nicht, ob ein Ding noch funktioniert, sondern ob es zu deinem Leben heute passt.',
+  'Bei Marie Kondo stellst du dir vorher vor, wie du in diesem Raum leben willst. Erst wenn das Bild klar ist, fängst du an.',
+  'Francine Jay sortiert in drei Gruppen: Müll, Schätze und Weitergeben. Für alles, was bleibt, braucht es einen guten Grund.',
+  'FlyLady fängt jeden Tag mit einer glänzenden Spüle an. Ein einziger ordentlicher Ort steckt den Rest der Wohnung an.',
+  'Fumio Sasaki fotografiert Dinge, an denen Erinnerungen hängen, und lässt sie dann gehen. Das Foto braucht keinen Platz im Schrank.',
+  'Dana K. White fängt immer mit dem Offensichtlichen an: zuerst den Müll, dann alles, was eindeutig woanders hingehört. Erst danach kommen die schweren Entscheidungen.',
+  'Margareta Magnusson, die Döstädning bekannt gemacht hat, hält eine kleine Kiste nur für sich: Private Dinge, die nur dir etwas bedeuten und später weg dürfen.',
+  'Bei Marie Kondo werden Kleider stehend gefaltet, wie kleine Päckchen. So siehst du in der Schublade alles auf einmal und nichts verschwindet nach unten.',
+  'Joshua Becker fragt: Besitze ich das, oder besitzt es mich? Alles, was du pflegen, putzen und verstauen musst, kostet Zeit.',
+  'The Minimalists nennen es Für-alle-Fälle-Kram. Fast nichts davon brauchst du wirklich, und wenn doch, findest du es meist schnell wieder.',
+  'Francine Jay: Jede Fläche frei. Tische, Arbeitsplatten und Fensterbänke sind zum Benutzen da, nicht zum Abstellen.',
+  'Peter Walsh fragt nicht nach den Dingen, sondern nach dem Leben: Wie willst du in diesem Raum leben? Was dabei stört, darf gehen.',
+  'Dana K. White: Ausmisten ist kein Projekt, sondern Alltag. Lieber jeden Tag ein wenig als einmal im Jahr alles.',
+  'Marie Kondo bedankt sich bei Dingen, bevor sie gehen. Das klingt komisch, macht das Loslassen aber wirklich leichter.',
+  'Francine Jay arbeitet mit Grenzen: ein Regalbrett für Bücher, eine Kiste für Deko. Ist es voll, geht etwas Altes, bevor etwas Neues kommt.',
+  'FlyLady sagt: Unordnung ist nicht in einem Tag entstanden und verschwindet auch nicht an einem Tag. Kleine Schritte reichen.',
+  'Gretchen Rubin: Äußere Ordnung bringt innere Ruhe. Schon eine aufgeräumte Schublade kann den Kopf freier machen.',
+  'Die Minimalists empfehlen, Geschenke loszulassen ohne schlechtes Gewissen: Das Geschenk war die Geste. Die ist längst angekommen.',
+  'Fumio Sasaki: Behalte nicht drei vom Gleichen. Ein gutes Messer, eine gute Tasche, ein guter Regenschirm reichen.',
+  'Dana K. White rät bei Papierbergen: Nur eine Frage pro Blatt. Muss ich damit etwas tun? Wenn nicht, weg damit.',
+  'Bei Marie Kondo kommen Erinnerungsstücke absichtlich zuletzt. Bis dahin hast du so viel geübt, dass auch diese Entscheidungen leichter fallen.',
+  'Joshua Becker: Weniger besitzen ist leichter als besser organisieren. Kein Aufbewahrungssystem schlägt einfach weniger Zeug.',
+  'Courtney Carver rät, eine Woche lang alles zu notieren, was du wirklich benutzt. Die Liste ist kürzer, als man denkt.',
+  'Francine Jay: Jeden Tag kurz zurückräumen. Fünf Minuten am Abend verhindern, dass es wieder so voll wird wie vorher.'];
 function cbType(store,sys){return store==='sichtbar'?(sys==='einfach'?'bf':'be'):(sys==='einfach'?'lb':'cr');}
 /* Jahreszeiten-Tipps: passend zum Monat */
 var MONTHS=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
@@ -768,9 +800,10 @@ var SEASON=[
  ['Weihnachtsdeko beim Aufhängen sortieren: Kaputtes und Ungeliebtes gleich aussortieren.','Geschenkpapier, Bänder und Tüten: nur so viel behalten, wie in eine Kiste passt.','Zwischen den Jahren: ein Raum, ein Nachmittag, und du startest leichter ins neue Jahr.']];
 function seasonTip(d,n){d=d||new Date();var m=d.getMonth(),a=SEASON[m];return {text:a[((n||0)%a.length+a.length)%a.length],season:MONTHS[m],own:false};}
 function tipFor(s,n,now){var d=now||new Date(),k=Math.floor(d.getTime()/86400000)+(n||0);
-  if(k%3===0)return seasonTip(d,Math.floor(k/3));
-  var j=k-Math.floor(k/3)-1;
-  if(s&&s.cb&&CB[s.cb]){var own=CB[s.cb].tips;if(j%2===0)return {text:own[(j/2)%own.length],own:true};return {text:TIPS[Math.floor(j/2)%TIPS.length],own:false};}return {text:TIPS[((j%TIPS.length)+TIPS.length)%TIPS.length],own:false};}
+  /* jeder 6. Tipp passt zur Jahreszeit, jeder 4. der übrigen zum Aufräumtyp, sonst die große Sammlung */
+  if(k%6===0)return seasonTip(d,Math.floor(k/6));
+  var j=k-Math.floor(k/6)-1,m=function(a,i){return a[((i%a.length)+a.length)%a.length];};
+  if(s&&s.cb&&CB[s.cb]){if(j%4===0)return {text:m(CB[s.cb].tips,j/4),own:true};return {text:m(TIPS,j-Math.floor(j/4)-1),own:false};}return {text:m(TIPS,j),own:false};}
 var GIVE_CATS=[['kl','Kleidung & Schuhe'],['bm','Bücher & Medien'],['sp','Spielzeug'],['hm','Haushalt & Möbel'],['el','Elektro'],['so','Sonstiges']];
 var GIVE_HOW=[['spenden','Spenden'],['verschenken','Verschenken'],['verkaufen','Verkaufen']];
 var PORTALS=[
@@ -1776,7 +1809,7 @@ function renderCal(){
 }
 
 /* ===== Feedback ===== */
-var APP_VERSION='kk-v16';
+var APP_VERSION='kk-v17';
 var FB_TO=['steffen','kiefer'].join('.')+String.fromCharCode(64)+['gmail','com'].join('.');
 var fb={kind:'idee',stars:0,text:'',info:true};
 function fbBody(){
