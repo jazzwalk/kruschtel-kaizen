@@ -198,6 +198,17 @@ textarea{width:100%;min-height:120px;border-radius:14px;border:0;box-shadow:inse
 .mascot .spark{animation:spark 1.6s ease-in-out infinite}
 @keyframes spark{50%{opacity:.2}}
 .center{text-align:center}
+section.today .buddy{grid-template-columns:78px 1fr!important;gap:12px!important;align-items:center}
+.bzov{position:absolute;left:8px;bottom:2px;width:clamp(58px,18vw,78px);border:0;background:none;padding:0;cursor:pointer;z-index:2;transform-origin:50% 100%}
+.bzov svg,.bzbig svg,.bzdlg svg{width:100%!important;height:auto!important;display:block;overflow:visible}
+.bzov.grow{animation:bzgrow .7s cubic-bezier(.2,1.6,.4,1)}
+@keyframes bzgrow{35%{transform:scale(1.14) rotate(-2deg)}}
+.bzbig{display:block;width:160px;margin:6px auto 4px;border:0;background:none;padding:0;cursor:pointer}
+.bzdlg{width:210px;margin:0 auto}
+.bzst{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.bzst b{display:block;font-family:var(--serif);font-weight:400;font-size:30px;line-height:1}
+.bzst span{font-size:12px;color:var(--soft)}
+@media (prefers-reduced-motion:reduce){.bzov.grow{animation:none}}
 .task .c svg{width:25px;height:25px}
 .c svg path,.ck svg path{transition:stroke-dashoffset .5s cubic-bezier(.6,0,.3,1) .05s}
 .brushfx{position:fixed;left:50%;top:40%;width:140px;height:140px;margin:-70px 0 0 -70px;pointer-events:none;z-index:30;animation:bfx 1.15s ease forwards}
@@ -1007,7 +1018,7 @@ function renderSetup(){
   if($('go'))$('go').onclick=function(){
     var rooms=d.rooms.filter(function(r){return r.on;}).map(function(r){return {id:r.id,name:r.name,big:r.big,custom:!!r.custom};});
     var old=S;S=newState(rooms,d.methods.slice(),d.seed,d.pace);
-    if(old){S.cal=old.cal;S.theme=old.theme;S.give=old.give;S.round=old.round;S.outPrev=totalOut(old);}
+    if(old){S.cal=old.cal;S.theme=old.theme;S.give=old.give;S.round=old.round;S.outPrev=totalOut(old);if(old.bz)S.bz=old.bz;}
     if(d.mq)S.mq=d.mq;else if(old&&old.mq)S.mq=old.mq;draft=null;save();tab='woche';render();
   };
 }
@@ -1023,7 +1034,7 @@ function renderWeek(){
   if(S.finished)return renderFinished();
   var i=S.week,w=S.plan[i],m=METHODS[w.method],f=frac(w);
   var h='<div class="head2"><div><span class="wk">'+U().one+' '+(i+1)+' von '+S.plan.length+(S.round>1?', Runde '+S.round:'')+'</span><h1 class="room">'+esc(w.room)+'</h1></div><button class="meth m-'+w.method+' mbtn" id="mhow" aria-label="So geht '+m.name+'">'+m.name+' <span aria-hidden="true">ⓘ</span></button></div>';
-  h+='<div class="scene" id="scene">'+scene(i,f)+visitorsHTML()+'</div>';
+  h+='<div class="scene" id="scene">'+scene(i,f)+visitorsHTML()+bonsaiOverlay()+'</div>';
   if(S.paused){
     h+='<div style="margin-top:14px">'+adventHTML()+'</div><section class="today light" style="margin-top:14px">'+buddyHTML(pick(LINES.pause),'sleepy')+'<p class="tt2">Pausiert seit '+fmtDate(S.paused)+'</p><p class="soft small">Der Plan wartet, deine Haken bleiben.</p><button class="btn" id="resume">Weitermachen</button></section>';
     $('app').innerHTML=h;bindHow(m);$('resume').onclick=function(){S.paused=null;save();renderWeek();};bindAdvent();$('deerbtn').onclick=function(){say(pick(LINES.pause));};return;
@@ -1047,7 +1058,7 @@ function renderWeek(){
     if(bump){$('tw').classList.remove('bump');void $('tw').offsetWidth;$('tw').classList.add('bump');}
     todayBox();
   };
-  var toggle=function(k){var t=toggleTask(S,k);save();if(t.done){FX.tick();brushFX();}else FX.untick();refresh(!!t.n);if(t.n)checkFriends();if(t.done)say(buddyLine(w),buddyMood(w));};
+  var toggle=function(k){var t=toggleTask(S,k);bzLeaf(t.done?1:-1);save();if(t.done)bzRefresh();else{var bb=$('bzbtn');if(bb)bb.innerHTML=bonsaiSVG();}if(t.done){FX.tick();brushFX();}else FX.untick();refresh(!!t.n);if(t.n)checkFriends();if(t.done)say(buddyLine(w),buddyMood(w));};
   WK={toggle:toggle};
   $('app').querySelectorAll('[data-t]').forEach(function(b){b.onclick=function(){toggle(+b.dataset.t);};});
   $('plus').onclick=function(){FX.plus();addOut(S,1);save();refresh(true);carry(1);say(pick(LINES.plus),'happy');checkFriends();};
@@ -1188,6 +1199,29 @@ function todayBox(){
 var BRUSH='<svg viewBox="0 0 24 24"><defs><filter id="bfxf" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="0.55" xChannelSelector="R" yChannelSelector="G"/></filter></defs><g filter="url(#bfxf)" fill="none" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--hanko)"><path pathLength="1" stroke-width="2.5" d="M4.6 12.4c1.7.9 3.2 2.5 4.4 4.5 2.7-4.8 5.6-8.3 9.6-11.3"/><path class="p2" pathLength="1" stroke-width=".7" stroke-opacity=".55" d="M10.2 16.1c2.3-3.8 4.8-6.7 7.9-9.2"/><path class="p3" pathLength="1" stroke-width=".9" stroke-opacity=".8" d="M18.5 5.7c.8-.6 1.6-1 2.4-1.3"/></g></svg>';
 function brushFX(){if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;var o=document.querySelector('.brushfx');if(o)o.remove();
   var d=document.createElement('div');d.className='brushfx';d.setAttribute('aria-hidden','true');d.innerHTML=BRUSH;document.body.appendChild(d);setTimeout(function(){d.remove();},1250);}
+/* ===== Kurumis Bonsai: Blatt pro Aufgabe, Ast pro Raum, Blütenkleid pro Runde. Er welkt nie. ===== */
+function bz(){if(!S.bz){var done=0,st=S.stamps||[];S.plan.forEach(function(w){w.tasks.forEach(function(t){if(t.done)done++;});});
+  var prev=st.filter(function(x){return !x.kaizen&&!x.advent&&x.round<S.round;}).length;
+  S.bz={l:done+prev*6+(S.minis||0),b:st.filter(function(x){return !x.kaizen&&!x.advent;}).length,f:st.filter(function(x){return x.kaizen;}).length};}return S.bz;}
+function bzLeaf(n){var z=bz();z.l=Math.max(0,z.l+n);}
+var BZ_BR=[[57,63,33,58],[64,74,89,69],[56,50,85,45],[60,41,35,33],[62,85,27,82],[60,32,83,24],[58,56,19,45],[63,67,98,56],[59,46,60,11]];
+function bonsaiSVG(z){z=z||bz();var r=rng(hash('kurumi-bonsai')),nb=Math.min(z.b,BZ_BR.length),pads=[[60,24]],tw=4.5+Math.min(4.5,z.b*.35);
+  var s='<svg viewBox="0 0 120 124" aria-hidden="true"><ellipse cx="60" cy="121" rx="38" ry="2.6" fill="#3a2a26" fill-opacity=".15"/>';
+  s+='<path d="M28 102h64l-5 16H33z" fill="#8f3b2c"/><rect x="25" y="97" width="70" height="6" rx="2" fill="#a8483a"/><path d="M36 118v3M84 118v3" stroke="#5e2a20" stroke-width="3" stroke-linecap="round"/><path d="M40 110h40" stroke="#c8483c" stroke-opacity=".35" stroke-width="1.2"/>';
+  s+='<ellipse cx="60" cy="98" rx="31" ry="2.4" fill="#5b4330"/>';
+  if(z.l>20)s+='<ellipse cx="'+(60-Math.min(10,z.l/40))+'" cy="97.4" rx="'+Math.min(26,8+z.l/15).toFixed(1)+'" ry="2.2" fill="#7c8f3e"/>';
+  for(var i=0;i<nb;i++){var B=BZ_BR[i];pads.push([B[2],B[3]]);s+='<path d="M'+B[0]+' '+B[1]+'Q'+((B[0]+B[2])/2)+' '+(B[1]-6)+' '+B[2]+' '+B[3]+'" stroke="#6b4a36" stroke-width="'+(tw*.45).toFixed(1)+'" fill="none" stroke-linecap="round"/>';}
+  s+='<path d="M60 98C46 86 74 72 58 58C48 48 64 38 60 24" stroke="#6b4a36" stroke-width="'+tw.toFixed(1)+'" fill="none" stroke-linecap="round"/>';
+  s+='<path d="M61 95C50 85 70 73 60 60" stroke="#8a6448" stroke-width="'+(tw*.3).toFixed(1)+'" fill="none" stroke-linecap="round" opacity=".6"/>';
+  var share=z.l/pads.length,rad=function(k){return z.l?3.5+Math.min(12,Math.sqrt(share+(k===0?2:0))*2):2.6;};
+  pads.forEach(function(p,k){var rr=rad(k);[[0,0,1,'#5f7a3c'],[-.55,.25,.75,'#55703a'],[.55,.25,.75,'#5f7a3c'],[0,-.35,.68,'#8a9a45']].forEach(function(o){s+='<ellipse cx="'+(p[0]+o[0]*rr).toFixed(1)+'" cy="'+(p[1]+o[1]*rr).toFixed(1)+'" rx="'+(rr*o[2]).toFixed(1)+'" ry="'+(rr*o[2]*.62).toFixed(1)+'" fill="'+o[3]+'"/>';});});
+  var nbl=Math.min(60,z.f*12);for(var q=0;q<nbl;q++){var k2=Math.floor(r()*pads.length),pp=pads[k2],rr2=rad(k2);s+='<circle cx="'+(pp[0]+(r()-.5)*rr2*1.5).toFixed(1)+'" cy="'+(pp[1]+(r()-.65)*rr2*.9).toFixed(1)+'" r="1.4" fill="#f2b8c6"/>';}
+  return s+'</svg>';}
+function bonsaiOverlay(){return '<button class="bzov" data-bz="1" id="bzbtn" aria-label="Kurumis Bonsai ansehen">'+bonsaiSVG()+'</button>';}
+function bzRefresh(){var b=$('bzbtn');if(!b)return;b.innerHTML=bonsaiSVG();b.classList.remove('grow');void b.offsetWidth;b.classList.add('grow');}
+function bonsaiBookHTML(){var z=bz();return '<section class="hbook"><div class="hhead"><h3>Kurumis Bonsai</h3><span class="soft small">'+z.l+(z.l===1?' Blatt, ':' Blätter, ')+z.b+(z.b===1?' Ast':' Äste')+'</span></div><button class="bzbig" data-bz="1" aria-label="Bonsai ansehen">'+bonsaiSVG()+'</button></section>';}
+function bonsaiDialog(){var z=bz(),w=S.plan[S.week];
+  dialog('<div class="bzdlg">'+bonsaiSVG()+'</div><h3 class="center">Kurumis Bonsai</h3><p class="soft center small">Ein Bonsai wächst langsam, wie Kaizen. Er welkt nie, auch nicht in Pausen.</p><div class="bzst"><div><b>'+z.l+'</b><span>'+(z.l===1?'Blatt':'Blätter')+'</span></div><div><b>'+z.b+'</b><span>'+(z.b===1?'Ast':'Äste')+'</span></div><div><b>'+z.f+'</b><span>'+(z.f===1?'Blütenkleid':'Blütenkleider')+'</span></div></div><p class="small">Jede erledigte Aufgabe bringt ein Blatt, jeder fertige Raum einen Ast und jede ganze Runde ein Blütenkleid.'+(!S.finished&&w?' Der nächste Ast wächst, wenn '+esc(w.room)+' fertig ist.':'')+'</p><button class="btn" data-close>Schön</button>');}
 /* ===== Wort der Woche: japanische Begriffe rund ums Ausmisten, jeden Montag ein neues ===== */
 var WORDS=[
  ['断捨離','Danshari','Ablehnen, wegwerfen, loslösen','Die japanische Ausmist-Idee in drei Schritten: Neues gar nicht erst reinlassen, Überflüssiges rauswerfen, innerlich loslassen.','Was gar nit neikummt, muss au nit naus.'],
@@ -1228,7 +1262,7 @@ function doorDialog(d,back){var a=adv(),ok=a.done[d]!=null;
   dialog('<div class="doorbig">'+d+'</div><p class="soft small center" style="margin-top:10px">Türchen '+d+(d===advToday()?', heute':'')+'</p><p class="mtask">'+esc(ADV[d-1])+'</p>'+(ok?'<p class="center soft">Geschafft'+(a.done[d]?', '+a.done[d]+(a.done[d]===1?' Ding':' Dinge')+' furt':'')+'.</p><button class="btn" data-close>Fertig</button>':'<button class="btn" id="dok">Erledigt</button><button class="btn text" data-close>Später</button>'),function(){
     if($('dok'))$('dok').onclick=function(){
       dialog('<div class="center" style="width:96px;margin:0 auto">'+happs(tines(),'proud')+'</div><h3 class="center">Türchen '+d+' geschafft!</h3><p class="soft center">Wie viele Dinge sind dabei rausgeflogen?</p><div class="qty"><button data-q="0">Keins</button><button data-q="1">+1</button><button data-q="3">+3</button><button data-q="5">+5</button></div>',function(){hop2();
-        $('dlgbox').querySelectorAll('[data-q]').forEach(function(b){b.onclick=function(){var q=+b.dataset.q;a.done[d]=q;if(q)addOut(S,q);FX.small();save();var st=advStamp();onClose=null;closeDlg();if(back)back();toast(st?'Neuer Stempel: 冬 heißt Winter':q?'Furt demit! +'+q:'Türchen '+d+' geschafft');};});},back);};
+        $('dlgbox').querySelectorAll('[data-q]').forEach(function(b){b.onclick=function(){var q=+b.dataset.q;a.done[d]=q;bzLeaf(1);if(q)addOut(S,q);FX.small();save();var st=advStamp();onClose=null;closeDlg();if(back)back();toast(st?'Neuer Stempel: 冬 heißt Winter':q?'Furt demit! +'+q:'Türchen '+d+' geschafft');};});},back);};
   },back);}
 function adventBookHTML(){var d=kNow();if(d.getMonth()!==11)return '';var a=adv(),t=d.getDate();
   var h='<section class="hbook"><div class="hhead"><h3>Adventskalender</h3><span class="soft small">'+advCount()+' von 24</span></div><div class="doors">';
@@ -1292,7 +1326,7 @@ function fiveMin(){
     },function(){stop();});};
   var done=function(){
     dialog('<div class="center" style="width:96px;margin:0 auto">'+happs(tines(),'proud')+'</div><h3 class="center">Kaizen! Kleine Schritte zählen.</h3><p class="soft center">Wie viele Dinge sind dabei rausgeflogen?</p><div class="qty"><button data-q="0">Keins</button><button data-q="1">+1</button><button data-q="3">+3</button><button data-q="5">+5</button></div>',function(){hop2();
-      $('dlgbox').querySelectorAll('[data-q]').forEach(function(b){b.onclick=function(){var q=+b.dataset.q;S.minis=(S.minis||0)+1;FX.small();if(q)addOut(S,q);save();closeDlg();if(tab==='woche')renderWeek();toast(q?'Furt demit! +'+q:'Auch Sortieren zählt.');};});});
+      $('dlgbox').querySelectorAll('[data-q]').forEach(function(b){b.onclick=function(){var q=+b.dataset.q;S.minis=(S.minis||0)+1;bzLeaf(1);FX.small();if(q)addOut(S,q);save();closeDlg();if(tab==='woche')renderWeek();toast(q?'Furt demit! +'+q:'Auch Sortieren zählt.');};});});
   };
   show();
 }
@@ -1478,10 +1512,10 @@ function confetti(n){
   document.body.appendChild(box);setTimeout(function(){box.remove();},3400);
 }
 function finishWeek(){
-    var w=S.plan[S.week],room=w.room,out=w.out,pa=w.fid?albumOf(S,w.fid):null,r=advance(S);save();
+    var w=S.plan[S.week],room=w.room,out=w.out,pa=w.fid?albumOf(S,w.fid):null,r=advance(S);bz().b++;if(r==='finish')bz().f++;save();
     var grew=tines()>Math.min(5,1+Math.floor((weeksDone()-1)/3)+(S.round-1));
     var lst=S.stamps[S.stamps.length-1];if(lst&&lst.kaizen)lst=S.stamps[S.stamps.length-2];
-    dialog('<div class="fhead"><div style="width:120px">'+happs(tines(),'proud')+'</div>'+(lst?'<div class="hnew">'+hankoSVG(lst,'fin')+'</div>':'')+'</div><h2>'+esc(room)+' hat wieder Luft.</h2>'+(lst?'<p class="soft small" style="margin-top:6px">Neuer Stempel: '+HANKO[lst.method][0]+' heißt '+HANKO[lst.method][1]+'.</p>':'')+(grew?'<p><b>Vorrat aufgeräumt!</b> Kurumis Kruschtel-Stapel ist eine Kiste kleiner.</p>':'')+'<p class="soft">'+(out?out+(out===1?' Ding hat':' Dinge haben')+' das Haus verlassen. ':'')+(r==='next'?'Als Nächstes: '+esc(S.plan[S.week].room)+' mit '+METHODS[S.plan[S.week].method].name+'.':'Das war der letzte Raum.')+'</p><button class="btn" data-close>'+(r==='next'?U().one+' '+(S.week+1)+' öffnen':'Weiter')+'</button>'+(pa&&pa.v&&!pa.n?'<button class="btn line" id="nph">Jetzt Nachher-Foto machen</button>':'')+'<button class="btn line" id="shr">Als Bild teilen</button>',function(){hop2();FX.done();var idx=S.finished?S.plan.length-1:S.week-1;$('shr').onclick=function(){shareCard(idx);};if($('nph'))$('nph').onclick=function(){pickPhoto(idx,'n',function(fid){compareDialog(fid);});};},function(){render();window.scrollTo(0,0);});
+    dialog('<div class="fhead"><div style="width:120px">'+happs(tines(),'proud')+'</div>'+(lst?'<div class="hnew">'+hankoSVG(lst,'fin')+'</div>':'')+'</div><h2>'+esc(room)+' hat wieder Luft.</h2>'+(lst?'<p class="soft small" style="margin-top:6px">Neuer Stempel: '+HANKO[lst.method][0]+' heißt '+HANKO[lst.method][1]+'.</p>':'')+(grew?'<p><b>Vorrat aufgeräumt!</b> Kurumis Kruschtel-Stapel ist eine Kiste kleiner.</p>':'')+'<p><b>Neuer Ast!</b> Kurumis Bonsai ist gewachsen'+(r==='finish'?' und trägt jetzt ein Blütenkleid.':'.')+'</p>'+'<p class="soft">'+(out?out+(out===1?' Ding hat':' Dinge haben')+' das Haus verlassen. ':'')+(r==='next'?'Als Nächstes: '+esc(S.plan[S.week].room)+' mit '+METHODS[S.plan[S.week].method].name+'.':'Das war der letzte Raum.')+'</p><button class="btn" data-close>'+(r==='next'?U().one+' '+(S.week+1)+' öffnen':'Weiter')+'</button>'+(pa&&pa.v&&!pa.n?'<button class="btn line" id="nph">Jetzt Nachher-Foto machen</button>':'')+'<button class="btn line" id="shr">Als Bild teilen</button>',function(){hop2();FX.done();var idx=S.finished?S.plan.length-1:S.week-1;$('shr').onclick=function(){shareCard(idx);};if($('nph'))$('nph').onclick=function(){pickPhoto(idx,'n',function(fid){compareDialog(fid);});};},function(){render();window.scrollTo(0,0);});
 }
 /* Abschlusskarte als Bild: Stillleben, Kurumi, Zahlen */
 var CARD_VARS={'var(--wall)':'#f6ebdd','var(--sky1)':'#f9d9a8','var(--sky2)':'#fbefe0','var(--light)':'#f6c66b','var(--paper2)':'#e8d6c2','currentColor':'#3a2a26'};
@@ -1544,7 +1578,7 @@ function renderPlan(){
       var pa=w.fid?albumOf(S,w.fid):null;
       h+='<div class="cell '+st+'"'+(st==='done'&&pa?' data-alb="'+w.fid+'" role="button" tabindex="0" aria-label="'+esc(w.room)+': Vorher/Nachher ansehen"':st==='done'?' data-share="'+i+'" role="button" tabindex="0" aria-label="'+esc(w.room)+' als Bild teilen"':' data-spots="'+i+'" role="button" tabindex="0" aria-label="Kruschtel-Ecken für '+esc(w.room)+'"')+'>'+stillLife(seed(i),f,{label:w.room,room:rid(w),dim:st==='lock',uid:'g'+i}).svg+'<b>'+esc(w.room)+'</b><span>'+(pa?'<span class="cam">'+CAM+'</span>':'')+(st==='done'?(pa?'':'<span class="shr">Teilen</span> ')+'Erledigt'+(w.out?', '+w.out+' Dinge weg':''):st==='now'?(S.paused?'Pausiert':U().dies):U().one+' '+(i+1))+', '+METHODS[w.method].name+'</span></div>';
     });
-    h+='</div>'+adventBookHTML()+stampBookHTML()+albumHTML();
+    h+='</div>'+bonsaiBookHTML()+adventBookHTML()+stampBookHTML()+albumHTML();
   }
   $('app').innerHTML=h;fillPhotos($('app'));
   $('app').querySelectorAll('[data-door]').forEach(function(c){c.onclick=function(){doorDialog(+c.dataset.door,function(){if(tab==='plan'){var y=window.scrollY;renderPlan();window.scrollTo(0,y);}});};});
@@ -1673,7 +1707,7 @@ function renderCal(){
 }
 
 /* ===== Feedback ===== */
-var APP_VERSION='kk-v13';
+var APP_VERSION='kk-v14';
 var FB_TO=['steffen','kiefer'].join('.')+String.fromCharCode(64)+['gmail','com'].join('.');
 var fb={kind:'idee',stars:0,text:'',info:true};
 function fbBody(){
@@ -1763,6 +1797,7 @@ function render(){
   document.querySelectorAll('.tabs button').forEach(function(b){b.classList.toggle('on',b.dataset.tab===(tab==='feedback'?'mehr':tab));});
   if(tab==='plan')renderPlan();else if(tab==='kalender')renderCal();else if(tab==='abgabe')renderGive();else if(tab==='mehr')renderMore();else if(tab==='feedback')renderFeedback();else renderWeek();
 }
+document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('[data-bz]');if(t&&S)bonsaiDialog();});
 S=load();render();
 })();
 </script>
