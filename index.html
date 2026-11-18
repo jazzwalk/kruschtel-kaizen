@@ -198,6 +198,13 @@ textarea{width:100%;min-height:120px;border-radius:14px;border:0;box-shadow:inse
 .mascot .spark{animation:spark 1.6s ease-in-out infinite}
 @keyframes spark{50%{opacity:.2}}
 .center{text-align:center}
+.mrow{display:flex;gap:6px;align-items:center;flex:none;margin-bottom:6px}
+.mrow .mbtn{margin-bottom:0!important}
+.pen2{width:36px;height:36px;border-radius:50%;border:0;padding:0;background:var(--sheet);box-shadow:inset 0 0 0 1px var(--hair);color:var(--ink);display:grid;place-items:center;cursor:pointer;flex:none}
+.pen2 svg,.pen svg{width:18px;height:18px}
+.head2{flex-wrap:wrap;row-gap:6px}
+.cell .pi{font-style:normal;display:inline-block;width:12px;height:12px;vertical-align:-1px;margin-left:4px;color:var(--ink)}
+.cell .pi svg{width:100%;height:100%;display:block;box-shadow:none!important;border-radius:0!important}
 .tipc.tipday{margin-top:12px;border-left:4px solid var(--saffron);box-shadow:inset 0 0 0 1px var(--hair)}
 .tipc.tipday p{font-size:15.5px}
 .tipc.tipday{position:relative;padding-right:52px}
@@ -636,6 +643,12 @@ function planWeeks(rooms,methods,weeks,seed,pace){
 }
 /* Methoden mitten im Plan wechseln: Erledigtes bleibt, kommende Räume bekommen die neuen Methoden.
    Der aktuelle Raum wechselt nur, solange dort noch nichts abgehakt ist. Eigene Aufgaben bleiben. */
+/* Methode eines einzelnen Raums im Plan ändern: kommende Räume immer, der aktuelle nur solange nichts abgehakt ist */
+function canSetMethod(s,i){var w=s.plan[i];return !!w&&!s.finished&&(i>s.week||(i===s.week&&!w.tasks.some(function(t){return t.done;})));}
+function setWeekMethod(s,i,m){if(!canSetMethod(s,i)||!METHODS[m])return false;var w=s.plan[i];if(w.method===m)return false;
+  var key=w.ids.join(),pass=0;for(var q=0;q<i;q++)if(s.plan[q].ids.join()===key)pass++;
+  var rt=ROOMTASKS[w.ids[0]]||GENERIC_ROOM,own=w.tasks.filter(function(t){return t.own&&!t.spot;});
+  w.method=m;w.tasks=methodTasks(m,rt[pass%2],s.pace).concat(own);if(i===s.week)applyCustom(s,i);return true;}
 function remethod(s,methods,rnd){
   rnd=rnd||Math.random;s.methods=methods.slice();
   var cur=s.plan[s.week],from=s.finished?s.plan.length:(cur&&cur.tasks.some(function(t){return t.done;})?s.week+1:s.week);
@@ -1138,7 +1151,7 @@ function tallyHTML(w){
 function renderWeek(){
   if(S.finished)return renderFinished();
   var i=S.week,w=S.plan[i],m=METHODS[w.method],f=frac(w);
-  var h='<div class="head2"><div><span class="wk">'+U().one+' '+(i+1)+' von '+S.plan.length+(S.round>1?', Runde '+S.round:'')+'</span><h1 class="room">'+esc(w.room)+'</h1></div><button class="meth m-'+w.method+' mbtn" id="mhow" aria-label="So geht '+m.name+'">'+m.name+' <span aria-hidden="true">ⓘ</span></button></div>';
+  var h='<div class="head2"><div><span class="wk">'+U().one+' '+(i+1)+' von '+S.plan.length+(S.round>1?', Runde '+S.round:'')+'</span><h1 class="room">'+esc(w.room)+'</h1></div><span class="mrow"><button class="meth m-'+w.method+' mbtn" id="mhow" aria-label="So geht '+m.name+'">'+m.name+' <span aria-hidden="true">ⓘ</span></button>'+(canSetMethod(S,i)?'<button class="pen2" id="mpen" aria-label="Methode für diesen Raum ändern"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4.5 19.5l1-4.2L16 4.8a1.6 1.6 0 0 1 2.3 0l.9.9a1.6 1.6 0 0 1 0 2.3L8.7 18.5z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linejoin=\"round\"/><path d=\"M14 6.8l3.2 3.2\" stroke=\"currentColor\" stroke-width=\"1.8\"/></svg></button>':'')+'</span></div>';
   h+='<div class="scene" id="scene">'+scene(i,f)+visitorsHTML()+bonsaiOverlay()+'</div>';
   if(S.paused){
     h+='<div style="margin-top:14px">'+adventHTML()+'</div><section class="today light" style="margin-top:14px">'+buddyHTML(pick(LINES.pause),'sleepy')+'<p class="tt2">Pausiert seit '+fmtDate(S.paused)+'</p><p class="soft small">Der Plan wartet, deine Haken bleiben.</p><button class="btn" id="resume">Weitermachen</button></section>';
@@ -1163,7 +1176,7 @@ function renderWeek(){
     if(bump){$('tw').classList.remove('bump');void $('tw').offsetWidth;$('tw').classList.add('bump');}
     todayBox();
   };
-  var toggle=function(k){var t=toggleTask(S,k);bzLeaf(t.done?1:-1);save();if(t.done)bzRefresh();else{var bb=$('bzbtn');if(bb)bb.innerHTML=bonsaiSVG();}if(t.done){FX.tick();brushFX();}else FX.untick();refresh(!!t.n);if(t.n)checkFriends();if(t.done)say(buddyLine(w),buddyMood(w));};
+  var toggle=function(k){var t=toggleTask(S,k);var mp=$('mpen');if(mp)mp.hidden=!canSetMethod(S,S.week);bzLeaf(t.done?1:-1);save();if(t.done)bzRefresh();else{var bb=$('bzbtn');if(bb)bb.innerHTML=bonsaiSVG();}if(t.done){FX.tick();brushFX();}else FX.untick();refresh(!!t.n);if(t.n)checkFriends();if(t.done)say(buddyLine(w),buddyMood(w));};
   WK={toggle:toggle};
   $('app').querySelectorAll('[data-t]').forEach(function(b){b.onclick=function(){toggle(+b.dataset.t);};});
   $('plus').onclick=function(){FX.plus();addOut(S,1);save();refresh(true);carry(1);say(pick(LINES.plus),'happy');checkFriends();};
@@ -1193,13 +1206,15 @@ function spotBox(){
 function spotsDialog(i){
   var w=S.plan[i],key=w.ids.join();
   var draw=function(){var sp=(S.spots||{})[key]||[];
-    dialog('<h3>Kruschtel-Ecken: '+esc(w.room)+'</h3><p class="soft small">Welche Stellen in diesem Raum quellen über? Sie werden zu Aufgaben, sobald '+esc(w.room)+' dran ist.</p>'+
+    var can=canSetMethod(S,i),mh='<p class="soft small" style="margin:2px 0 6px">Methode für diesen Raum</p>'+(can?'<div class="seg" role="group" aria-label="Methode">'+METHOD_ORDER.map(function(k){return '<button data-wm="'+k+'" aria-pressed="'+(w.method===k)+'">'+METHODS[k].name+'</button>';}).join('')+'</div><p class="soft small" style="margin-top:6px">'+METHODS[w.method].short+'</p>':'<p class="small"><span class="meth m-'+w.method+'" style="margin:0">'+METHODS[w.method].name+'</span></p><p class="soft small">'+(i<S.week||S.finished?'Dieser Raum ist schon fertig.':'Hier ist schon etwas abgehakt, darum bleibt die Methode.')+'</p>');
+    dialog('<h3>'+esc(w.room)+'</h3>'+mh+'<h4 style="margin:14px 0 0;font-family:var(--serif);font-weight:400;font-size:18px">Kruschtel-Ecken</h4><p class="soft small">Welche Stellen in diesem Raum quellen über? Sie werden zu Aufgaben, sobald '+esc(w.room)+' dran ist.</p>'+
       (sp.length?'<div class="schips">'+sp.map(function(s,k){return '<span class="schip">'+esc(s)+'<button data-dx="'+k+'" aria-label="Ecke entfernen">✕</button></span>';}).join('')+'</div>':'')+
       '<div class="sadd"><input type="text" id="dsn" maxlength="60" placeholder="z. B. Kiste mit Kabeln" aria-label="Neue Kruschtel-Ecke"><button class="btn" id="dsadd">Dazu</button></div><button class="btn" data-close>Fertig</button>',function(){
       var add=function(){if(addSpot(S,key,$('dsn').value)){save();draw();setTimeout(function(){var f=$('dsn');if(f)f.focus();},30);}};
       $('dsadd').onclick=add;$('dsn').onkeydown=function(e){if(e.key==='Enter')add();};
       $('dlgbox').querySelectorAll('[data-dx]').forEach(function(x){x.onclick=function(){removeSpot(S,key,sp[+x.dataset.dx]);save();draw();};});
-    },function(){if(tab==='plan')renderPlan();});};
+      $('dlgbox').querySelectorAll('[data-wm]').forEach(function(x){x.onclick=function(){if(setWeekMethod(S,i,x.dataset.wm)){save();draw();toast(esc(w.room)+': '+METHODS[w.method].name);}};});
+    },function(){if(tab==='plan')renderPlan();else if(tab==='woche'){var y=window.scrollY;renderWeek();window.scrollTo(0,y);}});};
   draw();
 }
 var photoWeek=null,WK=null,tipN=0,openSpots=false,openTip=false,openAll=false,miniN=0,miniTimer=null;
@@ -1269,7 +1284,7 @@ function methodQuiz(ctx){
   };
   ask();
 }
-function bindHow(m){$('mhow').onclick=function(){dialog('<h3>So geht '+m.name+'</h3><p>'+m.text+'</p><p class="rule">'+m.rule+'</p><button class="btn" data-close>Alles klar</button>');};}
+function bindHow(m){if($('mpen'))$('mpen').onclick=function(){spotsDialog(S.week);};$('mhow').onclick=function(){var ch=canSetMethod(S,S.week);dialog('<h3>So geht '+m.name+'</h3><p>'+m.text+'</p><p class="rule">'+m.rule+'</p><button class="btn" data-close>Alles klar</button>'+(ch?'<button class="btn text" id="mchg">Andere Methode für diesen Raum</button>':''),function(){if($('mchg'))$('mchg').onclick=function(){spotsDialog(S.week);};});};}
 function dots(t){var s='<span class="dots" aria-label="Tag '+Math.min(t.day+1,t.days)+' von '+t.days+'">';for(var d=0;d<t.days;d++)s+='<i class="'+(d<t.day?'past':d===t.day?'cur':'')+'"></i>';if(t.late)s+='<em>+'+(t.day-t.days+1)+'</em>';return s+'</span>';}
 function todayBox(){
   var w=S.plan[S.week],t=today(S),box=$('todaybox'),h,d=w.tasks.filter(function(x){return x.done;}).length,n=w.tasks.length;if(!box)return;
@@ -1667,7 +1682,7 @@ function renderFinished(){
 
 /* ===== Plan ===== */
 function renderPlan(){
-  var h='<h2>Zwölf '+U().many+'</h2><p class="soft small" style="margin-top:6px">'+(S.round>1?'Runde '+S.round+'. ':'')+S.rooms.length+' Räume, '+S.methods.map(function(k){return METHODS[k].name;}).join(', ')+'. Tipp auf einen kommenden Raum, um seine Kruschtel-Ecken einzutragen.</p>'+(S.finished?'':'<button class="btn line sm" id="om" style="margin-top:14px">'+(orderMode?'Fertig':'Reihenfolge ändern')+'</button>');
+  var h='<h2>Zwölf '+U().many+'</h2><p class="soft small" style="margin-top:6px">'+(S.round>1?'Runde '+S.round+'. ':'')+S.rooms.length+' Räume, '+S.methods.map(function(k){return METHODS[k].name;}).join(', ')+'. Tipp auf einen kommenden Raum, um seine Methode oder Kruschtel-Ecken zu ändern.</p>'+(S.finished?'':'<button class="btn line sm" id="om" style="margin-top:14px">'+(orderMode?'Fertig':'Reihenfolge ändern')+'</button>');
   if(orderMode){
     h+='<p class="soft small" style="margin-top:14px">Kommende '+U().many+' lassen sich verschieben. Erledigte und die aktuelle bleiben fest.</p><ul class="order" style="margin-top:14px">';
     S.plan.forEach(function(w,i){
@@ -1680,7 +1695,7 @@ function renderPlan(){
     S.plan.forEach(function(w,i){
       var st=S.finished||i<S.week?'done':i===S.week?'now':'lock',f=st==='done'?1:st==='now'?frac(w):0;
       var pa=w.fid?albumOf(S,w.fid):null;
-      h+='<div class="cell '+st+'"'+(st==='done'&&pa?' data-alb="'+w.fid+'" role="button" tabindex="0" aria-label="'+esc(w.room)+': Vorher/Nachher ansehen"':st==='done'?' data-share="'+i+'" role="button" tabindex="0" aria-label="'+esc(w.room)+' als Bild teilen"':' data-spots="'+i+'" role="button" tabindex="0" aria-label="Kruschtel-Ecken für '+esc(w.room)+'"')+'>'+stillLife(seed(i),f,{label:w.room,room:rid(w),dim:st==='lock',uid:'g'+i}).svg+'<b>'+esc(w.room)+'</b><span>'+(pa?'<span class="cam">'+CAM+'</span>':'')+(st==='done'?(pa?'':'<span class="shr">Teilen</span> ')+'Erledigt'+(w.out?', '+w.out+' Dinge weg':''):st==='now'?(S.paused?'Pausiert':U().dies):U().one+' '+(i+1))+', '+METHODS[w.method].name+'</span></div>';
+      h+='<div class="cell '+st+'"'+(st==='done'&&pa?' data-alb="'+w.fid+'" role="button" tabindex="0" aria-label="'+esc(w.room)+': Vorher/Nachher ansehen"':st==='done'?' data-share="'+i+'" role="button" tabindex="0" aria-label="'+esc(w.room)+' als Bild teilen"':' data-spots="'+i+'" role="button" tabindex="0" aria-label="Kruschtel-Ecken für '+esc(w.room)+'"')+'>'+stillLife(seed(i),f,{label:w.room,room:rid(w),dim:st==='lock',uid:'g'+i}).svg+'<b>'+esc(w.room)+'</b><span>'+(pa?'<span class="cam">'+CAM+'</span>':'')+(st==='done'?(pa?'':'<span class="shr">Teilen</span> ')+'Erledigt'+(w.out?', '+w.out+' Dinge weg':''):st==='now'?(S.paused?'Pausiert':U().dies):U().one+' '+(i+1))+', '+METHODS[w.method].name+(canSetMethod(S,i)?'<i class="pi" aria-hidden="true"><svg viewBox=\"0 0 24 24\"><path d=\"M4.5 19.5l1-4.2L16 4.8a1.6 1.6 0 0 1 2.3 0l.9.9a1.6 1.6 0 0 1 0 2.3L8.7 18.5z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linejoin=\"round\"/></svg></i>':'')+'</span></div>';
     });
     h+='</div>'+bonsaiBookHTML()+adventBookHTML()+stampBookHTML()+albumHTML();
   }
@@ -1811,7 +1826,7 @@ function renderCal(){
 }
 
 /* ===== Feedback ===== */
-var APP_VERSION='kk-v18';
+var APP_VERSION='kk-v19';
 var FB_TO=['steffen','kiefer'].join('.')+String.fromCharCode(64)+['gmail','com'].join('.');
 var fb={kind:'idee',stars:0,text:'',info:true};
 function fbBody(){
