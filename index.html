@@ -1154,8 +1154,8 @@ function renderWeek(){
   var h='<div class="head2"><div><span class="wk">'+U().one+' '+(i+1)+' von '+S.plan.length+(S.round>1?', Runde '+S.round:'')+'</span><h1 class="room">'+esc(w.room)+'</h1></div><span class="mrow"><button class="meth m-'+w.method+' mbtn" id="mhow" aria-label="So geht '+m.name+'">'+m.name+' <span aria-hidden="true">ⓘ</span></button>'+(canSetMethod(S,i)?'<button class="pen2" id="mpen" aria-label="Methode für diesen Raum ändern"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4.5 19.5l1-4.2L16 4.8a1.6 1.6 0 0 1 2.3 0l.9.9a1.6 1.6 0 0 1 0 2.3L8.7 18.5z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linejoin=\"round\"/><path d=\"M14 6.8l3.2 3.2\" stroke=\"currentColor\" stroke-width=\"1.8\"/></svg></button>':'')+'</span></div>';
   h+='<div class="scene" id="scene">'+scene(i,f)+visitorsHTML()+bonsaiOverlay()+'</div>';
   if(S.paused){
-    h+='<div style="margin-top:14px">'+adventHTML()+'</div><section class="today light" style="margin-top:14px">'+buddyHTML(pick(LINES.pause),'sleepy')+'<p class="tt2">Pausiert seit '+fmtDate(S.paused)+'</p><p class="soft small">Der Plan wartet, deine Haken bleiben.</p><button class="btn" id="resume">Weitermachen</button></section>';
-    $('app').innerHTML=h;bindHow(m);$('resume').onclick=function(){S.paused=null;save();renderWeek();};bindAdvent();$('deerbtn').onclick=function(){say(pick(LINES.pause));};return;
+    h+='<div style="margin-top:14px">'+adventHTML()+'</div><section class="today light" style="margin-top:14px">'+buddyHTML(pick(LINES.pause),'sleepy')+'<p class="tt2">Pausiert seit '+fmtDate(S.paused)+(S.pauseUntil?', bis '+fmtDate(S.pauseUntil):'')+'</p><p class="soft small">Der Plan wartet, deine Haken bleiben. Die Pausentage zählen nicht als „hinterher“.</p>'+(S.pauseUntil?'<button class="btn line" id="pzics2">Erinnerung in den Kalender</button>':'')+'<button class="btn" id="resume">Weitermachen</button></section>';
+    $('app').innerHTML=h;bindHow(m);$('resume').onclick=function(){resumePause();renderWeek();toast('Okaeri! Weiter geht\'s.');};if($('pzics2'))$('pzics2').onclick=function(){download('kruschtel-pause-ende.ics',pauseIcs(S.pauseUntil));};bindAdvent();$('deerbtn').onclick=function(){say(pick(LINES.pause));};return;
   }
   h+='<div id="todaybox" style="margin-top:14px"></div><div id="tipbox"></div>';
   h+='<section class="strip" aria-label="Zähler"><div class="sn"><b id="tw">'+(w.out||0)+'</b><span>weg '+U().inthis+'<br>insgesamt <span id="tt">'+num(totalOut(S))+'</span></span></div><div class="pm"><button id="mbox" class="lst mbb" aria-label="Vielleicht-Kiste'+(mb().items.length?', '+mb().items.length+' drin':'')+'">'+MBOX+(mb().items.length?'<i>'+mb().items.length+'</i>':'')+'</button><button id="togive" class="lst" aria-label="Auf die Abgabe-Liste"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11M4 12h11M4 17h7M18 14v6M15 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button><button id="minus" aria-label="Eins weniger">−</button><button class="plus" id="plus" aria-label="Eins mehr">+1</button></div></section>';
@@ -1188,7 +1188,7 @@ function renderWeek(){
   $('minus').onclick=function(){var b=w.out||0;addOut(S,-1);save();refresh(false);if(w.out<b)carry(-1);};
   $('togive').onclick=function(){addGiveDialog();};
   $('mbox').onclick=function(){maybeDialog();};
-  $('pause').onclick=function(){S.paused=new Date().toISOString();save();window.scrollTo(0,0);renderWeek();};
+  $('pause').onclick=pauseDialog;
   refresh(false);tipBox(0);spotBox();photoBox();wordBox();
   $('app').querySelectorAll('[data-vis]').forEach(function(b){b.onclick=function(){friendDialog(FRIENDS.filter(function(x){return x.id===b.dataset.vis;})[0],false);};});
   checkFriends();
@@ -1293,9 +1293,9 @@ function todayBox(){
   if(weekDone(w)){
     h='<section class="today light">'+bud+'<p class="tt2">'+esc(w.room)+' ist geschafft.</p><button class="btn" id="fin">'+esc(w.room)+' abschließen</button></section>';
   }else if(t.task!=null){
-    h='<section class="today">'+bud+'<div class="tl"><span>Heute dran</span>'+dots(t)+'</div><p class="tt2">'+esc(w.tasks[t.task].t)+'</p>'+(t.late?'<p class="tsub">Etwas hinterher. Kein Problem, einfach weiter.</p>':t.dueLeft>1?'<p class="tsub">Danach noch '+(t.dueLeft-1)+' für heute.</p>':'')+'<button class="btn" id="tdone">Erledigt</button><button class="mini" id="mini5">Wenig Energie? Nur 5 Minuten</button>'+bar+'</section>';
+    h='<section class="today">'+bud+'<div class="tl"><span>Heute dran</span>'+dots(t)+'</div><p class="tt2">'+esc(w.tasks[t.task].t)+'</p>'+(t.late?'<p class="tsub">Etwas hinterher. Kein Problem, einfach weiter.</p>':t.dueLeft>1?'<p class="tsub">Danach noch '+(t.dueLeft-1)+' für heute.</p>':'')+'<button class="btn" id="tdone">Erledigt</button><button class="mini" id="mini5">Wenig Energie? Nur 5 Minuten</button><button class="mini" id="pz">Ein paar Tage Pause einlegen</button>'+bar+'</section>';
   }else{
-    h='<section class="today light">'+bud+'<div class="tl"><span>Für heute geschafft</span>'+dots(t)+'</div><p class="tt2 sm">Morgen: '+esc(w.tasks[t.next].t)+'</p><button class="btn line" id="tmore">Schon jetzt erledigen</button><button class="mini" id="mini5">Noch Lust? 5-Minuten-Einsatz</button>'+bar+'</section>';
+    h='<section class="today light">'+bud+'<div class="tl"><span>Für heute geschafft</span>'+dots(t)+'</div><p class="tt2 sm">Morgen: '+esc(w.tasks[t.next].t)+'</p><button class="btn line" id="tmore">Schon jetzt erledigen</button><button class="mini" id="mini5">Noch Lust? 5-Minuten-Einsatz</button><button class="mini" id="pz">Ein paar Tage Pause einlegen</button>'+bar+'</section>';
   }
   var openG=S.give.filter(function(g){return !g.done;});
   if(furtToday(S)&&openG.length)h='<section class="furt"><h4>Heute ist Furt-Tag!</h4><p>'+openG.length+(openG.length===1?' Ding wartet':' Dinge warten')+' auf die Abgabe: '+openG.slice(0,3).map(function(g){return esc(g.t);}).join(', ')+(openG.length>3?' …':'')+'</p><button class="btn" id="gofurt">Zur Abgabe-Liste</button></section>'+h;
@@ -1313,6 +1313,7 @@ function todayBox(){
   if($('tmore'))$('tmore').onclick=function(){WK.toggle(t.next);};
   if($('fin'))$('fin').onclick=finishWeek;
   if($('mini5'))$('mini5').onclick=function(){fiveMin();};
+  if($('pz'))$('pz').onclick=pauseDialog;
 }
 /* Pinselstrich: beim Abhaken zieht Kurumi einen roten Tuschehaken übers Bild */
 var BRUSH='<svg viewBox="0 0 24 24"><defs><filter id="bfxf" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="0.55" xChannelSelector="R" yChannelSelector="G"/></filter></defs><g filter="url(#bfxf)" fill="none" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--hanko)"><path pathLength="1" stroke-width="2.5" d="M4.6 12.4c1.7.9 3.2 2.5 4.4 4.5 2.7-4.8 5.6-8.3 9.6-11.3"/><path class="p2" pathLength="1" stroke-width=".7" stroke-opacity=".55" d="M10.2 16.1c2.3-3.8 4.8-6.7 7.9-9.2"/><path class="p3" pathLength="1" stroke-width=".9" stroke-opacity=".8" d="M18.5 5.7c.8-.6 1.6-1 2.4-1.3"/></g></svg>';
@@ -1801,6 +1802,32 @@ function bindPlaces(){
 }
 
 /* ===== Kalender ===== */
+/* ===== Pause mit Dauer, Kalender-Erinnerung und Willkommen zurück ===== */
+function pauseDialog(){
+  var opts=[[3,'3 Tage'],[7,'1 Woche'],[14,'2 Wochen'],[0,'Bis ich wiederkomme']];
+  dialog('<div class="center" style="width:90px;margin:0 auto">'+happs(tines(),'sleepy')+'</div><h3 class="center">Pause einlegen</h3><p class="soft small center">Dein Plan wartet, deine Haken bleiben. Die Pausentage zählen nicht als „hinterher“.</p><div class="qty" style="grid-template-columns:1fr 1fr">'+opts.map(function(o){return '<button data-pz="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><button class="btn text" data-close>Doch nicht</button>',function(){
+    $('dlgbox').querySelectorAll('[data-pz]').forEach(function(b){b.onclick=function(){startPause(+b.dataset.pz);};});});
+}
+function startPause(days){var now=kNow();S.paused=now.toISOString();S.pauseUntil=days?new Date(d0(now).getTime()+days*DAY).toISOString():null;save();
+  dialog('<div class="center" style="width:90px;margin:0 auto">'+happs(tines(),'sleepy')+'</div><h3 class="center">Gute Erholung!</h3><p class="center soft">'+(days?'Ich halte bis zum '+fmtDate(S.pauseUntil)+' die Stellung. Soll ich dich dann erinnern?':'Ich halte die Stellung, bis du wiederkommst.')+'</p>'+(days?'<button class="btn" id="pzics">Erinnerung in den Kalender</button>':'')+'<button class="btn '+(days?'line':'')+'" data-close>Fertig</button>',function(){
+    if($('pzics'))$('pzics').onclick=function(){download('kruschtel-pause-ende.ics',pauseIcs(S.pauseUntil));};},function(){window.scrollTo(0,0);render();});}
+function pauseIcs(until){var d=new Date(until);d.setHours(10,0,0,0);var p=function(n){return ('0'+n).slice(-2);},f=function(x){return x.getFullYear()+p(x.getMonth()+1)+p(x.getDate())+'T'+p(x.getHours())+p(x.getMinutes())+'00';},e=new Date(d.getTime()+1800000);
+  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//jazzwalk//Kruschtel-Kaizen//DE','BEGIN:VEVENT','UID:kruschtel-pause-'+Date.now()+'@jazzwalk','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z','DTSTART;TZID=Europe/Berlin:'+f(d),'DTEND;TZID=Europe/Berlin:'+f(e),'SUMMARY:Kruschtel-Kaizen: Kurumi wartet auf dich','DESCRIPTION:Die Pause ist vorbei. Fang ganz sanft mit 5 Minuten an.','URL:'+location.origin+location.pathname,'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:Kruschtel-Kaizen','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');}
+/* Zeitplan des aktuellen Raums um n Tage nach hinten schieben, damit Pausen nicht als „hinterher“ zählen */
+function shiftWeek(n){var w=S.plan[S.week];if(!w||S.finished||n<=0)return;w.startAt=new Date(new Date(w.startAt||S.started).getTime()+n*DAY).toISOString();}
+function resumePause(){if(!S.paused)return;shiftWeek(Math.floor((d0(kNow())-d0(S.paused))/DAY));S.paused=null;S.pauseUntil=null;save();}
+function welcomeDialog(title,text,extra){
+  dialog('<div class="center" style="width:96px;margin:0 auto">'+happs(tines(),'happy')+'</div><h3 class="center">'+title+'</h3><p class="center soft">'+text+'</p><button class="btn" id="wb5">Mit 5 Minuten starten</button><button class="btn line" id="wbgo">Weiter geht\'s</button>'+(extra||''),function(){hop2();
+    $('wb5').onclick=function(){onClose=null;closeDlg();tab='woche';render();if(!S.finished)fiveMin();};
+    $('wbgo').onclick=function(){onClose=null;closeDlg();tab='woche';render();};
+    if($('wbmore'))$('wbmore').onclick=function(){S.paused=S.paused||kNow().toISOString();S.pauseUntil=new Date(d0(kNow()).getTime()+3*DAY).toISOString();save();onClose=null;closeDlg();render();toast('Noch 3 Tage Pause, bis '+fmtDate(S.pauseUntil));};});}
+function checkReturn(){
+  if(!S||draft||!$('dlg').hidden)return;var now=kNow(),last=S.lastSeen?new Date(S.lastSeen):null;S.lastSeen=now.toISOString();save();
+  if(S.paused&&S.pauseUntil&&now>=new Date(S.pauseUntil)){resumePause();
+    welcomeDialog('Okaeri! Schön, dass du wieder da bisch.','Deine Pause ist vorbei, und der Plan hat auf dich gewartet. Magst du ganz sanft anfangen?','<button class="btn text" id="wbmore">Noch 3 Tage Pause</button>');return;}
+  if(!S.paused&&!S.finished&&last){var gap=Math.floor((d0(now)-d0(last))/DAY);if(gap>=5){shiftWeek(gap-1);save();
+    welcomeDialog('Okaeri! Schön, dass du wieder da bisch.','Du warst '+gap+' Tage weg. Kein Problem, ich hab deinen Plan um die Tage verschoben. Nix isch verlore.');}}
+}
 function download(name,txt){try{var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/calendar'}));a.download=name;document.body.appendChild(a);a.click();a.remove();}catch(e){toast('Der Kalender lässt sich hier nicht laden.');}}
 var MON=['Jan.','Feb.','März','Apr.','Mai','Juni','Juli','Aug.','Sep.','Okt.','Nov.','Dez.'],MONL=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 function dm(d){return d.getDate()+'.'+(d.getMonth()+1)+'.';}
@@ -1826,7 +1853,7 @@ function renderCal(){
 }
 
 /* ===== Feedback ===== */
-var APP_VERSION='kk-v19';
+var APP_VERSION='kk-v20';
 var FB_TO=['steffen','kiefer'].join('.')+String.fromCharCode(64)+['gmail','com'].join('.');
 var fb={kind:'idee',stars:0,text:'',info:true};
 function fbBody(){
@@ -1917,7 +1944,7 @@ function render(){
   if(tab==='plan')renderPlan();else if(tab==='kalender')renderCal();else if(tab==='abgabe')renderGive();else if(tab==='mehr')renderMore();else if(tab==='feedback')renderFeedback();else renderWeek();
 }
 document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('[data-bz]');if(t&&S)bonsaiDialog();});
-S=load();render();
+S=load();render();setTimeout(checkReturn,700);document.addEventListener('visibilitychange',function(){if(!document.hidden)setTimeout(checkReturn,300);});
 })();
 </script>
 <script>if('serviceWorker' in navigator&&location.protocol==='https:'){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
